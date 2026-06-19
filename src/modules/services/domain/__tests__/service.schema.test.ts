@@ -5,9 +5,7 @@ import { moneySchema, serviceSchema } from "../service.schema";
 import {
   Currency,
   PaymentType,
-  PaymentTypeType,
   ServiceStatus,
-  ServiceStatusType,
 } from "../service";
 
 const VALID_ID = "11111111-1111-4111-8111-111111111111";
@@ -55,12 +53,12 @@ describe("moneySchema", () => {
     expect(result.success).toBe(false);
   });
 
-  it("rejects zero amount", () => {
+  it("accepts zero amount (free service)", () => {
     const result = moneySchema.safeParse({
       amount: 0,
       currency: Currency.ARS,
     });
-    expect(result.success).toBe(false);
+    expect(result.success).toBe(true);
   });
 
   it("rejects an invalid currency", () => {
@@ -151,6 +149,24 @@ describe("serviceSchema — rejection cases", () => {
       expect(
         result.error.issues.some(
           (i) => i.message === "Deposit is required for DEPOSIT payment type",
+        ),
+      ).toBe(true);
+    }
+  });
+
+  it("rejects DEPOSIT with depositAmount of zero", () => {
+    const result = serviceSchema.safeParse(
+      makeValidService({
+        paymentType: PaymentType.DEPOSIT,
+        price: { amount: 2000, currency: Currency.ARS },
+        depositAmount: { amount: 0, currency: Currency.ARS },
+      }),
+    );
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(
+        result.error.issues.some(
+          (i) => i.message === "Deposit amount must be greater than zero",
         ),
       ).toBe(true);
     }
@@ -253,18 +269,16 @@ describe("serviceSchema — rejection cases", () => {
   });
 
   it("rejects an invalid status", () => {
-    const result = serviceSchema.safeParse(
-      makeValidService({ status: "PAUSED" as unknown as ServiceStatusType }),
-    );
+    // @ts-expect-error - intentionally passing invalid runtime value to test Zod validation
+    const invalid = makeValidService({ status: "PAUSED" });
+    const result = serviceSchema.safeParse(invalid);
     expect(result.success).toBe(false);
   });
 
   it("rejects an invalid paymentType", () => {
-    const result = serviceSchema.safeParse(
-      makeValidService({
-        paymentType: "PARTIAL" as unknown as PaymentTypeType,
-      }),
-    );
+    // @ts-expect-error - intentionally passing invalid runtime value to test Zod validation
+    const invalid = makeValidService({ paymentType: "PARTIAL" });
+    const result = serviceSchema.safeParse(invalid);
     expect(result.success).toBe(false);
   });
 });

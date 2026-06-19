@@ -5,7 +5,7 @@ import { Currency, PaymentType, ServiceStatus } from "./service";
 export const moneySchema = z.object({
   amount: z
     .number()
-    .positive({ error: "Amount must be positive" })
+    .gte(0, { error: "Amount must not be negative" })
     .multipleOf(0.01, { error: "Amount must have at most 2 decimal places" }),
   currency: z.enum([Currency.ARS, Currency.USD]),
 });
@@ -38,15 +38,20 @@ export const serviceSchema = z
     updatedAt: z.date(),
   })
   .superRefine((data, ctx) => {
-    if (
-      data.paymentType === PaymentType.DEPOSIT &&
-      data.depositAmount === undefined
-    ) {
-      ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: "Deposit is required for DEPOSIT payment type",
-        path: ["depositAmount"],
-      });
+    if (data.paymentType === PaymentType.DEPOSIT) {
+      if (data.depositAmount === undefined) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Deposit is required for DEPOSIT payment type",
+          path: ["depositAmount"],
+        });
+      } else if (data.depositAmount.amount <= 0) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Deposit amount must be greater than zero",
+          path: ["depositAmount"],
+        });
+      }
     }
 
     if (
