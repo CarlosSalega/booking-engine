@@ -41,4 +41,5 @@ openspec/changes/tmp
 /public/uploads
 /uploads
 .cache
+.atl/.skill-registry.cache.json
 .turbo

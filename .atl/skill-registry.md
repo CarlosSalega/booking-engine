@@ -8,6 +8,7 @@ Last updated: 2026-06-19
 
 - .opencode/skills
 - /home/charlydev06/.config/opencode/skills
+- /home/charlydev06/.claude/skills
 - /home/charlydev06/.copilot/skills
 
 ## Contract
