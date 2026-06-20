@@ -29,4 +29,14 @@ export const PaymentType = {
 
 export type PaymentTypeType = (typeof PaymentType)[keyof typeof PaymentType];
 
+export const PaymentStatus = {
+  PENDING: "PENDING",
+  PAID: "PAID",
+  FAILED: "FAILED",
+  REFUNDED: "REFUNDED",
+  PARTIALLY_REFUNDED: "PARTIALLY_REFUNDED",
+} as const;
+
+export type PaymentStatusType = (typeof PaymentStatus)[keyof typeof PaymentStatus];
+
 export const DEFAULT_DURATION_MINUTES = 30;
