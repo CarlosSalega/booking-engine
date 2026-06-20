@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import "./globals.css";
 
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -28,6 +29,16 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${fontSans.variable} ${fontMono.variable} antialiased`}>
         <TooltipProvider>{children}</TooltipProvider>
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            style: {
+              background: "hsl(var(--card))",
+              color: "hsl(var(--foreground))",
+              border: "1px solid hsl(var(--border))",
+            },
+          }}
+        />
       </body>
     </html>
   );
