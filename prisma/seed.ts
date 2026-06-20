@@ -66,7 +66,7 @@ async function seedUsers(): Promise<SeedUsers> {
     prisma.user.create({
       data: {
         name: "Ana Administradora",
-        email: "admin@booking.dev",
+        email: "admin@clinica.com",
         role: "ADMIN",
         emailVerified: true,
       },
@@ -74,7 +74,7 @@ async function seedUsers(): Promise<SeedUsers> {
     prisma.user.create({
       data: {
         name: "Sofía Secretaria",
-        email: "secretary@booking.dev",
+        email: "secretaria@clinica.com",
         role: "SECRETARY",
         emailVerified: true,
       },
@@ -82,15 +82,15 @@ async function seedUsers(): Promise<SeedUsers> {
     prisma.user.create({
       data: {
         name: "Dr. Martín García",
-        email: "garcia@booking.dev",
+        email: "dra.garcia@clinica.com",
         role: "PROFESSIONAL",
         emailVerified: true,
       },
     }),
     prisma.user.create({
       data: {
-        name: "Dra. Laura López",
-        email: "lopez@booking.dev",
+        name: "Dr. Carlos Martínez",
+        email: "dr.martinez@clinica.com",
         role: "PROFESSIONAL",
         emailVerified: true,
       },
