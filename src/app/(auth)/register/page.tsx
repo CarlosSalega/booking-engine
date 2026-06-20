@@ -68,7 +68,7 @@ export default function RegisterPage() {
   // On successful registration we land authenticated — bounce to `/`.
   useEffect(() => {
     if (session) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [session, router]);
 

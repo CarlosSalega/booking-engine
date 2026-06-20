@@ -70,7 +70,7 @@ export default function LoginPage() {
   // protected pages but lets them see this page).
   useEffect(() => {
     if (session) {
-      router.replace("/");
+      router.replace("/dashboard");
     }
   }, [session, router]);
 
