@@ -276,7 +276,7 @@ Se pueden mockear:
 
 - Cloudinary
 - Mercado Pago
-- Clerk
+- Better Auth
 - Email
 - Analytics
 

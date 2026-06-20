@@ -198,7 +198,7 @@ Nunca confiar en:
 
 Proveedor:
 
-Clerk
+Better Auth
 
 La autenticación nunca se implementa manualmente.
 
