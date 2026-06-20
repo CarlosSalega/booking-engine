@@ -7,34 +7,19 @@
  * the database. The seed script creates a single organization, so this
  * matches the seeded data exactly.
  *
+ * Auth check is handled by the dashboard layout — by the time this
+ * function runs the user is guaranteed to be signed in.
+ *
  * Cached at the module level for the lifetime of the Node process — the
  * seed data is idempotent and we don't expect organizations to be
  * created at runtime yet.
- *
- * Behavior:
- * - If the request has no session → redirects to /login.
- * - If the database has no organization → throws a clear error
- *   (the operator must run the seed).
- * - Otherwise → returns the cached organizationId.
  */
 
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
-
-import { auth } from "@/core/auth/auth-instance";
 import { prisma } from "@/lib/prisma";
 
 let cachedOrgId: string | null = null;
 
 export async function getOrganizationId(): Promise<string> {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  });
-
-  if (!session?.user) {
-    redirect("/login");
-  }
-
   if (cachedOrgId) {
     return cachedOrgId;
   }
