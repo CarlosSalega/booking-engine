@@ -96,6 +96,8 @@ export default function LoginPage() {
     );
   }
 
+  const hasError = state && !state.success;
+
   return (
     <main className="flex min-h-screen">
       {/* Left panel — branding (hidden on mobile, visible on md+) */}
@@ -130,7 +132,8 @@ export default function LoginPage() {
           </header>
 
           <form action={formAction} className="space-y-5" noValidate>
-            <div className="space-y-2">
+            {/* Email field */}
+            <div className="space-y-1.5">
               <label
                 htmlFor="email"
                 className="text-sm font-medium text-foreground"
@@ -145,12 +148,25 @@ export default function LoginPage() {
                   type="email"
                   autoComplete="email"
                   required
-                  className="flex h-10 w-full rounded-lg border border-input bg-background py-2 pl-10 pr-3 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className={`flex h-10 w-full rounded-lg border bg-background py-2 pl-10 pr-3 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    hasError
+                      ? "border-destructive focus-visible:ring-destructive/30"
+                      : "border-input"
+                  }`}
                 />
+              </div>
+              {/* Reserved error space */}
+              <div className="min-h-[1.25rem]">
+                {hasError ? (
+                  <p className="text-xs text-destructive">
+                    {state.error}
+                  </p>
+                ) : null}
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* Password field */}
+            <div className="space-y-1.5">
               <label
                 htmlFor="password"
                 className="text-sm font-medium text-foreground"
@@ -165,19 +181,22 @@ export default function LoginPage() {
                   type="password"
                   autoComplete="current-password"
                   required
-                  className="flex h-10 w-full rounded-lg border border-input bg-background py-2 pl-10 pr-3 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50"
+                  className={`flex h-10 w-full rounded-lg border bg-background py-2 pl-10 pr-3 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 ${
+                    hasError
+                      ? "border-destructive focus-visible:ring-destructive/30"
+                      : "border-input"
+                  }`}
                 />
               </div>
+              {/* Reserved error space */}
+              <div className="min-h-[1.25rem]">
+                {hasError ? (
+                  <p className="text-xs text-destructive">
+                    {state.error}
+                  </p>
+                ) : null}
+              </div>
             </div>
-
-            {state && !state.success ? (
-              <p
-                role="alert"
-                className="rounded-md border border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
-              >
-                {state.error}
-              </p>
-            ) : null}
 
             <Button
               type="submit"

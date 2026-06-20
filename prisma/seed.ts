@@ -23,7 +23,7 @@ const prisma = new PrismaClient({
 const ORG_ID = "00000000-0000-4000-8000-000000000001";
 
 const PASSWORD_HASH =
-  "$2b$10$UvRArBxqPaxfzQQnj5iB7eh03/HUY/Cw5gA287y9q7gGhfxHBQQzq"; // password123
+  "a70492f2b0e8683f2487243105c2634d:80af416fe3111ed6cf659c96470b0b849d51207daf922f7d0a6f7f0beff8267da1fbfcc16c8ab3f0cf05c45f1b791fbe1815bcfb3ad48adbfbb6d852b0980839"; // password123 (scrypt N=16384 r=16 p=1 dkLen=64)
 
 async function cleanDatabase(): Promise<void> {
   // Order matters: delete children before parents to satisfy FK constraints.
