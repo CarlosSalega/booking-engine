@@ -22,18 +22,24 @@ Nunca confiar únicamente en el frontend.
 
 Proveedor:
 
-- Clerk
+- Better Auth
 
 La aplicación no implementa autenticación propia.
 
-Características requeridas:
+Better Auth es responsable de:
 
 - Login seguro
 - Password hashing
-- OAuth
-- Email Verification
-- Multi-Factor Authentication (futuro)
+- Sesiones httpOnly
+- Email Verification (opcional MVP)
+- Recuperación de contraseña
 - Session Management
+
+Futuro:
+
+- OAuth
+- Multi-Factor Authentication
+- Passkeys
 
 ---
 
@@ -66,20 +72,14 @@ Actualmente:
 ```text
 ADMIN
 
+SECRETARY
+
 PROFESSIONAL
 
 PATIENT
 ```
 
-Preparado para:
-
-```text
-ASSISTANT
-
-SUPER_ADMIN
-
-STAFF
-```
+Preparado para roles futuros según necesidad del negocio.
 
 ---
 
@@ -187,11 +187,9 @@ Ejemplos:
 ```text
 DATABASE_URL
 
-CLERK_SECRET_KEY
+BETTER_AUTH_SECRET
 
-CLERK_PUBLISHABLE_KEY
-
-NEXTAUTH_SECRET
+BETTER_AUTH_URL
 
 CLOUDINARY_API_SECRET
 
@@ -213,7 +211,7 @@ NEXT_PUBLIC_
 Ejemplo:
 
 ```text
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+NEXT_PUBLIC_APP_URL
 ```
 
 Nunca utilizar este prefijo para secretos.
@@ -353,7 +351,7 @@ Actualizar periódicamente:
 - Next.js
 - React
 - Prisma
-- Clerk
+- Better Auth
 - Zod
 - Tailwind
 

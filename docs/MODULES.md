@@ -656,7 +656,7 @@ config/
 
 Responsabilidades
 
-- Clerk
+- Better Auth
 - Prisma
 - RBAC
 - configuración
@@ -698,7 +698,7 @@ Domain
 
 ❌ Cloudinary
 
-❌ Clerk
+❌ Better Auth
 
 ❌ Stripe
 

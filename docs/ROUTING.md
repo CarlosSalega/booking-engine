@@ -182,7 +182,7 @@ forgot-password
 verify-email
 ```
 
-Todas gestionadas por Clerk.
+Todas gestionadas por Better Auth.
 
 ---
 
@@ -400,7 +400,7 @@ Incluye:
 
 - Providers
 - Theme
-- ClerkProvider
+- AuthProvider
 - Toasts
 - Fonts
 - Metadata
