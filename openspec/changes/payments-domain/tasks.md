@@ -34,15 +34,15 @@ Chain strategy: feature-branch-chain
 
 ## Phase 2: Validation Schemas (RED → GREEN, strict TDD)
 
-- [ ] 2.1 RED: Write `src/modules/payments/domain/__tests__/payment.schema.test.ts` — valid parses, invalid enum values, negative amounts, missing UUIDs, default `retryCount=0`, optional `parentPaymentId`, barrel re-exports
-- [ ] 2.2 GREEN: Create `src/modules/payments/domain/payment.schema.ts` — `providerPaymentSchema` + `paymentSchema` using `z.enum(Object.values(const) as [string, ...string[]])`, `.positive()`, `.int().nonnegative()`, `.optional()`
-- [ ] 2.3 Verify: `pnpm test payment.schema.test.ts` — 12 tests green
+- [x] 2.1 RED: Write `src/modules/payments/domain/__tests__/payment.schema.test.ts` — valid parses, invalid enum values, negative amounts, missing UUIDs, default `retryCount=0`, optional `parentPaymentId`, barrel re-exports
+- [x] 2.2 GREEN: Create `src/modules/payments/domain/payment.schema.ts` — `providerPaymentSchema` + `paymentSchema` using `z.enum(Object.values(const) as [string, ...string[]])`, `.positive()`, `.int().nonnegative()`, `.optional()` (English validation messages per project convention)
+- [x] 2.3 Verify: `pnpm test payment.schema.test.ts` — 18 tests green
 
 ## Phase 3: Module-Wide Verification
 
-- [ ] 3.1 Run `pnpm test` — 139 existing + 29 new = ~168 tests pass (zero regressions)
-- [ ] 3.2 Run `pnpm type-check` — strict mode passes, no `any`, no type errors
-- [ ] 3.3 Run `pnpm lint` — no warnings on new files
-- [ ] 3.4 Verify domain isolation: `readFileSync` asserts no imports from `next/*`, `react`, or `@prisma/client`
-- [ ] 3.5 Verify cross-module read-only deps: `PaymentStatus`, `PaymentType` from `@/modules/services/domain` resolve cleanly
-- [ ] 3.6 Verify barrel import: `import { paymentSchema, ProviderPaymentStatus } from "@/modules/payments"` resolves
+- [x] 3.1 Run `pnpm test` — 139 existing + 42 new = 181 tests pass (zero regressions)
+- [x] 3.2 Run `pnpm type-check` — strict mode passes, no `any`, no type errors
+- [x] 3.3 Run `pnpm lint` — no warnings on new files
+- [x] 3.4 Verify domain isolation: `readFileSync` asserts no imports from `next/*`, `react`, or `@prisma/client`
+- [x] 3.5 Verify cross-module read-only deps: `PaymentStatus`, `PaymentType` from `@/modules/services/domain` resolve cleanly
+- [x] 3.6 Verify barrel import: `import { paymentSchema, ProviderPaymentStatus } from "@/modules/payments"` resolves
