@@ -1,51 +1,46 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { GalleryVerticalEnd, Mail, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { Button } from "@/components/ui/button";
-import { login } from "@/modules/auth/actions";
-import { type AuthResult } from "@/modules/auth/types";
-import { type LoginSession } from "@/modules/auth/types";
+import { createAuthClient } from "@/core/auth/auth-client";
 
-type LoginState = AuthResult<LoginSession> | null;
-
-async function loginAction(
-  _prev: LoginState,
-  formData: FormData,
-): Promise<LoginState> {
-  const input = {
-    email: formData.get("email")?.toString() ?? "",
-    password: formData.get("password")?.toString() ?? "",
-  };
-  return login(input);
-}
+const authClient = createAuthClient();
 
 export function LoginForm() {
   const router = useRouter();
-  const [state, formAction, isSubmitting] = useActionState<LoginState, FormData>(
-    loginAction,
-    null,
-  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!state) return;
-    if (state.success) {
-      toast.success("¡Bienvenido! Redirigiendo…");
-      router.replace("/dashboard");
-    } else {
-      toast.error(state.error ?? "Error al iniciar sesión");
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError(null);
+
+    const formData = new FormData(e.currentTarget);
+    const email = formData.get("email")?.toString() ?? "";
+    const password = formData.get("password")?.toString() ?? "";
+
+    const result = await authClient.signIn.email({ email, password });
+
+    if (result.error) {
+      setError("Credenciales inválidas");
+      toast.error("Credenciales inválidas");
+      setIsSubmitting(false);
+      return;
     }
-  }, [state, router]);
 
-  const hasError = state && !state.success;
+    toast.success("¡Bienvenido! Redirigiendo…");
+    router.replace("/dashboard");
+  }
 
   return (
     <main className="flex min-h-screen">
-      {/* Left panel — branding (hidden on mobile, visible on md+) */}
+      {/* Left panel — branding */}
       <div className="relative hidden w-1/2 bg-primary md:flex md:items-center md:justify-center md:p-12">
         <div className="absolute inset-0 bg-black/10" />
         <div className="relative z-10 mx-auto max-w-md space-y-4 text-center text-primary-foreground">
@@ -75,7 +70,7 @@ export function LoginForm() {
             </p>
           </header>
 
-          <form action={formAction} className="space-y-5" noValidate>
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             <div className="space-y-1.5">
               <label htmlFor="email" className="text-sm font-medium text-foreground">
                 Email
@@ -89,12 +84,12 @@ export function LoginForm() {
                   autoComplete="email"
                   required
                   className={`flex h-10 w-full rounded-lg border bg-background py-2 pl-10 pr-3 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 ${
-                    hasError ? "border-destructive focus-visible:ring-destructive/30" : "border-input"
+                    error ? "border-destructive focus-visible:ring-destructive/30" : "border-input"
                   }`}
                 />
               </div>
               <div className="min-h-[1.25rem]">
-                {hasError ? <p className="text-xs text-destructive">{state.error}</p> : null}
+                {error ? <p className="text-xs text-destructive">{error}</p> : null}
               </div>
             </div>
 
@@ -111,12 +106,12 @@ export function LoginForm() {
                   autoComplete="current-password"
                   required
                   className={`flex h-10 w-full rounded-lg border bg-background py-2 pl-10 pr-3 text-sm shadow-xs transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50 ${
-                    hasError ? "border-destructive focus-visible:ring-destructive/30" : "border-input"
+                    error ? "border-destructive focus-visible:ring-destructive/30" : "border-input"
                   }`}
                 />
               </div>
               <div className="min-h-[1.25rem]">
-                {hasError ? <p className="text-xs text-destructive">{state.error}</p> : null}
+                {error ? <p className="text-xs text-destructive">{error}</p> : null}
               </div>
             </div>
 
