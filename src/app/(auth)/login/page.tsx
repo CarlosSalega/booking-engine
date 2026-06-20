@@ -52,16 +52,20 @@ export default function LoginPage() {
     null,
   );
 
-  // Surface the Server Action outcome as a toast. We key on the
-  // state reference so the same result is never toasted twice.
+  // Surface the Server Action outcome as a toast and redirect on success.
+  // We redirect here (instead of waiting for useSession to update) because
+  // the session cookie is set by the Server Action response but the reactive
+  // session store only refreshes on the next client-side navigation or
+  // explicit refetch — not immediately after the form submits.
   useEffect(() => {
     if (!state) return;
     if (state.success) {
       toast.success("¡Bienvenido! Redirigiendo…");
+      router.replace("/dashboard");
     } else {
       toast.error(state.error ?? "Error al iniciar sesión");
     }
-  }, [state]);
+  }, [state, router]);
 
   // Bounce authenticated users back to the dashboard as soon as we know
   // they have a session. The visible "already signed in" card stays

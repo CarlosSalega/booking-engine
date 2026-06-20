@@ -55,15 +55,16 @@ export default function RegisterPage() {
   );
   const [password, setPassword] = useState("");
 
-  // Surface the Server Action outcome as a toast.
+  // Surface the Server Action outcome as a toast and redirect on success.
   useEffect(() => {
     if (!state) return;
     if (state.success) {
       toast.success("¡Cuenta creada! Redirigiendo…");
+      router.replace("/dashboard");
     } else {
       toast.error(state.error ?? "Error al crear la cuenta");
     }
-  }, [state]);
+  }, [state, router]);
 
   // On successful registration we land authenticated — bounce to `/`.
   useEffect(() => {
