@@ -153,6 +153,16 @@ describe("paymentSchema", () => {
     expect(result.success).toBe(false);
   });
 
+  it("rejects a non-UUID organizationId", () => {
+    const result = paymentSchema.safeParse({
+      organizationId: "not-a-valid-uuid",
+      bookingId: VALID_BOOKING_ID,
+      provider: PaymentProvider.MERCADOPAGO,
+      amount: 2000,
+    });
+    expect(result.success).toBe(false);
+  });
+
   it("accepts preferenceId when present", () => {
     const result = paymentSchema.safeParse({
       organizationId: VALID_ORG_ID,

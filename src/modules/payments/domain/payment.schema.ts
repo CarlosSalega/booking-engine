@@ -16,7 +16,7 @@ export const providerPaymentSchema = z.object({
 });
 
 export const paymentSchema = z.object({
-  organizationId: z.string(),
+  organizationId: z.string().uuid("Organization ID must be a valid UUID"),
   bookingId: z.string().uuid("Booking ID must be a valid UUID"),
   provider: z.enum(
     Object.values(PaymentProvider) as [string, ...string[]],
