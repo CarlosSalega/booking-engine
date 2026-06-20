@@ -3,18 +3,52 @@ schema: spec-driven
 # Project context (optional)
 # This is shown to AI when creating artifacts.
 # Add your tech stack, conventions, style guides, domain knowledge, etc.
-# Example:
-#   context: |
-#     Tech stack: TypeScript, React, Node.js
-#     We use conventional commits
-#     Domain: e-commerce platform
+context: |
+  Tech stack: Next.js 16 (App Router), React 19, TypeScript 5.9, Prisma 7 (PostgreSQL)
+  Auth: Better Auth v1.6.19 with prisma-adapter
+  Validation: Zod 4
+  UI: shadcn/ui (Radix UI 1.6), Tailwind CSS 4, React Hook Form, react-hot-toast
+  Architecture: Feature-Based Modular with Clean Architecture (domain/application/infrastructure/presentation layers)
+  Testing: Vitest 4 + React Testing Library + jsdom
+  Domain: Booking engine for healthcare professionals
+  Conventions: Domain-first, Server-first (Server Components + Server Actions), RBAC, repositories pattern, DTOs
+
+# Strict TDD mode — enabled because test runner is present
+# When true, every change must start with tests before implementation code
+strict_tdd: true
+
+# Testing capabilities — detected during sdd-init
+testing:
+  runner:
+    command: "pnpm test"
+    framework: vitest 4.1.9
+    watch: "pnpm test:watch"
+    coverage: "pnpm test:coverage"
+  layers:
+    unit: vitest
+    integration: vitest
+    e2e: not-deployed
+  coverage:
+    available: true
+    command: "vitest run --coverage"
+    provider: v8
+  quality:
+    linter: "pnpm lint" (eslint 9 + next configs)
+    type_checker: "pnpm type-check" (tsc --noEmit)
+    formatter: Prettier 3.8 (prettier-plugin-tailwindcss)
 
 # Per-artifact rules (optional)
 # Add custom rules for specific artifacts.
-# Example:
-#   rules:
-#     proposal:
-#       - Keep proposals under 500 words
-#       - Always include a "Non-goals" section
-#     tasks:
-#       - Break tasks into chunks of max 2 hours
+rules:
+  proposal:
+    - Keep proposals scoped to a single domain change
+    - Always include a "Non-goals" section
+  spec:
+    - Every spec must define at minimum: intent, requirements, scenarios
+    - Scenarios must cover happy path, validation errors, and edge cases
+  tasks:
+    - Break tasks into chunks of max 2 hours
+    - Each task must include test files alongside implementation
+  verify:
+    - All tests must pass before verification is complete
+    - Coverage should meet minimum thresholds
