@@ -22,8 +22,8 @@ const prisma = new PrismaClient({
 
 const ORG_ID = "00000000-0000-4000-8000-000000000001";
 
-const PASSWORD_PLACEHOLDER =
-  "seed-placeholder-do-not-use-in-prod:$2a$10$mockhashforseedonly00000000000000000000";
+const PASSWORD_HASH =
+  "$2b$10$UvRArBxqPaxfzQQnj5iB7eh03/HUY/Cw5gA287y9q7gGhfxHBQQzq"; // password123
 
 async function cleanDatabase(): Promise<void> {
   // Order matters: delete children before parents to satisfy FK constraints.
@@ -145,7 +145,7 @@ async function seedUsers(): Promise<SeedUsers> {
       accountId: u.id,
       providerId: "credential",
       userId: u.id,
-      password: PASSWORD_PLACEHOLDER,
+      password: PASSWORD_HASH,
     })),
   });
 
