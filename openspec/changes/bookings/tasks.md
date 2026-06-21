@@ -67,16 +67,16 @@ Verify: `pnpm test && pnpm type-check`. Depends on PR #1 (data fns, `Patient?` t
 
 Verify: `pnpm test && pnpm type-check` + manual filter check. Depends on PR #1, #2.
 
-- [ ] 3.1 [UTILS] `presentation/formatters.ts` — `formatBookingDate`, `formatBookingTime` (es-AR Intl)
-- [ ] 3.2 [C] `components/bookings/booking-status-badge.tsx` — status-tone map
-- [ ] 3.3 [C] `components/bookings/booking-payment-badge.tsx` — NONE/DEPOSIT/FULL
-- [ ] 3.4 [C] `components/bookings/booking-empty-state.tsx`
-- [ ] 3.5 [C] `components/bookings/booking-table-skeleton.tsx`
-- [ ] 3.6 [C] `components/bookings/booking-search-bar.tsx` — URL `?search=`
-- [ ] 3.7 [C] `components/bookings/booking-filters.tsx` — status+prof+service+date range → URL
-- [ ] 3.8 [C] `components/bookings/booking-table.tsx` — Table+Badges, row→detail
-- [ ] 3.9 [PAGE] `app/(dashboard)/bookings/page.tsx` — Server, `getOrganizationId`+session → searchParams → `BookingsTableDataWrapper` (Suspense) → Table+Filters+SearchBar (mirror `dashboard/page.tsx`)
-- [ ] 3.10 [V] Manual: `status=CONFIRMED`; PROFESSIONAL sees own
+- [x] 3.1 [UTILS] `presentation/formatters.ts` — `formatBookingDate`, `formatBookingTime` (es-AR Intl)
+- [x] 3.2 [C] `components/bookings/booking-status-badge.tsx` — status-tone map
+- [x] 3.3 [C] `components/bookings/booking-payment-badge.tsx` — NONE/DEPOSIT/FULL
+- [x] 3.4 [C] `components/bookings/booking-empty-state.tsx`
+- [x] 3.5 [C] `components/bookings/booking-table-skeleton.tsx`
+- [x] 3.6 [C] `components/bookings/booking-search-bar.tsx` — URL `?search=`
+- [x] 3.7 [C] `components/bookings/booking-filters.tsx` — status+prof+service+date range → URL
+- [x] 3.8 [C] `components/bookings/booking-table.tsx` — Table+Badges, row→detail
+- [x] 3.9 [PAGE] `app/(dashboard)/dashboard/bookings/page.tsx` — Server, `getOrganizationId`+session → searchParams → `BookingsTableDataWrapper` (Suspense) → Table+Filters+SearchBar (mirror `dashboard/page.tsx`)
+- [x] 3.10 [V] Manual: `status=CONFIRMED`; PROFESSIONAL sees own
 
 ## Phase 4: PR #4 — Detail Page
 
