@@ -149,8 +149,8 @@ model Service {
 model Booking {
   id             String       @id @default(uuid())
   organizationId String
-  patientId      String
-  patient        Patient      @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  patientId      String?
+  patient        Patient?     @relation(fields: [patientId], references: [id], onDelete: SetNull, onUpdate: Cascade)
   professionalId String
   professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
   serviceId      String

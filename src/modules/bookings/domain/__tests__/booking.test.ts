@@ -217,6 +217,35 @@ describe("bookingSchema", () => {
     expect(result.success).toBe(true);
   });
 
+  it("parses a guest booking with patientId omitted (optional patient)", () => {
+    const input = makeValidBooking();
+    delete (input as { patientId?: string }).patientId;
+    const result = bookingSchema.safeParse(input);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.patientId).toBeUndefined();
+    }
+  });
+
+  it("parses a guest booking with patientId explicitly null", () => {
+    const input = makeValidBooking();
+    const result = bookingSchema.safeParse({ ...input, patientId: null });
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.patientId).toBeNull();
+    }
+  });
+
+  it("rejects an invalid UUID on the patientId field when provided", () => {
+    const input = makeValidBooking({ patientId: "not-a-uuid" });
+    const result = bookingSchema.safeParse(input);
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find((i) => i.path[0] === "patientId");
+      expect(issue?.message).toBe("Invalid UUID");
+    }
+  });
+
   it("rejects an invalid UUID on the id field", () => {
     const input = makeValidBooking({ id: "not-a-uuid" });
     const result = bookingSchema.safeParse(input);
@@ -288,6 +317,19 @@ describe("bookingDataSchema", () => {
       // Type-level: BookingData must NOT carry id/createdAt/updatedAt
       const sample: BookingData = result.data;
       expect(sample).toBeDefined();
+    }
+  });
+
+  it("accepts a guest payload (patientId omitted)", () => {
+    const { id, createdAt, updatedAt, patientId, ...payload } = makeValidBooking();
+    void id;
+    void createdAt;
+    void updatedAt;
+    void patientId;
+    const result = bookingDataSchema.safeParse(payload);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.patientId).toBeUndefined();
     }
   });
 

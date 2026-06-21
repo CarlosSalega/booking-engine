@@ -220,7 +220,7 @@ export async function getRecentActivity(
     ...recentBookings.map((b) => ({
       id: b.id,
       type: "booking" as const,
-      description: `Reserva de ${b.patient.user.name} — ${b.service.name}`,
+      description: `Reserva de ${b.patient ? b.patient.user.name : "Invitado"} — ${b.service.name}`,
       timestamp: b.createdAt,
     })),
     ...recentPayments.map((p) => ({

@@ -158,7 +158,7 @@ describe("getTodayBookings", () => {
 
     expect(result).toHaveLength(1);
     expect(result[0]?.service.name).toBe("Limpieza Dental");
-    expect(result[0]?.patient.user.name).toBe("Juan Pérez");
+    expect(result[0]?.patient?.user.name).toBe("Juan Pérez");
     expect(result[0]?.professional.user.name).toBe("Dr. García");
 
     const callArgs = prismaMock.booking.findMany.mock.calls[0]?.[0];

@@ -404,13 +404,14 @@ async function seedBookings(
   // 20 bookings spread across ±7 days. Status mix:
   //   - past: COMPLETED, NO_SHOW, CANCELLED
   //   - present/future: CONFIRMED, PENDING, AWAITING_PAYMENT
+  // Plus 2 guest bookings (patientId: null) for development testing.
   type Spec = {
     key: string;
     days: number;
     hour: number;
     minute?: number;
     durationMinutes: number;
-    patientId: string;
+    patientId: string | null;
     professionalId: string;
     serviceId: string;
     status: string;
@@ -623,6 +624,29 @@ async function seedBookings(
       serviceId: services.implanteConsulta,
       status: "PENDING",
     },
+    // --- Guest bookings (patientId: null) ---
+    {
+      key: "b-guest-consulta-pending",
+      days: 4,
+      hour: 13,
+      durationMinutes: 30,
+      patientId: null,
+      professionalId: professionals.drGarcia,
+      serviceId: services.consultaGeneral,
+      status: "PENDING",
+      notes: "Invitado: María Gómez | Tel: 351-9876543 | Email: maria.gomez@email.com",
+    },
+    {
+      key: "b-guest-urgencia-confirmed",
+      days: 6,
+      hour: 18,
+      durationMinutes: 30,
+      patientId: null,
+      professionalId: professionals.draLopez,
+      serviceId: services.implanteConsulta,
+      status: "CONFIRMED",
+      notes: "Invitado: Roberto Silva | Tel: 351-5551234 | Email: roberto.silva@email.com",
+    },
   ];
 
   const byKey: Record<string, string> = {};
@@ -802,8 +826,8 @@ async function main(): Promise<void> {
   const services = await seedServices(professionals);
   console.log("  - seeded 8 services");
 
-  const bookings = await seedBookings(patients, professionals, services);
-  console.log("  - seeded 20 bookings (past + today + future)");
+  const bookings =   await seedBookings(patients, professionals, services);
+  console.log("  - seeded 22 bookings (20 + 2 guest bookings)");
 
   await seedPayments(bookings);
   console.log("  - seeded payments (FULL + DEPOSIT parent/child)");

@@ -12,7 +12,9 @@ export const timeSlotSchema = z.object({
 export const bookingSchema = z.object({
   id: z.uuid({ error: "Invalid UUID" }),
   organizationId: z.uuid({ error: "Invalid UUID" }),
-  patientId: z.uuid({ error: "Invalid UUID" }),
+  patientId: z
+    .uuid({ error: "Invalid UUID" })
+    .nullish(),
   professionalId: z.uuid({ error: "Invalid UUID" }),
   serviceId: z.uuid({ error: "Invalid UUID" }),
   startTime: z.date(),

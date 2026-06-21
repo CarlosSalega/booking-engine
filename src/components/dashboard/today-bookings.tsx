@@ -84,10 +84,10 @@ export async function TodayBookings({ organizationId }: TodayBookingsProps) {
                   </TableCell>
                   <TableCell>
                     <div className="font-medium">
-                      {booking.patient.user.name}
+                      {booking.patient ? booking.patient.user.name : "Invitado"}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {booking.patient.user.email}
+                      {booking.patient ? booking.patient.user.email : "Sin paciente registrado"}
                     </div>
                   </TableCell>
                   <TableCell className="hidden sm:table-cell">

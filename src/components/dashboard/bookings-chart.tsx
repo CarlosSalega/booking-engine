@@ -37,7 +37,9 @@ function dayLabel(yyyymmdd: string): string {
   // yyyymmdd is "YYYY-MM-DD" (UTC). Parse to a Date in UTC and format in es-AR.
   const [yearStr, monthStr, dayStr] = yyyymmdd.split("-");
   if (!yearStr || !monthStr || !dayStr) return yyyymmdd;
-  const d = new Date(Date.UTC(Number(yearStr), Number(monthStr) - 1, Number(dayStr)));
+  const d = new Date(
+    Date.UTC(Number(yearStr), Number(monthStr) - 1, Number(dayStr)),
+  );
   return new Intl.DateTimeFormat("es-AR", {
     weekday: "short",
     day: "2-digit",
@@ -59,12 +61,10 @@ export function BookingsChart({ data }: BookingsChartProps) {
     <Card>
       <CardHeader>
         <CardTitle>Reservas por día</CardTitle>
-        <CardDescription>
-          Turnos creados en los últimos 7 días.
-        </CardDescription>
+        <CardDescription>Turnos creados en los últimos 7 días.</CardDescription>
       </CardHeader>
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[260px] w-full">
+        <ChartContainer config={chartConfig} className="h-65 w-full">
           <BarChart
             data={display}
             margin={{ left: 12, right: 12, top: 8, bottom: 8 }}
