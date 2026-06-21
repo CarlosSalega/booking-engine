@@ -82,10 +82,10 @@ Verify: `pnpm test && pnpm type-check` + manual filter check. Depends on PR #1, 
 
 Verify: `pnpm test && pnpm type-check` + manual action flow. Depends on PR #1, #2.
 
-- [ ] 4.1 [C] `components/bookings/booking-detail.tsx` — header+info (reuse `formatCurrency` from dashboard)
-- [ ] 4.2 [C] `components/bookings/booking-detail-actions.tsx` — buttons gated by `canTransition`+role; call action with `id,updatedAt`
-- [ ] 4.3 [PAGE] `app/(dashboard)/bookings/[id]/page.tsx` — `getBookingById` → `notFound()`; PROFESSIONAL own-only
-- [ ] 4.4 [V] Manual: confirm/cancel/complete/no-show/reschedule; P2025 toast
+- [x] 4.1 [C] `components/bookings/booking-detail.tsx` — header+info (reuse `formatCurrency` from dashboard)
+- [x] 4.2 [C] `components/bookings/booking-detail-actions.tsx` — buttons gated by `canTransition`+role; call action with `id,updatedAt`
+- [x] 4.3 [PAGE] `app/(dashboard)/bookings/[id]/page.tsx` — `getBookingById` → `notFound()`; PROFESSIONAL own-only
+- [x] 4.4 [V] Manual: confirm/cancel/complete/no-show/reschedule; P2025 toast
 
 ## Phase 5: PR #5 — Creation Wizard
 
