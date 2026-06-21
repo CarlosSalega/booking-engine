@@ -91,16 +91,16 @@ Verify: `pnpm test && pnpm type-check` + manual action flow. Depends on PR #1, #
 
 Verify: `pnpm test && pnpm type-check` + full + guest flow. Depends on PR #1, #2.
 
-- [ ] 5.1 [STORE] `presentation/wizard-store.ts` — Zustand 5, 11 setters+step nav+`reset`; no `persist`
-- [ ] 5.2 [RED] `presentation/__tests__/wizard-store.test.ts` — step bounds, `setService` resets downstream, `reset` returns initial
-- [ ] 5.3 [GREEN] Refactor if needed
-- [ ] 5.4 [C] `wizard/wizard-progress.tsx` — 6 step dots
-- [ ] 5.5 [C] `wizard/wizard-navigation.tsx` — prev/next with per-step validation
-- [ ] 5.6 [C] `wizard/wizard-step-service.tsx` — service cards (`getServices`)
-- [ ] 5.7 [C] `wizard/wizard-step-professional.tsx` — filtered by `serviceId`
-- [ ] 5.8 [C] `wizard/wizard-step-schedule.tsx` — date picker+slot grid (`getAvailableSlots`)
-- [ ] 5.9 [C] `wizard/wizard-step-customer.tsx` — debounced `getPatients` OR guest form
-- [ ] 5.10 [C] `wizard/wizard-step-payment.tsx` — placeholder, reads `service.paymentType`
-- [ ] 5.11 [C] `wizard/wizard-step-confirm.tsx` — summary + "Confirmar Turno" → `createBooking` → redirect
-- [ ] 5.12 [PAGE] `app/(dashboard)/bookings/new/page.tsx` — Client, `useEffect: store.reset()` on mount, render step by `currentStep`
-- [ ] 5.13 [V] Manual: full 6-step + guest + cancel mid-wizard resets
+- [x] 5.1 [STORE] `presentation/wizard-store.ts` — Zustand 5, 11 setters+step nav+`reset`; no `persist`
+- [x] 5.2 [RED] `presentation/__tests__/wizard-store.test.ts` — step bounds, `setService` resets downstream, `reset` returns initial
+- [x] 5.3 [GREEN] Refactor if needed
+- [x] 5.4 [C] `wizard/wizard-progress.tsx` — 6 step dots
+- [x] 5.5 [C] `wizard/wizard-navigation.tsx` — prev/next with per-step validation
+- [x] 5.6 [C] `wizard/wizard-step-service.tsx` — service cards (`getServices`)
+- [x] 5.7 [C] `wizard/wizard-step-professional.tsx` — filtered by `serviceId`
+- [x] 5.8 [C] `wizard/wizard-step-schedule.tsx` — date picker+slot grid (`getAvailableSlots`)
+- [x] 5.9 [C] `wizard/wizard-step-customer.tsx` — debounced `getPatients` OR guest form
+- [x] 5.10 [C] `wizard/wizard-step-payment.tsx` — placeholder, reads `service.paymentType`
+- [x] 5.11 [C] `wizard/wizard-step-confirm.tsx` — summary + "Confirmar Turno" → `createBooking` → redirect
+- [x] 5.12 [PAGE] `app/(dashboard)/bookings/new/page.tsx` — Client, `useEffect: store.reset()` on mount, render step by `currentStep`
+- [x] 5.13 [V] Manual: full 6-step + guest + cancel mid-wizard resets

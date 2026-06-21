@@ -11,6 +11,12 @@ export { confirmBooking } from "./confirm-booking.action";
 export { createBooking } from "./create-booking.action";
 export { markNoShow } from "./mark-no-show.action";
 export { rescheduleBooking } from "./reschedule-booking.action";
+export {
+  getAvailableSlotsForWizard,
+  getPatientsForWizard,
+  getProfessionalsForWizard,
+  getServicesForWizard,
+} from "./wizard-data.action";
 
 export {
   type BookingError,
