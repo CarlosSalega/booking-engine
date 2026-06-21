@@ -47,21 +47,21 @@ Verify: `pnpm test && pnpm type-check && pnpm prisma migrate dev && pnpm db:seed
 
 Verify: `pnpm test && pnpm type-check`. Depends on PR #1 (data fns, `Patient?` type).
 
-- [ ] 2.1 [TYPES] `actions/booking-actions.types.ts` — `BookingResult<T>`, 6 `*Input` types
-- [ ] 2.2 [RED] `actions/__tests__/booking-actions.schema.test.ts` — 6 schemas: happy+invalid
-- [ ] 2.3 [GREEN] `actions/booking-actions.schema.ts` — 6 Zod 4 schemas (`z.uuid().optional()`, `error:` param)
-- [ ] 2.4 [RED] `actions/__tests__/create-booking.test.ts` — mock prisma+auth+headers; success, overlap, guest, invalid, PROFESSIONAL foreign-id
-- [ ] 2.5 [GREEN] `actions/create-booking.action.ts` — `"use server"` → Zod → session → `getOrganizationId` → RBAC → `$transaction(overlap+insert)` → guest into `notes` → `revalidatePath` → `BookingResult<Booking>`
-- [ ] 2.6 [RED] `actions/__tests__/confirm-booking.test.ts` — PENDING→CONFIRMED, COMPLETED reject, P2025
-- [ ] 2.7 [GREEN] `actions/confirm-booking.action.ts` — `canTransition` + `where: {id,updatedAt}` optimistic lock → catch P2025
-- [ ] 2.8 [RED] `actions/__tests__/cancel-booking.test.ts` — CONFIRMED→CANCELLED, terminal reject, reason in notes
-- [ ] 2.9 [GREEN] `actions/cancel-booking.action.ts` — mirror confirm; append `reason` to `notes`
-- [ ] 2.10 [R+G] `actions/complete-booking.action.ts` — mirror confirm
-- [ ] 2.11 [R+G] `actions/mark-no-show.action.ts` — mirror confirm
-- [ ] 2.12 [RED] `actions/__tests__/reschedule-booking.test.ts` — free slot (old→RESCHEDULED + new→PENDING), occupied, P2025
-- [ ] 2.13 [GREEN] `actions/reschedule-booking.action.ts` — `$transaction`: `canTransition` + exclude-self overlap + update old + create new
-- [ ] 2.14 [BARREL] `index.ts` — export actions + types
-- [ ] 2.15 [VERIFY] 6 actions + 6 schemas covered, no `any`
+- [x] 2.1 [TYPES] `actions/booking-actions.types.ts` — `BookingResult<T>`, 6 `*Input` types
+- [x] 2.2 [RED] `actions/__tests__/booking-actions.schema.test.ts` — 6 schemas: happy+invalid
+- [x] 2.3 [GREEN] `actions/booking-actions.schema.ts` — 6 Zod 4 schemas (`z.uuid().optional()`, `error:` param)
+- [x] 2.4 [RED] `actions/__tests__/create-booking.test.ts` — mock prisma+auth+headers; success, overlap, guest, invalid, PROFESSIONAL foreign-id
+- [x] 2.5 [GREEN] `actions/create-booking.action.ts` — `"use server"` → Zod → session → `getOrganizationId` → RBAC → `$transaction(overlap+insert)` → guest into `notes` → `revalidatePath` → `BookingResult<Booking>`
+- [x] 2.6 [RED] `actions/__tests__/confirm-booking.test.ts` — PENDING→CONFIRMED, COMPLETED reject, P2025
+- [x] 2.7 [GREEN] `actions/confirm-booking.action.ts` — `canTransition` + `where: {id,updatedAt}` optimistic lock → catch P2025
+- [x] 2.8 [RED] `actions/__tests__/cancel-booking.test.ts` — CONFIRMED→CANCELLED, terminal reject, reason in notes
+- [x] 2.9 [GREEN] `actions/cancel-booking.action.ts` — mirror confirm; append `reason` to `notes`
+- [x] 2.10 [R+G] `actions/complete-booking.action.ts` — mirror confirm
+- [x] 2.11 [R+G] `actions/mark-no-show.action.ts` — mirror confirm
+- [x] 2.12 [RED] `actions/__tests__/reschedule-booking.test.ts` — free slot (old→RESCHEDULED + new→PENDING), occupied, P2025
+- [x] 2.13 [GREEN] `actions/reschedule-booking.action.ts` — `$transaction`: `canTransition` + exclude-self overlap + update old + create new
+- [x] 2.14 [BARREL] `index.ts` — export actions + types
+- [x] 2.15 [VERIFY] 6 actions + 6 schemas covered, no `any`
 
 ## Phase 3: PR #3 — List Page
 
