@@ -20,17 +20,16 @@ Estimated: ~1430 lines, 4 PRs (350/350/350/380), base=main, tests in same PR.
 
 ## Phase 2: PR #2 — Server Actions
 
-- [ ] 2.1 [TEST RED] `src/modules/services/actions/__tests__/service-actions.schema.test.ts` — safeParse 3 schemas, Spanish errors
-- [ ] 2.2 [IMPL GREEN] `src/modules/services/actions/service-actions.schema.ts` — 3 Zod 4 schemas with `error` param
-- [ ] 2.3 [IMPL GREEN] `src/modules/services/actions/service-actions.types.ts` — `ServiceResult<T=void>` union, inputs via `z.infer`
-- [ ] 2.4 [TEST RED] `__tests__/create-service.test.ts` — mock auth/headers/getOrganizationId/revalidatePath/data; RBAC PROFESSIONAL+PATIENT rejected, ADMIN success
-- [ ] 2.5 [IMPL GREEN] `create-service.action.ts` — Zod → session+orgId → reject PROFESSIONAL/PATIENT → prisma.professional.findFirst → data createService → revalidate
-- [ ] 2.6 [TEST RED] `__tests__/update-service.test.ts` — RBAC, Zod fail, wrong-org→"Servicio no encontrado", partial success
-- [ ] 2.7 [IMPL GREEN] `update-service.action.ts` — Zod → session → RBAC → getServiceById null→error → data updateService → revalidate
-- [ ] 2.8 [TEST RED] `__tests__/change-service-status.test.ts` — RBAC, not-found, ACTIVE↔INACTIVE any transition
-- [ ] 2.9 [IMPL GREEN] `change-service-status.action.ts` — Zod → session → RBAC → getServiceById → prisma.service.update({status}) → revalidate
-- [ ] 2.10 [IMPL GREEN] `actions/index.ts` barrel — re-export actions + schemas + types
-- [ ] 2.11 [VERIFY] `pnpm test src/modules/services/actions`
+- [x] 2.1 [TEST RED] `src/modules/services/actions/__tests__/create-service.test.ts` — mock auth/headers/getOrganizationId/revalidatePath/data; RBAC PROFESSIONAL+PATIENT rejected, ADMIN/SECRETARY success
+- [x] 2.2 [IMPL GREEN] `src/modules/services/actions/service-actions.schema.ts` — 3 Zod 4 schemas with `error` param (Spanish messages, cross-field superRefine for DEPOSIT)
+- [x] 2.3 [IMPL GREEN] `src/modules/services/actions/service-actions.types.ts` — `ServiceResult<T=void>` union, inputs via `z.infer`
+- [x] 2.4 [IMPL GREEN] `src/modules/services/actions/create-service.action.ts` — Zod → session+orgId → reject PROFESSIONAL/PATIENT → data createService → revalidate → `ServiceResult<{id}>`
+- [x] 2.5 [TEST RED] `src/modules/services/actions/__tests__/update-service.test.ts` — RBAC, Zod fail, wrong-org→"Servicio no encontrado", partial success, P2025
+- [x] 2.6 [IMPL GREEN] `src/modules/services/actions/update-service.action.ts` — Zod → session → RBAC → getServiceById null→"Servicio no encontrado" → data updateService → catch P2025 → revalidate
+- [x] 2.7 [TEST RED] `src/modules/services/actions/__tests__/change-service-status.test.ts` — RBAC, not-found, ACTIVE↔INACTIVE any transition, bad enum
+- [x] 2.8 [IMPL GREEN] `src/modules/services/actions/change-service-status.action.ts` — Zod → session → RBAC → getServiceById → prisma.service.update({status}) → revalidate
+- [x] 2.9 [IMPL GREEN] `src/modules/services/actions/index.ts` barrel — re-export actions + schemas + types
+- [x] 2.10 [VERIFY] `pnpm test` (659/659) + `pnpm type-check` (clean) + `pnpm lint` (clean)
 
 ## Phase 3: PR #3 — List Page + Components
 
