@@ -143,6 +143,7 @@ model Service {
   description     String?
   durationMinutes Int          @default(30)
   price           Float        @default(0)
+  depositAmount   Float?
   paymentType     String       @default("NONE") // PaymentType
   paymentStatus   String       @default("PENDING") // PaymentStatus from services-domain
   status          String       @default("ACTIVE") // ServiceStatus
