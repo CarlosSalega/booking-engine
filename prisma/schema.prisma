@@ -115,13 +115,23 @@ model Patient {
   address        String?
   dateOfBirth    DateTime?
   notes          String?
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  // `createdByUserId` is a plain string column — NOT a Prisma relation.
+  // Rationale: Better Auth's `User` model already has a `patient Patient?`
+  // relation through `userId`. A second `@relation` on `createdByUserId`
+  // would create a circular reference that Better Auth's prisma-adapter
+  // may not handle cleanly. The column is audit-only: if the referenced
+  // user is deleted, the UI shows "Desconocido". No cascade needed.
+  createdByUserId String
+  documentId      String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   bookings Booking[]
 
   @@index([organizationId])
   @@index([status])
+  @@index([documentId])
+  @@index([createdByUserId])
 }
 
 model Service {
