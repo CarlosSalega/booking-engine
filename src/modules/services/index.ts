@@ -2,7 +2,7 @@
  * Services module — public barrel.
  *
  * Re-exports the domain types, the data access layer (queries + types),
- * the three Server Actions, and (in PR #3) the presentation formatters.
+ * the three Server Actions, and the presentation formatters.
  *
  * The data layer's `createService` and `updateService` are intentionally
  * NOT re-exported from this barrel because they share names with the
@@ -19,6 +19,9 @@
  *                          `ServiceResult`, `CreateServiceInput`,
  *                          `UpdateServiceInput`,
  *                          `ChangeServiceStatusInput`
+ *   - Formatters         → `getServiceStatusLabel`, `getPaymentTypeLabel`,
+ *                          `formatPrice`, `SERVICE_STATUS_LABEL`,
+ *                          `PAYMENT_TYPE_LABEL`
  */
 
 export * from "./domain";
@@ -42,3 +45,6 @@ export { DEFAULT_PAGE_SIZE } from "./data/service-data.types";
 
 // Server Actions + their schemas + result/input types
 export * from "./actions";
+
+// Presentation formatters (es-AR status labels, payment-type labels, price)
+export * from "./presentation";

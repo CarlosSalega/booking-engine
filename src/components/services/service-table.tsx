@@ -30,7 +30,6 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { PaymentType } from "@/modules/services/domain/service";
 import type { EnrichedService } from "@/modules/services/data/service-data.types";
 import {
   formatPrice,
