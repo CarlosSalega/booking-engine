@@ -8,8 +8,9 @@
  * - Shows loading state via `useTransition` while the action is in flight
  * - Toasts on success (with `router.refresh()` to re-fetch server data)
  * - Toasts on error (with the action's user-facing Spanish message)
- * - Renders the "Reprogramar" button as a placeholder (the date-picker
- *   dialog is out of scope for PR #4)
+ * - Opens the `BookingRescheduleDialog` when "Reprogramar" is clicked;
+ *   the dialog owns the date picker + slot grid and calls
+ *   `rescheduleBooking` on confirm
  *
  * Server Actions are mocked at the module boundary so the tests stay
  * pure RTL + jsdom. Toast is also mocked so we can assert on the calls
@@ -17,13 +18,16 @@
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { PaymentStatus } from "@/modules/services/domain";
 import { BookingStatus, type BookingStatusType } from "@/modules/bookings/domain/booking";
 import { USER_ROLE, type UserRoleType } from "@/modules/auth/domain/roles";
-import type { EnrichedBooking } from "@/modules/bookings/data/booking-data.types";
+import type {
+  EnrichedBooking,
+  AvailableSlot,
+} from "@/modules/bookings/data/booking-data.types";
 
 // ---------------------------------------------------------------------------
 // Mock declarations — Server Actions + toast.
@@ -34,6 +38,7 @@ const cancelBookingMock = vi.fn();
 const completeBookingMock = vi.fn();
 const markNoShowMock = vi.fn();
 const rescheduleBookingMock = vi.fn();
+const getAvailableSlotsForWizardMock = vi.fn();
 
 vi.mock("@/modules/bookings/actions", () => ({
   confirmBooking: confirmBookingMock,
@@ -41,6 +46,7 @@ vi.mock("@/modules/bookings/actions", () => ({
   completeBooking: completeBookingMock,
   markNoShow: markNoShowMock,
   rescheduleBooking: rescheduleBookingMock,
+  getAvailableSlotsForWizard: getAvailableSlotsForWizardMock,
 }));
 
 const toastSuccessMock = vi.fn();
@@ -126,6 +132,17 @@ beforeEach(() => {
   completeBookingMock.mockResolvedValue({ success: true });
   markNoShowMock.mockResolvedValue({ success: true });
   rescheduleBookingMock.mockResolvedValue({ success: true });
+  // Default: two open 30-min slots on the date the dialog will request.
+  getAvailableSlotsForWizardMock.mockResolvedValue([
+    {
+      startTime: new Date(2026, 5, 20, 9, 0, 0),
+      endTime: new Date(2026, 5, 20, 9, 30, 0),
+    },
+    {
+      startTime: new Date(2026, 5, 20, 9, 30, 0),
+      endTime: new Date(2026, 5, 20, 10, 0, 0),
+    },
+  ] satisfies AvailableSlot[]);
 });
 
 // ---------------------------------------------------------------------------
@@ -213,13 +230,139 @@ describe("BookingDetailActions — action wiring", () => {
     expect(cancelBookingMock).toHaveBeenCalledTimes(1);
   });
 
-  it("does NOT call rescheduleBooking on click — Reprogramar is a placeholder toast", async () => {
+  it("opens the reschedule dialog (does NOT call rescheduleBooking) when Reprogramar is clicked", async () => {
     const user = userEvent.setup();
     renderActions(makeBooking(BookingStatus.CONFIRMED));
     await user.click(screen.getByRole("button", { name: "Reprogramar" }));
+    // The dialog renders with its title; the action hasn't been
+    // dispatched yet (the user still has to pick a date + slot).
+    expect(
+      await screen.findByTestId("booking-reschedule-dialog"),
+    ).toBeInTheDocument();
+    expect(screen.getByText("Reprogramar turno")).toBeInTheDocument();
     expect(rescheduleBookingMock).not.toHaveBeenCalled();
-    // The placeholder shows an info toast (default `toast(...)`).
-    expect(toastMock).toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Reschedule dialog flow — full happy path
+// ---------------------------------------------------------------------------
+
+describe("BookingDetailActions — reschedule dialog", () => {
+  it("fetches available slots when a date is chosen and 'Buscar horarios' is clicked", async () => {
+    const user = userEvent.setup();
+    renderActions(makeBooking(BookingStatus.CONFIRMED));
+    await user.click(screen.getByRole("button", { name: "Reprogramar" }));
+
+    const dateInput = await screen.findByLabelText(/fecha/i);
+    await user.type(dateInput, "2026-06-20");
+    await user.click(screen.getByTestId("reschedule-search-button"));
+
+    await waitFor(() => {
+      expect(getAvailableSlotsForWizardMock).toHaveBeenCalledTimes(1);
+    });
+    const [profId, svcId, dateArg] = getAvailableSlotsForWizardMock.mock.calls[0] ?? [];
+    expect(profId).toBe(PROF_ID);
+    expect(svcId).toBe(SERVICE_ID);
+    expect(dateArg).toBeInstanceOf(Date);
+  });
+
+  it("renders the slot grid after a successful search", async () => {
+    const user = userEvent.setup();
+    renderActions(makeBooking(BookingStatus.CONFIRMED));
+    await user.click(screen.getByRole("button", { name: "Reprogramar" }));
+
+    const dateInput = await screen.findByLabelText(/fecha/i);
+    await user.type(dateInput, "2026-06-20");
+    await user.click(screen.getByTestId("reschedule-search-button"));
+
+    const grid = await screen.findByTestId("reschedule-slot-grid");
+    expect(grid).toBeInTheDocument();
+    // Two slot buttons (one per mock slot).
+    expect(
+      within(grid).getAllByTestId("reschedule-slot-button"),
+    ).toHaveLength(2);
+  });
+
+  it("shows the empty-state copy when the search returns no slots", async () => {
+    getAvailableSlotsForWizardMock.mockResolvedValueOnce([]);
+    const user = userEvent.setup();
+    renderActions(makeBooking(BookingStatus.CONFIRMED));
+    await user.click(screen.getByRole("button", { name: "Reprogramar" }));
+
+    const dateInput = await screen.findByLabelText(/fecha/i);
+    await user.type(dateInput, "2026-06-20");
+    await user.click(screen.getByTestId("reschedule-search-button"));
+
+    expect(
+      await screen.findByTestId("reschedule-empty-slots"),
+    ).toBeInTheDocument();
+    // The confirm button must remain disabled with no slot picked.
+    expect(screen.getByTestId("reschedule-confirm-button")).toBeDisabled();
+  });
+
+  it("calls rescheduleBooking with the picked slot on confirm and refreshes on success", async () => {
+    const user = userEvent.setup();
+    renderActions(makeBooking(BookingStatus.CONFIRMED));
+    await user.click(screen.getByRole("button", { name: "Reprogramar" }));
+
+    const dateInput = await screen.findByLabelText(/fecha/i);
+    await user.type(dateInput, "2026-06-20");
+    await user.click(screen.getByTestId("reschedule-search-button"));
+
+    const grid = await screen.findByTestId("reschedule-slot-grid");
+    const slots = within(grid).getAllByTestId("reschedule-slot-button");
+    await user.click(slots[0]!);
+
+    const confirmBtn = screen.getByTestId("reschedule-confirm-button");
+    expect(confirmBtn).toBeEnabled();
+    await user.click(confirmBtn);
+
+    await waitFor(() => {
+      expect(rescheduleBookingMock).toHaveBeenCalledTimes(1);
+    });
+    const payload = rescheduleBookingMock.mock.calls[0]?.[0] as {
+      bookingId: string;
+      newStartTime: Date;
+    };
+    expect(payload.bookingId).toBe(BOOKING_ID);
+    expect(payload.newStartTime).toBeInstanceOf(Date);
+
+    await waitFor(() => {
+      expect(toastSuccessMock).toHaveBeenCalledWith("Turno reprogramado");
+    });
+    await waitFor(() => {
+      expect(refreshMock).toHaveBeenCalled();
+    });
+  });
+
+  it("renders the action's error message inline when rescheduleBooking returns an error", async () => {
+    rescheduleBookingMock.mockResolvedValueOnce({
+      success: false,
+      error: "El horario deseado está ocupado",
+    });
+    const user = userEvent.setup();
+    renderActions(makeBooking(BookingStatus.CONFIRMED));
+    await user.click(screen.getByRole("button", { name: "Reprogramar" }));
+
+    const dateInput = await screen.findByLabelText(/fecha/i);
+    await user.type(dateInput, "2026-06-20");
+    await user.click(screen.getByTestId("reschedule-search-button"));
+
+    const grid = await screen.findByTestId("reschedule-slot-grid");
+    const slots = within(grid).getAllByTestId("reschedule-slot-button");
+    await user.click(slots[0]!);
+    await user.click(screen.getByTestId("reschedule-confirm-button"));
+
+    expect(
+      await screen.findByTestId("reschedule-submit-error"),
+    ).toHaveTextContent("El horario deseado está ocupado");
+    // The dialog must still be open and the page must NOT have been
+    // refreshed on a failed reschedule.
+    expect(
+      screen.getByTestId("booking-reschedule-dialog"),
+    ).toBeInTheDocument();
+    expect(refreshMock).not.toHaveBeenCalled();
   });
 });
 
