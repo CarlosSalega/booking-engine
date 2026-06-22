@@ -10,10 +10,9 @@
  *
  * UX:
  * - One row of buttons, right-aligned on desktop, stacked on mobile.
- * - The "Reprogramar" button is a placeholder for PR #4 — a real date
- *   picker dialog needs a Dialog primitive that isn't installed in this
- *   project. Clicking it shows an info toast ("Próximamente") so the
- *   user knows the button works but the feature is on the roadmap.
+ * - The "Reprogramar" button opens the `BookingRescheduleDialog`,
+ *   which owns its own date + slot picker and calls the
+ *   `rescheduleBooking` Server Action on confirm.
  * - `useTransition` provides the loading state for every wired action;
  *   the buttons disable themselves while a transition is in flight.
  * - On success, `router.refresh()` re-fetches the page's Server
@@ -24,7 +23,7 @@
 
 "use client";
 
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
@@ -39,6 +38,8 @@ import {
 import { getAvailableActions, type BookingActionKey } from "@/modules/bookings/presentation/booking-detail-policy";
 
 import { Button } from "@/components/ui/button";
+
+import { BookingRescheduleDialog } from "./booking-reschedule-dialog";
 
 interface BookingDetailActionsProps {
   booking: EnrichedBooking;
@@ -62,6 +63,10 @@ const BUTTON_VARIANT: Record<
 export function BookingDetailActions({ booking, role }: BookingDetailActionsProps) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
+  // The reschedule flow is a two-step UX: the button opens a dialog,
+  // the dialog owns the actual action call. We keep just the open
+  // state here.
+  const [isRescheduleOpen, setIsRescheduleOpen] = useState(false);
   const actions = getAvailableActions(booking.status, role);
 
   // Terminal statuses render no buttons — the parent already checks
@@ -71,19 +76,11 @@ export function BookingDetailActions({ booking, role }: BookingDetailActionsProp
     return null;
   }
 
-  function handleReschedulePlaceholder() {
-    // The reschedule action needs a date picker. Out of scope for PR #4
-    // (no Dialog primitive installed). Show a neutral info toast so the
-    // user understands the button is wired but the feature is on the
-    // roadmap.
-    toast("La función de reprogramar estará disponible próximamente.", {
-      icon: "⏳",
-    });
-  }
-
   function dispatchAction(key: BookingActionKey) {
     if (key === "reschedule") {
-      handleReschedulePlaceholder();
+      // Hand off to the dialog — it owns the date picker, slot
+      // selection, and the eventual `rescheduleBooking` call.
+      setIsRescheduleOpen(true);
       return;
     }
 
@@ -103,23 +100,33 @@ export function BookingDetailActions({ booking, role }: BookingDetailActionsProp
   }
 
   return (
-    <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
-      {actions.map((action) => {
-        const variant = BUTTON_VARIANT[action.key];
-        return (
-          <Button
-            key={action.key}
-            type="button"
-            variant={variant}
-            disabled={isPending}
-            onClick={() => dispatchAction(action.key)}
-            data-action={action.key}
-          >
-            {action.label}
-          </Button>
-        );
-      })}
-    </div>
+    <>
+      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:justify-end">
+        {actions.map((action) => {
+          const variant = BUTTON_VARIANT[action.key];
+          return (
+            <Button
+              key={action.key}
+              type="button"
+              variant={variant}
+              disabled={isPending}
+              onClick={() => dispatchAction(action.key)}
+              data-action={action.key}
+            >
+              {action.label}
+            </Button>
+          );
+        })}
+      </div>
+
+      <BookingRescheduleDialog
+        bookingId={booking.id}
+        professionalId={booking.professionalId}
+        serviceId={booking.serviceId}
+        open={isRescheduleOpen}
+        onOpenChange={setIsRescheduleOpen}
+      />
+    </>
   );
 }
 
@@ -143,9 +150,8 @@ async function runAction(
   if (key === "noShow") {
     return markNoShow({ bookingId });
   }
-  // "reschedule" is handled by the placeholder, but TypeScript still
-  // needs an exhaustive branch. Surface a defensive error in case the
-  // contract changes.
+  // "reschedule" is handled by the dialog — surface a defensive error
+  // in case the contract changes and the dispatcher is hit directly.
   return {
     success: false,
     error: "Acción no soportada en este momento.",

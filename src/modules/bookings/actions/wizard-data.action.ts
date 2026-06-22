@@ -31,7 +31,7 @@ import {
   getProfessionalsForService,
   getServices,
 } from "../data/booking-data";
-import type { AvailableSlot } from "../data/booking-availability";
+import type { AvailableSlot } from "../data/booking-data.types";
 import type {
   PatientOption,
   ProfessionalOption,

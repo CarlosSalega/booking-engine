@@ -25,7 +25,7 @@ import { useEffect, useState } from "react";
 import { AlertCircle, Calendar as CalendarIcon, Loader2 } from "lucide-react";
 
 import { getAvailableSlotsForWizard } from "@/modules/bookings/actions";
-import type { AvailableSlot } from "@/modules/bookings/data/booking-availability";
+import type { AvailableSlot } from "@/modules/bookings/data/booking-data.types";
 
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";

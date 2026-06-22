@@ -14,7 +14,7 @@ import { useState } from "react";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import type { AvailableSlot } from "@/modules/bookings/data/booking-availability";
+import type { AvailableSlot } from "@/modules/bookings/data/booking-data.types";
 
 import { WizardStepSchedule } from "@/components/bookings/wizard/wizard-step-schedule";
 
