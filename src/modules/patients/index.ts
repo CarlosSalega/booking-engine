@@ -2,11 +2,11 @@
  * Patients module — public barrel.
  *
  * Re-exports the domain types, the data access layer (queries + types),
- * and the three Server Actions. The data layer's `createPatient` and
- * `updatePatient` are intentionally NOT re-exported here because they
- * share names with the Server Actions; the actions are the public API
- * and the data-layer write functions are implementation details used by
- * the actions themselves.
+ * the three Server Actions, and the presentation formatters. The data
+ * layer's `createPatient` and `updatePatient` are intentionally NOT
+ * re-exported here because they share names with the Server Actions;
+ * the actions are the public API and the data-layer write functions
+ * are implementation details used by the actions themselves.
  *
  * Consumers should import from `@/modules/patients`:
  *   - Server Components  → `getPatients`, `getPatientById`
@@ -15,6 +15,8 @@
  *   - Types              → `EnrichedPatient`, `PatientFilters`,
  *                          `CreatePatientInput`, `UpdatePatientInput`,
  *                          `ChangeStatusInput`, `PatientResult`
+ *   - Formatters         → `getPatientStatusLabel`, `formatPatientName`,
+ *                          `PATIENT_STATUS_LABEL`
  */
 
 export * from "./domain";
@@ -34,3 +36,6 @@ export { DEFAULT_PAGE_SIZE } from "./data/patient-data.types";
 
 // Server Actions + their schemas + result/input types
 export * from "./actions";
+
+// Presentation formatters (es-AR status labels, name formatting)
+export * from "./presentation";

@@ -50,19 +50,19 @@ Chain strategy: stacked-to-main
 
 ## Phase 3: PR #3 — Pages + Components + Bookings Extension
 
-- [ ] 3.1 [TEST RED] Failing test `patient-status-badge.test.tsx`: ACTIVE→green "Activo", INACTIVE→gray "Inactivo", BLOCKED→red "Bloqueado".
-- [ ] 3.2 [IMPL GREEN] Create `presentation/formatters.ts` (`getPatientStatusLabel`, `formatPatientName`) + `presentation/index.ts`.
-- [ ] 3.3 [IMPL GREEN] Create `patient-status-badge.tsx` (shadcn Badge variants).
-- [ ] 3.4 [TEST RED] Failing tests `patient-form.test.tsx`: pre-fill, empty fullName, bad email, bad documentId, notes>1000, valid submit.
-- [ ] 3.5 [IMPL GREEN] Create `patient-table.tsx` (Client, shadcn Table, 6 columns + action).
-- [ ] 3.6 [IMPL GREEN] Create `patient-detail.tsx` (Client): info cards, audit, status dropdown wired to `changePatientStatus`, edit button, booking history.
-- [ ] 3.7 [IMPL GREEN] Create `patient-form.tsx` (Client): Zod 4 client validation, `useActionState`, redirect on success, inline errors.
-- [ ] 3.8 [IMPL GREEN] Create `app/(dashboard)/dashboard/patients/page.tsx` (Server): PageHeader, filters, `<Suspense>` + `PatientTableDataWrapper` async, `PatientEmptyState`.
-- [ ] 3.9 [IMPL GREEN] Create `app/(dashboard)/dashboard/patients/[id]/page.tsx`: getPatientById → notFound() → `<PatientDetail>` + bookings.
-- [ ] 3.10 [IMPL GREEN] Create `app/(dashboard)/dashboard/patients/[id]/edit/page.tsx`: Server wrapper + `<PatientForm>` Client.
-- [ ] 3.11 [EXTEND] Add `patientId?: string` to `BookingFilters`; add `if (patientId) where.patientId = patientId` in `getBookings`.
-- [ ] 3.12 [BARREL] Re-export `./actions` + `./presentation` from `src/modules/patients/index.ts`.
-- [ ] 3.13 [VERIFY] `pnpm test`, `pnpm type-check`, `pnpm lint` green; manual smoke test 3 routes.
+- [x] 3.1 [TEST RED] Failing test `patient-status-badge.test.tsx`: ACTIVE→green "Activo", INACTIVE→gray "Inactivo", BLOCKED→red "Bloqueado".
+- [x] 3.2 [IMPL GREEN] Create `presentation/formatters.ts` (`getPatientStatusLabel`, `formatPatientName`) + `presentation/index.ts`.
+- [x] 3.3 [IMPL GREEN] Create `patient-status-badge.tsx` (shadcn Badge variants).
+- [x] 3.4 [TEST RED] Failing tests `patient-form.test.tsx`: pre-fill, empty fullName, bad email, bad documentId, notes>1000, valid submit.
+- [x] 3.5 [IMPL GREEN] Create `patient-table.tsx` (Client, shadcn Table, 6 columns + action).
+- [x] 3.6 [IMPL GREEN] Create `patient-detail.tsx` (Client): info cards, audit, status dropdown wired to `changePatientStatus`, edit button, booking history.
+- [x] 3.7 [IMPL GREEN] Create `patient-form.tsx` (Client): Zod 4 client validation, `useActionState`, redirect on success, inline errors.
+- [x] 3.8 [IMPL GREEN] Create `app/(dashboard)/dashboard/patients/page.tsx` (Server): PageHeader, filters, `<Suspense>` + `PatientTableDataWrapper` async, `PatientEmptyState`.
+- [x] 3.9 [IMPL GREEN] Create `app/(dashboard)/dashboard/patients/[id]/page.tsx`: getPatientById → notFound() → `<PatientDetail>` + bookings.
+- [x] 3.10 [IMPL GREEN] Create `app/(dashboard)/dashboard/patients/[id]/edit/page.tsx`: Server wrapper + `<PatientForm>` Client.
+- [x] 3.11 [EXTEND] Add `patientId?: string` to `BookingFilters`; add `if (patientId) where.patientId = patientId` in `getBookings`.
+- [x] 3.12 [BARREL] Re-export `./actions` + `./presentation` from `src/modules/patients/index.ts`.
+- [x] 3.13 [VERIFY] `pnpm test`, `pnpm type-check`, `pnpm lint` green; manual smoke test 3 routes.
 
 ## Dependencies
 
