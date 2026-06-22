@@ -191,8 +191,9 @@ describe("createService action", () => {
   // -------------------------------------------------------------------------
 
   it("rejects empty name with a Spanish error message", async () => {
-    // No session mock needed: Zod parse fails first.
-    // @ts-expect-error testing invalid input at runtime
+    // No session mock needed: Zod parse fails first. Empty `name` is a
+    // valid `string` at the type level but is rejected at runtime by the
+    // schema's `min(1)` constraint.
     const result = await createService({ ...validInput, name: "" });
 
     expect(result.success).toBe(false);
