@@ -37,16 +37,16 @@ Chain strategy: stacked-to-main
 
 ## Phase 2: PR #2 — Server Actions
 
-- [x] 2.1 [TEST RED] Failing tests in `create-patient.test.ts`: success, dedup match, P2002, PATIENT RBAC, invalid input, no session.
-- [x] 2.2 [IMPL GREEN] Create `patient-actions.schema.ts` (3 Zod 4 schemas, Spanish errors).
-- [x] 2.3 [IMPL GREEN] Create `patient-actions.types.ts`: `PatientResult<T>` discriminated union + 3 inferred input types.
-- [x] 2.4 [IMPL GREEN] Create `create-patient.action.ts`: safeParse → session → RBAC → orgId → `$transaction` with `patientMatches` dedup → catch P2002/DedupError → revalidatePath → return `PatientResult<{id}>`.
-- [x] 2.5 [TEST RED] Failing tests in `update-patient.test.ts`: success, not-found, wrong-org, bad UUID, P2002, PATIENT RBAC.
-- [x] 2.6 [IMPL GREEN] Create `update-patient.action.ts`: validate → RBAC → org scope → `$transaction` User+Patient update → catch P2025/P2002 → revalidatePath.
-- [x] 2.7 [TEST RED] Failing tests in `change-patient-status.test.ts`: valid, bad enum, not-found, wrong-org, PATIENT RBAC.
-- [x] 2.8 [IMPL GREEN] Create `change-patient-status.action.ts`: validate id+enum → RBAC → `prisma.patient.update` → revalidatePath.
-- [x] 2.9 [BARREL] Create `actions/index.ts` exporting schemas, types, 3 actions.
-- [x] 2.10 [VERIFY] `pnpm test` + `pnpm type-check` green.
+- [ ] 2.1 [TEST RED] Failing tests in `create-patient.test.ts`: success, dedup match, P2002, PATIENT RBAC, invalid input, no session.
+- [ ] 2.2 [IMPL GREEN] Create `patient-actions.schema.ts` (3 Zod 4 schemas, Spanish errors).
+- [ ] 2.3 [IMPL GREEN] Create `patient-actions.types.ts`: `PatientResult<T>` discriminated union + 3 inferred input types.
+- [ ] 2.4 [IMPL GREEN] Create `create-patient.action.ts`: safeParse → session → RBAC → orgId → `$transaction` with `patientMatches` dedup → catch P2002/DedupError → revalidatePath → return `PatientResult<{id}>`.
+- [ ] 2.5 [TEST RED] Failing tests in `update-patient.test.ts`: success, not-found, wrong-org, bad UUID, P2002, PATIENT RBAC.
+- [ ] 2.6 [IMPL GREEN] Create `update-patient.action.ts`: validate → RBAC → org scope → `$transaction` User+Patient update → catch P2025/P2002 → revalidatePath.
+- [ ] 2.7 [TEST RED] Failing tests in `change-patient-status.test.ts`: valid, bad enum, not-found, wrong-org, PATIENT RBAC.
+- [ ] 2.8 [IMPL GREEN] Create `change-patient-status.action.ts`: validate id+enum → RBAC → `prisma.patient.update` → revalidatePath.
+- [ ] 2.9 [BARREL] Create `actions/index.ts` exporting schemas, types, 3 actions.
+- [ ] 2.10 [VERIFY] `pnpm test` + `pnpm type-check` green.
 
 ## Phase 3: PR #3 — Pages + Components + Bookings Extension
 
