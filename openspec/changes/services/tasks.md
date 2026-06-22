@@ -46,10 +46,10 @@ Estimated: ~1430 lines, 4 PRs (350/350/350/380), base=main, tests in same PR.
 
 ## Phase 4: PR #4 — Detail + Create + Edit Pages
 
-- [ ] 4.1 [TEST RED] `__tests__/service-form.test.tsx` — Zod 4 client validation, depositAmount conditional on DEPOSIT, submit, success redirect, error inline
-- [ ] 4.2 [IMPL GREEN] `service-form.tsx` — Client Component, `useActionState`, conditional depositAmount, `useRouter().replace()` on success, error banner
-- [ ] 4.3 [IMPL GREEN] `service-detail-card.tsx` — name, description, duration, formatPrice, status + payment-type badges, profesional, Edit button (hidden PROFESSIONAL)
-- [ ] 4.4 [IMPL GREEN] `src/app/(dashboard)/dashboard/services/[id]/page.tsx` — await params → getOrganizationId → getServiceById null→notFound → ServiceDetailCard
-- [ ] 4.5 [IMPL GREEN] `new/page.tsx` — fetch org professionals → render `<ServiceForm mode="create" professionals={...} />`
-- [ ] 4.6 [IMPL GREEN] `[id]/edit/page.tsx` — getServiceById null→notFound → fetch professionals → render `<ServiceForm mode="edit" service={...} professionals={...} />`
-- [ ] 4.7 [VERIFY] `pnpm test` all green; lint; type-check; manual list→create→edit→detail→status
+- [x] 4.1 [TEST RED] `__tests__/service-form.test.tsx` — Zod 4 client validation, depositAmount conditional on DEPOSIT, submit, success redirect, error inline
+- [x] 4.2 [IMPL GREEN] `service-form.tsx` — Client Component, `useActionState`, conditional depositAmount, `useRouter().replace()` on success, error banner
+- [x] 4.3 [IMPL GREEN] `service-detail-card.tsx` — name, description, duration, formatPrice, status + payment-type badges, profesional, Edit button (hidden PROFESSIONAL)
+- [x] 4.4 [IMPL GREEN] `src/app/(dashboard)/dashboard/services/[id]/page.tsx` — await params → getOrganizationId → getServiceById null→notFound → ServiceDetailCard
+- [x] 4.5 [IMPL GREEN] `new/page.tsx` — fetch org professionals → render `<ServiceForm mode="create" professionals={...} />`
+- [x] 4.6 [IMPL GREEN] `[id]/edit/page.tsx` — getServiceById null→notFound → fetch professionals → render `<ServiceForm mode="edit" service={...} professionals={...} />`
+- [x] 4.7 [VERIFY] `pnpm test` all green; lint; type-check; manual list→create→edit→detail→status
