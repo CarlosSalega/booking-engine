@@ -10,6 +10,7 @@ import * as PatientsBarrel from "@/modules/patients";
 
 const VALID_ID = "11111111-1111-4111-8111-111111111111";
 const VALID_ORG_ID = "22222222-2222-4222-8222-222222222222";
+const VALID_USER_ID = "33333333-3333-4333-8333-333333333333";
 
 function makeValidPatient(overrides: Partial<Patient> = {}): Patient {
   return {
@@ -21,6 +22,7 @@ function makeValidPatient(overrides: Partial<Patient> = {}): Patient {
     documentId: "30123456",
     status: PatientStatus.ACTIVE,
     notes: "Prefiere turnos mañana",
+    createdByUserId: VALID_USER_ID,
     createdAt: new Date("2026-01-01T00:00:00Z"),
     updatedAt: new Date("2026-01-01T00:00:00Z"),
     ...overrides,
@@ -64,6 +66,14 @@ describe("patientSchema — valid cases", () => {
     );
     expect(result.success).toBe(true);
   });
+
+  it("preserves createdByUserId in the parsed output (audit field round-trip)", () => {
+    const result = patientSchema.safeParse(makeValidPatient());
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.createdByUserId).toBe(VALID_USER_ID);
+    }
+  });
 });
 
 describe("patientSchema — rejection cases", () => {
@@ -75,6 +85,30 @@ describe("patientSchema — rejection cases", () => {
         result.error.issues.some(
           (i) => i.message === "Full name is required",
         ),
+      ).toBe(true);
+    }
+  });
+
+  it("rejects patient without createdByUserId (audit field required)", () => {
+    const result = patientSchema.safeParse(
+      makeValidPatient({ createdByUserId: undefined }),
+    );
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(
+        result.error.issues.some((i) => i.message === "Invalid UUID"),
+      ).toBe(true);
+    }
+  });
+
+  it("rejects non-UUID createdByUserId", () => {
+    const result = patientSchema.safeParse(
+      makeValidPatient({ createdByUserId: "not-a-uuid" }),
+    );
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      expect(
+        result.error.issues.some((i) => i.message === "Invalid UUID"),
       ).toBe(true);
     }
   });
@@ -219,6 +253,23 @@ describe("patientDataSchema — strict mode", () => {
     });
     expect(result.success).toBe(false);
   });
+
+  it("rejects creation input with createdByUserId present (set by action, not input)", () => {
+    const result = patientDataSchema.safeParse({
+      organizationId: VALID_ORG_ID,
+      fullName: "Ana Torres",
+      status: PatientStatus.ACTIVE,
+      createdByUserId: VALID_USER_ID,
+    });
+    expect(result.success).toBe(false);
+    if (!result.success) {
+      const issue = result.error.issues.find(
+        (i) => i.code === "unrecognized_keys",
+      );
+      expect(issue).toBeDefined();
+      expect(issue?.keys).toContain("createdByUserId");
+    }
+  });
 });
 
 describe("patientMatches", () => {
@@ -303,6 +354,13 @@ describe("barrel exports", () => {
     expect(PatientsBarrel.patientSchema).toBeDefined();
     expect(PatientsBarrel.patientDataSchema).toBeDefined();
     expect(typeof PatientsBarrel.patientMatches).toBe("function");
+    // Data layer (PR #1)
+    expect(typeof PatientsBarrel.getPatients).toBe("function");
+    expect(typeof PatientsBarrel.getPatientById).toBe("function");
+    expect(typeof PatientsBarrel.createPatient).toBe("function");
+    expect(typeof PatientsBarrel.updatePatient).toBe("function");
+    expect(PatientsBarrel.PatientNotFoundError).toBeDefined();
+    expect(PatientsBarrel.DEFAULT_PAGE_SIZE).toBe(20);
     // Type-level: ensure inferred types are exported (compile-time check)
     const _type: PatientsBarrel.Patient = makeValidPatient();
     const _data: PatientsBarrel.PatientData = {
@@ -310,11 +368,17 @@ describe("barrel exports", () => {
       fullName: "Test",
       status: PatientStatus.ACTIVE,
     };
+    const _enriched: PatientsBarrel.EnrichedPatient = {
+      ...makeValidPatient(),
+      createdByUserName: "Admin Pérez",
+    };
     expect(_type).toBeDefined();
     expect(_data).toBeDefined();
+    expect(_enriched).toBeDefined();
     // suppress unused warnings
     void _type;
     void _data;
+    void _enriched;
   });
 });
 
