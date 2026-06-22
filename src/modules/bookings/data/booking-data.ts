@@ -73,6 +73,7 @@ export async function getBookings(
     status,
     search,
     professionalUserId,
+    patientId,
     page = 1,
     pageSize = DEFAULT_PAGE_SIZE,
   } = filters;
@@ -89,6 +90,9 @@ export async function getBookings(
   }
   if (professionalUserId) {
     where.professional = { userId: professionalUserId };
+  }
+  if (patientId) {
+    where.patientId = patientId;
   }
   if (search) {
     where.OR = [

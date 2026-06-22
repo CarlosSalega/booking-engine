@@ -28,6 +28,9 @@ export const DEFAULT_PAGE_SIZE = 20;
  * - `professionalUserId` — RBAC scoping; when set, only bookings whose
  *   `professional.userId` matches are returned. Data layer must NOT
  *   import auth — the caller resolves the session and passes this.
+ * - `patientId` — filter by the linked Patient. Added in the patients
+ *   change (AD5) so the patient detail page can show a single patient's
+ *   booking history. Backwards-compatible: undefined → no filter.
  * - `page` / `pageSize` — pagination, 1-indexed.
  */
 export interface BookingFilters {
@@ -37,6 +40,7 @@ export interface BookingFilters {
   status?: BookingStatusType[];
   search?: string;
   professionalUserId?: string;
+  patientId?: string;
   page?: number;
   pageSize?: number;
 }
