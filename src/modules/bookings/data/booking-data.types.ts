@@ -108,3 +108,9 @@ export interface ProfessionalOption {
   user: { name: string };
   specialties: string[];
 }
+
+/** A time slot presented to the wizard UI for available-slot selection. */
+export interface AvailableSlot {
+  startTime: Date;
+  endTime: Date;
+}

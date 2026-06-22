@@ -18,6 +18,7 @@
 import { prisma } from "@/lib/prisma";
 
 import { isOverlapping, type TimeSlot } from "../domain/time-slot";
+import type { AvailableSlot } from "./booking-data.types";
 
 // ---------------------------------------------------------------------------
 // Constants — single source of truth for the slot grid.
@@ -68,12 +69,6 @@ export async function checkAvailability(
 // ---------------------------------------------------------------------------
 // getAvailableSlots
 // ---------------------------------------------------------------------------
-
-/** A time slot presented to the wizard UI. */
-export interface AvailableSlot {
-  startTime: Date;
-  endTime: Date;
-}
 
 /**
  * List open 30-min slots for the given date and service. The function:
