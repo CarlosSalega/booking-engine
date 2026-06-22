@@ -1,12 +1,14 @@
-# Delta for Bookings Data
+# Bookings Data Access Layer Specification
 
-## MODIFIED Requirements
+## Purpose
 
-### Requirement: Data Access Layer — getBookings (MODIFIED)
+Data access layer for the Bookings domain — paginated queries, filtering, and mutations for the Booking entity. Operates on top of the domain's Booking entity type, BookingStatus constants, and validation schemas.
 
-`BookingFilters` SHALL add optional `patientId?: string` field. `getBookings` SHALL filter bookings by `patientId` when provided, adding `where.patientId = patientId` to the Prisma query. Backwards-compatible: existing callers omit `patientId`, no behavior change.
+## Requirements
 
-(Previously: `getBookings` had no `patientId` filter. `BookingFilters` had no `patientId` field.)
+### Requirement: Data Access Layer — getBookings
+
+`BookingFilters` SHALL include an optional `patientId?: string` field. `getBookings` SHALL filter bookings by `patientId` when provided, adding `where.patientId = patientId` to the Prisma query. Backwards-compatible: existing callers omit `patientId`, no behavior change.
 
 #### Scenario: Filter bookings by patientId
 
