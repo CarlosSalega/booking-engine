@@ -205,27 +205,32 @@ async function seedPatients(users: SeedUsers): Promise<SeedPatients> {
       data: {
         organizationId: ORG_ID,
         userId: users.p1,
+        createdByUserId: users.admin,
         status: "ACTIVE",
         phone: "+54 11 5555-1001",
         address: "Av. Corrientes 1234, CABA",
         dateOfBirth: new Date("1985-04-12"),
         notes: "Paciente regular, sin alergias conocidas.",
+        documentId: "30123456",
       },
     }),
     prisma.patient.create({
       data: {
         organizationId: ORG_ID,
         userId: users.p2,
+        createdByUserId: users.admin,
         status: "ACTIVE",
         phone: "+54 11 5555-1002",
         address: "Av. Santa Fe 2345, CABA",
         dateOfBirth: new Date("1990-09-23"),
+        documentId: "35123456",
       },
     }),
     prisma.patient.create({
       data: {
         organizationId: ORG_ID,
         userId: users.p3,
+        createdByUserId: users.admin,
         status: "ACTIVE",
         phone: "+54 11 5555-1003",
         address: "Belgrano 567, CABA",
@@ -237,6 +242,7 @@ async function seedPatients(users: SeedUsers): Promise<SeedPatients> {
       data: {
         organizationId: ORG_ID,
         userId: users.p4,
+        createdByUserId: users.admin,
         status: "ACTIVE",
         phone: "+54 11 5555-1004",
         address: "Caballito 890, CABA",
@@ -247,6 +253,7 @@ async function seedPatients(users: SeedUsers): Promise<SeedPatients> {
       data: {
         organizationId: ORG_ID,
         userId: users.p5,
+        createdByUserId: users.admin,
         status: "BLOCKED",
         phone: "+54 11 5555-1005",
         address: "Palermo 432, CABA",

@@ -31,12 +31,20 @@ export const patientSchema = z.object({
     .string()
     .max(1000, { error: "Notes must be 1000 characters or less" })
     .optional(),
+  createdByUserId: z.uuid({ error: "Invalid UUID" }),
   createdAt: z.date(),
   updatedAt: z.date(),
 });
 
 export const patientDataSchema = patientSchema
-  .omit({ id: true, createdAt: true, updatedAt: true })
+  .omit({
+    id: true,
+    createdAt: true,
+    updatedAt: true,
+    // `createdByUserId` is set by the action from the session, not by the
+    // creation input. Strict mode then rejects it as an unknown field.
+    createdByUserId: true,
+  })
   .strict();
 
 export type Patient = z.infer<typeof patientSchema>;
