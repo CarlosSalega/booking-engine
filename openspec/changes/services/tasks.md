@@ -33,16 +33,16 @@ Estimated: ~1430 lines, 4 PRs (350/350/350/380), base=main, tests in same PR.
 
 ## Phase 3: PR #3 — List Page + Components
 
-- [ ] 3.1 [TEST RED] `src/modules/services/presentation/__tests__/formatters.test.ts` — getServiceStatusLabel, getPaymentTypeLabel, formatPrice ARS
-- [ ] 3.2 [IMPL GREEN] `src/modules/services/presentation/formatters.ts` + `index.ts` — Spanish labels, `formatPrice` returns `$ 2.000,00`
-- [ ] 3.3 [TEST RED] `src/components/services/__tests__/service-status-badge.test.tsx` — variant map + label render
-- [ ] 3.4 [IMPL GREEN] `service-status-badge.tsx` — variant map (ACTIVE=default, INACTIVE=secondary) + shadcn Badge Client Component
-- [ ] 3.5 [TEST RED] `__tests__/service-table.test.tsx` — rows, links, empty-state, professional, price, badge
-- [ ] 3.6 [IMPL GREEN] `service-table.tsx` — shadcn Table columns Nombre/Profesional/Duración/Precio/Estado, pagination, PROFESSIONAL hides actions
-- [ ] 3.7 [IMPL GREEN] `service-table-skeleton.tsx`, `service-search-bar.tsx`, `service-status-filter.tsx`, `service-professional-filter.tsx`, `service-empty-state.tsx`
-- [ ] 3.8 [IMPL GREEN] Replace `src/app/(dashboard)/dashboard/services/page.tsx` — Server Component, `searchParams: Promise`, `parseFilters`, header + filters, `<Suspense key={filters}>` → data wrapper → getServices + ServiceTable
-- [ ] 3.9 [IMPL GREEN] Update `src/modules/services/index.ts` — export data, actions, presentation (mirror patients barrel)
-- [ ] 3.10 [VERIFY] `pnpm test src/components/services src/modules/services/presentation`; type-check
+- [x] 3.1 [TEST RED] `src/modules/services/presentation/__tests__/formatters.test.ts` — getServiceStatusLabel, getPaymentTypeLabel, formatPrice ARS
+- [x] 3.2 [IMPL GREEN] `src/modules/services/presentation/formatters.ts` + `index.ts` — Spanish labels, `formatPrice` returns `$ 2.000,00`
+- [x] 3.3 [TEST RED] `src/components/services/__tests__/service-status-badge.test.tsx` — variant map + label render
+- [x] 3.4 [IMPL GREEN] `service-status-badge.tsx` — variant map (ACTIVE=default, INACTIVE=secondary) + shadcn Badge Client Component
+- [x] 3.5 [TEST RED] `__tests__/service-table.test.tsx` — rows, links, empty-state, professional, price, badge
+- [x] 3.6 [IMPL GREEN] `service-table.tsx` — shadcn Table columns Nombre/Profesional/Precio/Tipo de pago/Estado, pagination
+- [x] 3.7 [IMPL GREEN] `service-table-skeleton.tsx`, `service-search-bar.tsx`, `service-status-filter.tsx`, `service-empty-state.tsx` (no professional filter in this PR — patient module doesn't have one)
+- [x] 3.8 [IMPL GREEN] Replace `src/app/(dashboard)/dashboard/services/page.tsx` — Server Component, `searchParams: Promise`, `parseFilters`, header + filters, `<Suspense key={filters}>` → data wrapper → getServices + ServiceTable, "Nuevo Servicio" button hidden for PROFESSIONAL
+- [x] 3.9 [IMPL GREEN] Update `src/modules/services/index.ts` — export data, actions, presentation (mirror patients barrel)
+- [x] 3.10 [VERIFY] `pnpm test` (696/696) + `pnpm type-check` (clean) + `pnpm lint` (clean); 37 new tests
 
 ## Phase 4: PR #4 — Detail + Create + Edit Pages
 
