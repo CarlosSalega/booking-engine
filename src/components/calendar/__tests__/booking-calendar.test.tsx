@@ -20,11 +20,19 @@
 
 import "temporal-polyfill/global";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, render, screen } from "@testing-library/react";
 import { Temporal } from "temporal-polyfill";
 
 import { BookingStatus, type BookingStatusType } from "@/modules/bookings/domain/booking";
 import type { EnrichedBooking } from "@/modules/bookings/data/booking-data.types";
+
+const mocks = vi.hoisted(() => ({
+  useMediaQueryMock: vi.fn().mockReturnValue(false),
+}));
+
+vi.mock("@/hooks/use-media-query", () => ({
+  useMediaQuery: mocks.useMediaQueryMock,
+}));
 
 // ---------------------------------------------------------------------------
 // Mock @schedule-x/react BEFORE importing the component.
@@ -34,9 +42,20 @@ import type { EnrichedBooking } from "@/modules/bookings/data/booking-data.types
 
 const useNextCalendarAppMock = vi.fn();
 const ScheduleXCalendarMock = vi.fn(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ({ calendarApp: _calendarApp }: { calendarApp: unknown }) => (
-    <div data-testid="schedule-x-calendar-mock" />
+  ({
+    customComponents,
+  }: {
+    calendarApp: unknown;
+    customComponents?: Record<string, unknown>;
+  }) => (
+    <div
+      data-testid="schedule-x-calendar-mock"
+      data-custom-month-event={
+        typeof customComponents?.["monthGridEvent"] === "function"
+          ? "present"
+          : "absent"
+      }
+    />
   ),
 );
 
@@ -135,7 +154,6 @@ describe("BookingCalendar — useNextCalendarApp config", () => {
       end: Temporal.ZonedDateTime;
     }>;
     const first = events[0]!;
-    expect(Temporal.ZonedDateTime.compare(first.start, first.start)).toBe(0);
     expect(first.start.timeZoneId).toBe("America/Argentina/Buenos_Aires");
   });
 
@@ -211,7 +229,15 @@ describe("BookingCalendar — onEventClick callback", () => {
 // ---------------------------------------------------------------------------
 
 describe("BookingCalendar — onRangeUpdate callback", () => {
-  it("is wired to the parent's onRangeUpdate prop with the new range", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("is wired to the parent's onRangeUpdate prop with the new range (after debounce)", () => {
     const parentRange = vi.fn();
     render(<BookingCalendar bookings={bookings} onRangeUpdate={parentRange} />);
     const config = getConfig();
@@ -220,6 +246,13 @@ describe("BookingCalendar — onRangeUpdate callback", () => {
 
     const range = { start: "2026-06-22", end: "2026-06-29" };
     callbacks.onRangeUpdate(range);
+
+    // The wrapper debounces onRangeUpdate by 200ms. Advance the
+    // fake timer past the debounce window so the callback fires.
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+
     expect(parentRange).toHaveBeenCalledWith(range);
   });
 });
@@ -242,5 +275,115 @@ describe("BookingCalendar — rendering", () => {
     expect(
       screen.getByTestId("schedule-x-calendar-mock"),
     ).toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// PR #2 additions — onRangeUpdate debounce, mobile default view, month grid
+// ---------------------------------------------------------------------------
+
+describe("BookingCalendar — onRangeUpdate debounce", () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  it("debounces consecutive onRangeUpdate calls within 200ms", () => {
+    const parentRange = vi.fn();
+    render(<BookingCalendar bookings={bookings} onRangeUpdate={parentRange} />);
+    const config = getConfig();
+    const callbacks = config["callbacks"] as {
+      onRangeUpdate: (range: unknown) => void;
+    };
+
+    // Three rapid navigation clicks. The wrapper must collapse
+    // them into ONE onRangeUpdate call (the final range), not
+    // three.
+    callbacks.onRangeUpdate({ start: "2026-06-22", end: "2026-06-29" });
+    callbacks.onRangeUpdate({ start: "2026-06-29", end: "2026-07-06" });
+    callbacks.onRangeUpdate({ start: "2026-07-06", end: "2026-07-13" });
+
+    // Within the debounce window, no calls have been made yet.
+    expect(parentRange).not.toHaveBeenCalled();
+
+    // After the debounce delay, exactly one call has been emitted
+    // with the LATEST range.
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+
+    expect(parentRange).toHaveBeenCalledTimes(1);
+    expect(parentRange).toHaveBeenCalledWith({
+      start: "2026-07-06",
+      end: "2026-07-13",
+    });
+  });
+
+  it("emits the FIRST call after the debounce window elapses (no trailing suppression)", () => {
+    const parentRange = vi.fn();
+    render(<BookingCalendar bookings={bookings} onRangeUpdate={parentRange} />);
+    const config = getConfig();
+    const callbacks = config["callbacks"] as {
+      onRangeUpdate: (range: unknown) => void;
+    };
+
+    callbacks.onRangeUpdate({ start: "2026-06-22", end: "2026-06-29" });
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+    expect(parentRange).toHaveBeenCalledTimes(1);
+
+    // A second call, after the first debounce window, must also fire.
+    callbacks.onRangeUpdate({ start: "2026-06-29", end: "2026-07-06" });
+    act(() => {
+      vi.advanceTimersByTime(250);
+    });
+    expect(parentRange).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("BookingCalendar — mobile default view", () => {
+  afterEach(() => {
+    mocks.useMediaQueryMock.mockReturnValue(false);
+  });
+
+  it("defaults to 'day' view on mobile (≤ 768px) when no defaultView prop is provided", () => {
+    mocks.useMediaQueryMock.mockReturnValue(true);
+    render(<BookingCalendar bookings={bookings} />);
+    const config = getConfig();
+    expect(config["defaultView"]).toBe("day");
+  });
+
+  it("keeps the URL/explicit defaultView on desktop even when the prop is 'week'", () => {
+    mocks.useMediaQueryMock.mockReturnValue(false);
+    render(<BookingCalendar bookings={bookings} defaultView="week" />);
+    const config = getConfig();
+    expect(config["defaultView"]).toBe("week");
+  });
+
+  it("forces 'day' on mobile even when the prop is 'month-grid'", () => {
+    // Mobile UX trumps the URL view — the wrapper always defaults
+    // to 'day' on small screens so the user sees a usable layout
+    // without horizontal scrolling.
+    mocks.useMediaQueryMock.mockReturnValue(true);
+    render(<BookingCalendar bookings={bookings} defaultView="month-grid" />);
+    const config = getConfig();
+    expect(config["defaultView"]).toBe("day");
+  });
+});
+
+describe("BookingCalendar — month grid event handler", () => {
+  it("passes the dot-only month event component as the monthGridEvent", () => {
+    render(<BookingCalendar bookings={bookings} />);
+    // The wrapper registers the dot-only `BookingCalendarMonthEvent`
+    // for the month grid. Schedule-X's day cell uses it to render
+    // the count indicator. The mock surfaces the registration via
+    // a `data-custom-month-event` attribute so we don't need to
+    // poke at internals.
+    const mock = screen.getByTestId("schedule-x-calendar-mock");
+    expect(mock.getAttribute("data-custom-month-event")).toBe("present");
   });
 });

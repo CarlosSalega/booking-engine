@@ -150,13 +150,17 @@ beforeEach(() => {
 // ---------------------------------------------------------------------------
 
 describe("BookingDetailActions — visibility", () => {
-  it("renders [Confirmar, Cancelar] for PENDING", () => {
+  it("renders [Confirmar, Cancelar, Reprogramar] for PENDING (calendar spec scenario)", () => {
+    // The calendar popover spec requires PENDING bookings to expose
+    // "Reprogramar" alongside Confirmar / Cancelar. The state machine
+    // accepts PENDING → RESCHEDULED, so the detail page mirrors the
+    // popover's action set.
     renderActions(makeBooking(BookingStatus.PENDING));
     expect(screen.getByRole("button", { name: "Confirmar" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Reprogramar" })).toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "Completar" })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "No asistió" })).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "Reprogramar" })).not.toBeInTheDocument();
   });
 
   it("renders [Completar, No asistió, Cancelar, Reprogramar] for CONFIRMED (the spec scenario)", () => {

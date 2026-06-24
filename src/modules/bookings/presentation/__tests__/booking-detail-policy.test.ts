@@ -25,9 +25,12 @@ describe("getAvailableActions", () => {
   // Happy path — status → expected action set
   // -------------------------------------------------------------------------
 
-  it("returns [confirm, cancel] for PENDING", () => {
+  it("returns [confirm, cancel, reschedule] for PENDING (calendar spec scenario)", () => {
+    // The calendar popover spec requires PENDING bookings to expose
+    // "Reprogramar" alongside Confirmar / Cancelar. The state machine
+    // accepts PENDING → RESCHEDULED, so the policy surfaces it here.
     const actions = getAvailableActions(BookingStatus.PENDING, USER_ROLE.ADMIN);
-    expect(actions.map((a) => a.key)).toEqual(["confirm", "cancel"]);
+    expect(actions.map((a) => a.key)).toEqual(["confirm", "cancel", "reschedule"]);
   });
 
   it("returns [confirm, cancel] for AWAITING_PAYMENT", () => {

@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * `BookingCalendar` — the Client Component that wraps Schedule-X.
  *
@@ -15,6 +17,12 @@
  *      and Monday as the first day of the week.
  *   5. Forward `onEventClick` (popover) and `onRangeUpdate`
  *      (refetch) callbacks to the parent.
+ *   6. Debounce `onRangeUpdate` calls by 200ms so rapid navigation
+ *      (e.g. clicking "next week" three times quickly) does NOT
+ *      fire three refetches.
+ *   7. Swap the default view to "day" on mobile viewports (≤ 768px)
+ *      so the user lands on a single-day view that's usable on
+ *      small screens.
  *
  * The popover actions, the toolbar, the empty state, and the URL
  * sync all live in PR #2. This wrapper only owns the Schedule-X
@@ -25,7 +33,7 @@ import "temporal-polyfill/global";
 import "@schedule-x/theme-default/dist/index.css";
 import "./booking-calendar.css";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import {
   ScheduleXCalendar,
   useNextCalendarApp,
@@ -46,6 +54,7 @@ import {
 } from "./booking-calendar-utils";
 import { BookingCalendarEvent } from "./booking-calendar-event";
 import { BookingCalendarMonthEvent } from "./booking-calendar-month-event";
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -115,8 +124,17 @@ export function BookingCalendar({
   onEventClick,
   onRangeUpdate,
 }: BookingCalendarProps) {
-  // Map bookings → Schedule-X events. Memoized so the array identity
-  // is stable across re-renders (Schedule-X diffs events by id).
+  // 1. Mobile detection. On a small viewport the wrapper forces
+  //    the default view to "day" so the user lands on a usable
+  //    single-day layout (the week view doesn't fit a 375px screen).
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const effectiveDefaultView: "week" | "day" | "month-grid" = isMobile
+    ? "day"
+    : defaultView;
+
+  // 2. Map bookings → Schedule-X events. Memoized so the array
+  //    identity is stable across re-renders (Schedule-X diffs events
+  //    by id).
   const events = useMemo(
     () => bookings.map(bookingToCalendarEvent),
     [bookings],
@@ -124,11 +142,32 @@ export function BookingCalendar({
 
   const calendars = useMemo(() => buildCalendarsConfig(), []);
 
+  // 3. onRangeUpdate debounce — rapid navigation (e.g. spamming
+  //    the "next week" arrow) should NOT fire one fetch per click.
+  //    We hold the latest range in a ref and emit a single call
+  //    200ms after the last change. Schedule-X hands us an object
+  //    shaped `{ start, end }` (matching our `CalendarViewRange`
+  //    type), not an array.
+  const rangeRef = useRef<{ start: Temporal.ZonedDateTime; end: Temporal.ZonedDateTime } | null>(
+    null,
+  );
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    // Cleanup any pending timer on unmount so the callback doesn't
+    // fire after the component has been swapped out.
+    return () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+      }
+    };
+  }, []);
+
   const calendar = useNextCalendarApp({
     views: [createViewWeek(), createViewDay(), createViewMonthGrid()],
     events,
     calendars,
-    defaultView,
+    defaultView: effectiveDefaultView,
     locale: "es-AR",
     firstDayOfWeek: 1,
     callbacks: {
@@ -139,7 +178,19 @@ export function BookingCalendar({
         onEventClick?.(event as unknown as CalendarAppEvent);
       },
       onRangeUpdate: (range) => {
-        onRangeUpdate?.(range);
+        // Store the latest range and schedule the debounced emit.
+        rangeRef.current = range as {
+          start: Temporal.ZonedDateTime;
+          end: Temporal.ZonedDateTime;
+        };
+        if (timerRef.current) {
+          clearTimeout(timerRef.current);
+        }
+        timerRef.current = setTimeout(() => {
+          if (rangeRef.current && onRangeUpdate) {
+            onRangeUpdate(rangeRef.current);
+          }
+        }, 200);
       },
     },
   });
@@ -150,6 +201,11 @@ export function BookingCalendar({
         calendarApp={calendar}
         customComponents={{
           timeGridEvent: BookingCalendarEvent,
+          // Mobile (≤ 768px) shows a dot-only month grid; desktop
+          // shows the same component but Schedule-X gives it more
+          // space to render the count alongside the dot. The
+          // component itself reads the schedule-x cell width to
+          // decide which to render.
           monthGridEvent: BookingCalendarMonthEvent,
         }}
       />

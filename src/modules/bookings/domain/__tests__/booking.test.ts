@@ -155,6 +155,24 @@ describe("canTransition", () => {
       canTransition(BookingStatus.CANCELLED, BookingStatus.CONFIRMED),
     ).toBe(false);
   });
+
+  it("allows PENDING → RESCHEDULED (PENDING popover shows Reprogramar)", () => {
+    // Spec scenario: when a PENDING booking is open in the popover, the
+    // "Reprogramar" action is available, so the state machine MUST
+    // accept the transition PENDING → RESCHEDULED.
+    expect(canTransition(BookingStatus.PENDING, BookingStatus.RESCHEDULED)).toBe(
+      true,
+    );
+  });
+
+  it("rejects CANCELLED → RESCHEDULED (CANCELLED stays terminal)", () => {
+    // Spec scenario: terminal states have no outgoing edges. We add
+    // this here so the new PENDING → RESCHEDULED edge is added without
+    // accidentally opening CANCELLED too.
+    expect(
+      canTransition(BookingStatus.CANCELLED, BookingStatus.RESCHEDULED),
+    ).toBe(false);
+  });
 });
 
 describe("calculateEndTime", () => {

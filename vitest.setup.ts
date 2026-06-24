@@ -7,3 +7,30 @@ if (!process.env["DATABASE_URL"]) {
   process.env["DATABASE_URL"] =
     "postgres://test:test@localhost:5432/test?sslmode=disable";
 }
+
+// jsdom does not implement pointer capture, but Radix UI (shadcn's
+// Select, Popover, etc.) calls `hasPointerCapture` on every
+// pointer-down event. Polyfill the relevant methods on `Element`
+// so Radix handlers don't throw during user-event interactions.
+if (typeof Element !== "undefined") {
+  if (!Element.prototype.hasPointerCapture) {
+    Element.prototype.hasPointerCapture = function hasPointerCapture() {
+      return false;
+    };
+  }
+  if (!Element.prototype.releasePointerCapture) {
+    Element.prototype.releasePointerCapture = function releasePointerCapture() {
+      // no-op
+    };
+  }
+  if (!Element.prototype.setPointerCapture) {
+    Element.prototype.setPointerCapture = function setPointerCapture() {
+      // no-op
+    };
+  }
+  if (!Element.prototype.scrollIntoView) {
+    Element.prototype.scrollIntoView = function scrollIntoView() {
+      // no-op
+    };
+  }
+}
