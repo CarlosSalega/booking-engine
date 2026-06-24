@@ -33,8 +33,8 @@ import { cn } from "@/lib/utils";
 interface WizardStepServiceProps {
   /** The currently selected service id (or null). Used for highlighting. */
   selectedServiceId: string | null;
-  /** Called with the new service id when the user picks a service. */
-  onSelect: (serviceId: string) => void;
+  /** Called with the full service object when the user picks a service. */
+  onSelect: (service: ServiceOption) => void;
 }
 
 type FetchState =
@@ -120,7 +120,7 @@ export function WizardStepService({
           <li key={service.id}>
             <button
               type="button"
-              onClick={() => onSelect(service.id)}
+              onClick={() => onSelect(service)}
               aria-pressed={selected}
               className={cn(
                 "flex w-full flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",

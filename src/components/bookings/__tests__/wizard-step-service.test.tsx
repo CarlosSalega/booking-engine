@@ -131,7 +131,7 @@ describe("WizardStepService", () => {
     expect(other).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("calls onSelect when a service card is clicked", async () => {
+  it("calls onSelect with the full service object when a card is clicked", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     getServicesMock.mockResolvedValue(SERVICES);
@@ -140,7 +140,10 @@ describe("WizardStepService", () => {
       name: /limpieza dental/i,
     });
     await user.click(card);
-    expect(onSelect).toHaveBeenCalledWith("svc-1");
+    // The component passes the whole `ServiceOption` (not just the
+    // id) so the wizard store can cache the name/price/paymentType
+    // for the payment + confirm steps.
+    expect(onSelect).toHaveBeenCalledWith(SERVICES[0]);
   });
 
   it("does not call onSelect when the currently selected service is clicked again", async () => {
@@ -157,7 +160,7 @@ describe("WizardStepService", () => {
       name: /limpieza dental/i,
     });
     await user.click(card);
-    expect(onSelect).toHaveBeenCalledWith("svc-1");
+    expect(onSelect).toHaveBeenCalledWith(SERVICES[0]);
   });
 
   it("fetches only once across renders", async () => {

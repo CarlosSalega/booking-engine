@@ -25,6 +25,11 @@ import userEvent from "@testing-library/user-event";
 
 import type { BookingResult } from "@/modules/bookings/actions";
 import { useWizardStore } from "@/modules/bookings/presentation/wizard-store";
+import type {
+  PatientOption,
+  ProfessionalOption,
+  ServiceOption,
+} from "@/modules/bookings/data/booking-data.types";
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -84,6 +89,33 @@ const { default: NewBookingPage } = await import(
   "@/app/(dashboard)/dashboard/bookings/new/page"
 );
 
+// ---------------------------------------------------------------------------
+// Fixtures — full objects, matching the real `ServiceOption` /
+// `ProfessionalOption` / `PatientOption` shapes. The wizard store
+// setters now take objects, not ids, so all the helpers below pass
+// these directly.
+// ---------------------------------------------------------------------------
+
+const SERVICE: ServiceOption = {
+  id: "svc-1",
+  name: "Consulta General",
+  price: 5000,
+  durationMinutes: 30,
+  paymentType: "FULL",
+};
+
+const PROFESSIONAL: ProfessionalOption = {
+  id: "prof-1",
+  userId: "user-prof-1",
+  user: { name: "Dra. Pérez" },
+  specialties: ["Kinesiología"],
+};
+
+const PATIENT: PatientOption = {
+  id: "pat-1",
+  user: { name: "Ana López", email: "ana@x.com" },
+};
+
 beforeEach(() => {
   // Reset the wizard store + mocks between tests.
   useWizardStore.getState().reset();
@@ -103,17 +135,17 @@ beforeEach(() => {
  */
 function fillStoreForStep6() {
   const s = useWizardStore.getState();
-  s.setService("svc-1");
-  s.setProfessional("prof-1");
+  s.setService(SERVICE);
+  s.setProfessional(PROFESSIONAL);
   s.setSchedule("2026-06-20", "09:00", "09:30");
-  s.setPatient("pat-1");
+  s.setPatient(PATIENT);
   s.goToStep(6);
 }
 
 function fillStoreForStep4() {
   const s = useWizardStore.getState();
-  s.setService("svc-1");
-  s.setProfessional("prof-1");
+  s.setService(SERVICE);
+  s.setProfessional(PROFESSIONAL);
   s.setSchedule("2026-06-20", "09:00", "09:30");
   s.goToStep(4);
 }
@@ -174,8 +206,8 @@ describe("NewBookingPage", () => {
       render(<NewBookingPage />);
     });
     act(() => {
-      // Need a serviceId for the payment step to render.
-      useWizardStore.getState().setService("svc-1");
+      // Need a service (id + object) for the payment step to render.
+      useWizardStore.getState().setService(SERVICE);
       useWizardStore.getState().goToStep(5);
     });
     expect(screen.getByTestId("wizard-step-payment")).toBeInTheDocument();
@@ -218,7 +250,7 @@ describe("NewBookingPage", () => {
     });
     act(() => {
       // Select a service so step 1 is valid.
-      useWizardStore.getState().setService("svc-1");
+      useWizardStore.getState().setService(SERVICE);
     });
     await user.click(screen.getByRole("button", { name: /siguiente/i }));
     expect(useWizardStore.getState().currentStep).toBe(2);
@@ -245,8 +277,8 @@ describe("NewBookingPage", () => {
     });
     act(() => {
       // Go to step 3 to test Anterior from there.
-      useWizardStore.getState().setService("svc-1");
-      useWizardStore.getState().setProfessional("prof-1");
+      useWizardStore.getState().setService(SERVICE);
+      useWizardStore.getState().setProfessional(PROFESSIONAL);
       useWizardStore.getState().setSchedule("2026-06-20", "09:00", "09:30");
       useWizardStore.getState().goToStep(3);
     });

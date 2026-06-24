@@ -76,11 +76,14 @@ export default function NewBookingPage() {
   // ---------------------------------------------------------------------
   const currentStep = useWizardStore((s) => s.currentStep);
   const serviceId = useWizardStore((s) => s.serviceId);
+  const selectedService = useWizardStore((s) => s.selectedService);
   const professionalId = useWizardStore((s) => s.professionalId);
+  const selectedProfessional = useWizardStore((s) => s.selectedProfessional);
   const date = useWizardStore((s) => s.date);
   const startTime = useWizardStore((s) => s.startTime);
   const endTime = useWizardStore((s) => s.endTime);
   const patientId = useWizardStore((s) => s.patientId);
+  const selectedPatient = useWizardStore((s) => s.selectedPatient);
   const isGuest = useWizardStore((s) => s.isGuest);
   const guestName = useWizardStore((s) => s.guestName);
   const guestPhone = useWizardStore((s) => s.guestPhone);
@@ -264,7 +267,9 @@ export default function NewBookingPage() {
               if (m === "guest" && !isGuest) {
                 setGuest("", "", "");
               } else if (m === "existing" && isGuest) {
-                setPatient("");
+                // Clear the (already-absent) selectedPatient so
+                // the "Paciente existente" tab starts unselected.
+                setPatient(null);
               }
             }}
             selectedPatientId={patientId}
@@ -275,36 +280,42 @@ export default function NewBookingPage() {
             onGuestChange={setGuest}
           />
         )}
-        {currentStep === 5 && serviceId && (
-          // The service info is sourced from the same store; the
-          // step component is purely presentational. We pull the
-          // service details from the list loaded by step 1 — but
-          // since the step 1 component already fetched and
-          // discarded the full list, we use a lightweight placeholder
-          // for the price. The payment type is the more important
-          // detail; the name + price are shown when available.
-          <PaymentStepSummary
-            serviceId={serviceId}
-            paymentTypeFallback="FULL"
+        {currentStep === 5 && selectedService && (
+          // The cached `selectedService` carries name + price +
+          // paymentType — the payment step is purely presentational
+          // and renders those directly. No re-fetch, no placeholder.
+          <WizardStepPayment
+            serviceName={selectedService.name}
+            servicePrice={selectedService.price}
+            paymentType={selectedService.paymentType}
           />
         )}
-        {currentStep === 6 && serviceId && professionalId && date && startTime && endTime && (
-          <ConfirmStepSummary
-            serviceId={serviceId}
-            professionalId={professionalId}
-            date={date}
-            startTime={startTime}
-            endTime={endTime}
-            isGuest={isGuest}
-            patientId={patientId}
-            guestName={guestName}
-            guestPhone={guestPhone}
-            guestEmail={guestEmail}
-            isSubmitting={isSubmitting}
-            error={error}
-            onSubmit={handleSubmit}
-          />
-        )}
+        {currentStep === 6 &&
+          selectedService &&
+          selectedProfessional &&
+          date &&
+          startTime &&
+          endTime && (
+            // The cached service + professional objects carry the
+            // real name + price + specialty info. Patient is null
+            // in guest mode (the confirm step already handles that
+            // branch via the `isGuest` + `guestName` props).
+            <WizardStepConfirm
+              service={selectedService}
+              professional={selectedProfessional}
+              date={date}
+              startTime={startTime}
+              endTime={endTime}
+              isGuest={isGuest}
+              patient={isGuest ? null : selectedPatient}
+              guestName={guestName}
+              guestPhone={guestPhone}
+              guestEmail={guestEmail}
+              isSubmitting={isSubmitting}
+              error={error}
+              onSubmit={handleSubmit}
+            />
+          )}
       </div>
 
       {/* Navigation */}
@@ -317,116 +328,5 @@ export default function NewBookingPage() {
         onCancel={handleCancel}
       />
     </div>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Sub-components — render the step 5 / step 6 content with the data
-// available in the page's closure. These exist so the page itself
-// stays readable; they're not exported and not tested directly (the
-// underlying WizardStepPayment / WizardStepConfirm have their own
-// test files).
-// ---------------------------------------------------------------------------
-
-/**
- * Step 5 wrapper. The full service info isn't in the wizard store
- * (only the id is) — we re-fetch it via the data layer's server
- * action and render `<WizardStepPayment>`. For now we render a
- * minimal placeholder using the fallback payment type; the full
- * service info would require keeping the loaded services list in
- * the store, which the design intentionally avoids.
- */
-function PaymentStepSummary({
-  serviceId,
-  paymentTypeFallback,
-}: {
-  serviceId: string;
-  paymentTypeFallback: "FULL" | "DEPOSIT" | "NONE";
-}) {
-  // The full service list isn't in the store (intentionally — the
-  // store is small and the design keeps fetches in the step
-  // components). Render the step with the fallback data the design
-  // accepts; the full price + name are shown in step 6 (confirm).
-  return (
-    <WizardStepPayment
-      serviceName={`Servicio ${serviceId.slice(0, 8)}`}
-      servicePrice={0}
-      paymentType={paymentTypeFallback}
-    />
-  );
-}
-
-interface ConfirmStepSummaryProps {
-  serviceId: string;
-  professionalId: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  isGuest: boolean;
-  patientId: string | null;
-  guestName: string;
-  guestPhone: string;
-  guestEmail: string;
-  isSubmitting: boolean;
-  error: string | null;
-  onSubmit: () => void;
-}
-
-/**
- * Step 6 wrapper. The service + professional + patient details
- * aren't in the wizard store (only their ids are), so we render
- * a minimal confirm view that shows the schedule + the customer
- * choice. The full names appear in the detail page after the
- * booking is created.
- */
-function ConfirmStepSummary({
-  serviceId,
-  professionalId,
-  date,
-  startTime,
-  endTime,
-  isGuest,
-  patientId,
-  guestName,
-  guestPhone,
-  guestEmail,
-  isSubmitting,
-  error,
-  onSubmit,
-}: ConfirmStepSummaryProps) {
-  return (
-    <WizardStepConfirm
-      service={{
-        id: serviceId,
-        name: `Servicio ${serviceId.slice(0, 8)}`,
-        price: 0,
-        durationMinutes: 30,
-        paymentType: "FULL",
-      }}
-      professional={{
-        id: professionalId,
-        userId: professionalId,
-        user: { name: `Profesional ${professionalId.slice(0, 8)}` },
-        specialties: [],
-      }}
-      date={date}
-      startTime={startTime}
-      endTime={endTime}
-      isGuest={isGuest}
-      patient={
-        isGuest || !patientId
-          ? null
-          : {
-              id: patientId,
-              user: { name: `Paciente ${patientId.slice(0, 8)}`, email: "" },
-            }
-      }
-      guestName={guestName}
-      guestPhone={guestPhone}
-      guestEmail={guestEmail}
-      isSubmitting={isSubmitting}
-      error={error}
-      onSubmit={onSubmit}
-    />
   );
 }

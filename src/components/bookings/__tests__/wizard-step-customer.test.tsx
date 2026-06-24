@@ -138,7 +138,7 @@ describe("WizardStepCustomer", () => {
     ).toBeInTheDocument();
   });
 
-  it("calls onSelectPatient when a patient is clicked", async () => {
+  it("calls onSelectPatient with the full patient object when a card is clicked", async () => {
     const user = userEvent.setup();
     const onSelectPatient = vi.fn();
     getPatientsMock.mockResolvedValue(PATIENTS);
@@ -156,7 +156,10 @@ describe("WizardStepCustomer", () => {
     );
     const card = await screen.findByRole("button", { name: /ana lópez/i });
     await user.click(card);
-    expect(onSelectPatient).toHaveBeenCalledWith("pat-2");
+    // The component passes the whole `PatientOption` (not just the
+    // id) so the wizard store can cache the user.name + user.email
+    // for the confirm step.
+    expect(onSelectPatient).toHaveBeenCalledWith(PATIENTS[1]);
   });
 
   it("marks the selected patient as pressed", async () => {

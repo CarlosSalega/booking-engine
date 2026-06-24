@@ -36,7 +36,8 @@ interface WizardStepCustomerProps {
   mode: WizardCustomerMode;
   onModeChange: (mode: WizardCustomerMode) => void;
   selectedPatientId: string | null;
-  onSelectPatient: (patientId: string) => void;
+  /** Called with the full patient object when the user picks one. */
+  onSelectPatient: (patient: PatientOption) => void;
   guestName: string;
   guestPhone: string;
   guestEmail: string;
@@ -187,7 +188,7 @@ export function WizardStepCustomer({
                   <li key={patient.id}>
                     <button
                       type="button"
-                      onClick={() => onSelectPatient(patient.id)}
+                      onClick={() => onSelectPatient(patient)}
                       aria-pressed={selected}
                       className={cn(
                         "flex w-full items-center justify-between gap-2 rounded-lg border p-3 text-left transition-colors",

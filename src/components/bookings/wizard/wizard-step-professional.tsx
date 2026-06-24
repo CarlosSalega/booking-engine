@@ -22,7 +22,8 @@ import { cn } from "@/lib/utils";
 interface WizardStepProfessionalProps {
   serviceId: string | null;
   selectedProfessionalId: string | null;
-  onSelect: (professionalId: string) => void;
+  /** Called with the full professional object when the user picks one. */
+  onSelect: (professional: ProfessionalOption) => void;
 }
 
 type FetchState =
@@ -113,7 +114,7 @@ export function WizardStepProfessional({
           <li key={prof.id}>
             <button
               type="button"
-              onClick={() => onSelect(prof.id)}
+              onClick={() => onSelect(prof)}
               aria-pressed={selected}
               className={cn(
                 "flex w-full flex-col items-start gap-2 rounded-lg border p-4 text-left transition-colors",

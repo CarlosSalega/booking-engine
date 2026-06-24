@@ -144,7 +144,7 @@ describe("WizardStepProfessional", () => {
     expect(selected).toHaveAttribute("aria-pressed", "true");
   });
 
-  it("calls onSelect when a professional is clicked", async () => {
+  it("calls onSelect with the full professional object when a card is clicked", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     getProfessionalsMock.mockResolvedValue(PROS);
@@ -157,7 +157,10 @@ describe("WizardStepProfessional", () => {
     );
     const card = await screen.findByRole("button", { name: /dra\. lópez/i });
     await user.click(card);
-    expect(onSelect).toHaveBeenCalledWith("prof-2");
+    // The component passes the whole `ProfessionalOption` (not just
+    // the id) so the wizard store can cache the user/specialties for
+    // the confirm step.
+    expect(onSelect).toHaveBeenCalledWith(PROS[1]);
   });
 
   it("re-fetches when serviceId changes", async () => {

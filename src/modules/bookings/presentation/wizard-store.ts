@@ -14,16 +14,30 @@
  * - **`setService` resets downstream fields** — if the user picks a
  *   different service after they already chose a professional, the old
  *   professional may not offer the new service, so the chain is
- *   cleared. This mirrors how real booking systems behave.
+ *   cleared (including the cached `selectedProfessional` /
+ *   `selectedPatient` objects, not just their ids). This mirrors how
+ *   real booking systems behave.
  * - **`canAdvanceFromStep` is a pure helper** — the navigation bar uses
  *   it to enable/disable "Siguiente", and the page can also use it to
  *   validate before submit.
+ * - **Setters take full objects, not just ids** — the step components
+ *   already have the full `ServiceOption` / `ProfessionalOption` /
+ *   `PatientOption` in scope when the user picks one. Storing the
+ *   full object means the confirm + payment steps can render the real
+ *   name/price/specialty without re-fetching or fabricating
+ *   placeholders from the id.
  *
  * Pure module: no React, no Next.js, no Prisma. The store itself uses
  * Zustand 5's `create` with a single `set` argument.
  */
 
 import { create } from "zustand";
+
+import type {
+  PatientOption,
+  ProfessionalOption,
+  ServiceOption,
+} from "@/modules/bookings/data/booking-data.types";
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -38,9 +52,13 @@ export const WIZARD_TOTAL_STEPS = 6;
 
 /** Shape of the wizard's reactive state. */
 export interface WizardState {
-  // Step data
+  // Step data — ids + cached full objects
   serviceId: string | null;
+  /** Full service object cached at selection time. Drives step 5 + 6 UI. */
+  selectedService: ServiceOption | null;
   professionalId: string | null;
+  /** Full professional object cached at selection time. Drives step 6 UI. */
+  selectedProfessional: ProfessionalOption | null;
   /** Calendar day in YYYY-MM-DD local time. */
   date: string | null;
   /** Start time in HH:mm (24h). */
@@ -49,6 +67,8 @@ export interface WizardState {
   endTime: string | null;
   /** Registered patient id; null = no patient selected. */
   patientId: string | null;
+  /** Full patient object cached at selection time. Drives step 6 UI. */
+  selectedPatient: PatientOption | null;
   /** True when the user toggled "Invitado" and provided guest info. */
   isGuest: boolean;
   guestName: string;
@@ -64,10 +84,11 @@ export interface WizardState {
   error: string | null;
 
   // Actions
-  setService: (serviceId: string) => void;
-  setProfessional: (professionalId: string) => void;
+  setService: (service: ServiceOption) => void;
+  setProfessional: (professional: ProfessionalOption) => void;
   setSchedule: (date: string, startTime: string, endTime: string) => void;
-  setPatient: (patientId: string) => void;
+  /** Pass `null` to clear the patient selection (e.g. on mode switch). */
+  setPatient: (patient: PatientOption | null) => void;
   setGuest: (name: string, phone: string, email: string) => void;
   setNotes: (notes: string) => void;
   setSubmitting: (isSubmitting: boolean) => void;
@@ -82,11 +103,14 @@ export interface WizardState {
 export function getInitialWizardState() {
   return {
     serviceId: null,
+    selectedService: null,
     professionalId: null,
+    selectedProfessional: null,
     date: null,
     startTime: null,
     endTime: null,
     patientId: null,
+    selectedPatient: null,
     isGuest: false,
     guestName: "",
     guestPhone: "",
@@ -112,15 +136,21 @@ const INITIAL = getInitialWizardState();
 export const useWizardStore = create<WizardState>()((set) => ({
   ...INITIAL,
 
-  setService: (serviceId) =>
+  setService: (service) =>
     set({
-      serviceId,
-      // Downstream reset — see design.md AD4.
+      serviceId: service.id,
+      selectedService: service,
+      // Downstream reset — see design.md AD4. We clear both the ids
+      // AND the cached objects: a stale `selectedProfessional` from
+      // before the service change would point at a professional who
+      // may not even offer the new service.
       professionalId: null,
+      selectedProfessional: null,
       date: null,
       startTime: null,
       endTime: null,
       patientId: null,
+      selectedPatient: null,
       isGuest: false,
       guestName: "",
       guestPhone: "",
@@ -129,9 +159,10 @@ export const useWizardStore = create<WizardState>()((set) => ({
       error: null,
     }),
 
-  setProfessional: (professionalId) =>
+  setProfessional: (professional) =>
     set({
-      professionalId,
+      professionalId: professional.id,
+      selectedProfessional: professional,
       // Schedule becomes invalid for the new professional.
       date: null,
       startTime: null,
@@ -140,9 +171,10 @@ export const useWizardStore = create<WizardState>()((set) => ({
 
   setSchedule: (date, startTime, endTime) => set({ date, startTime, endTime }),
 
-  setPatient: (patientId) =>
+  setPatient: (patient) =>
     set({
-      patientId,
+      patientId: patient?.id ?? null,
+      selectedPatient: patient,
       // Switch to patient mode → clear guest fields.
       isGuest: false,
       guestName: "",
@@ -157,6 +189,7 @@ export const useWizardStore = create<WizardState>()((set) => ({
       guestEmail,
       isGuest: true,
       patientId: null,
+      selectedPatient: null,
     }),
 
   setNotes: (notes) => set({ notes }),
