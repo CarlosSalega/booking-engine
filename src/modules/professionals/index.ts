@@ -15,6 +15,8 @@
  *   - Server Components  → `getProfessionals`, `getProfessionalById`
  *   - Server Actions     → `createProfessional`, `updateProfessional`,
  *                          `changeProfessionalStatus`
+ *   - Presentation       → `getProfessionalStatusLabel`, `formatSpecialties`,
+ *                          `PROFESSIONAL_STATUS_LABEL`
  *   - Types              → `Professional`, `ProfessionalData`,
  *                          `ProfessionalStatus`, `ProfessionalStatusType`,
  *                          `professionalSchema`, `professionalDataSchema`,
@@ -26,6 +28,7 @@
  */
 
 export * from "./domain";
+export * from "./presentation";
 
 // Re-export the data layer's public reads. The writes
 // (`createProfessional` and `updateProfessional`) are NOT re-exported
