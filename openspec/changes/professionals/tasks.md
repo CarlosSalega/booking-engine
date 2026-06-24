@@ -51,14 +51,14 @@ Verify: `pnpm test professionals/actions && pnpm type-check && pnpm lint`
 
 ## PR #3 — List + Components
 
-- [ ] 3.1 Add `presentation/formatters.ts` (`getProfessionalStatusLabel`, `formatSpecialties`) + tests
-- [ ] 3.2 Add `components/professionals/tag-input.tsx` (controlled `string[]`, Enter/Backspace, dedup) + tests
-- [ ] 3.3 Add `professional-status-badge.tsx` (ACTIVE emerald / INACTIVE gray) + tests
-- [ ] 3.4 Add `professional-status-filter.tsx` (URL `?status=`) + tests
-- [ ] 3.5 Add `professional-search-bar.tsx` (debounced URL `?search=`) + tests
-- [ ] 3.6 Add `professional-table-skeleton.tsx`
-- [ ] 3.7 RED → GREEN: `professional-table.tsx` (5 cols, table+cards, pagination) + tests
-- [ ] 3.8 Rewrite `app/(dashboard)/dashboard/professionals/page.tsx` (Suspense, parseFilters, getCanCreate)
+- [x] 3.1 Add `presentation/formatters.ts` (`getProfessionalStatusLabel`, `formatSpecialties`) + tests
+- [x] 3.2 Add `components/professionals/tag-input.tsx` (controlled `string[]`, Enter/Backspace, dedup) + tests
+- [x] 3.3 Add `professional-status-badge.tsx` (ACTIVE emerald / INACTIVE gray) + tests
+- [x] 3.4 Add `professional-status-filter.tsx` (URL `?status=`) + tests
+- [x] 3.5 Add `professional-search-bar.tsx` (debounced URL `?search=`) + tests
+- [x] 3.6 Add `professional-table-skeleton.tsx`
+- [x] 3.7 RED → GREEN: `professional-table.tsx` (5 cols, table+cards, pagination) + tests
+- [x] 3.8 Rewrite `app/(dashboard)/dashboard/professionals/page.tsx` (Suspense, parseFilters, getCanCreate)
 
 Verify: `pnpm test professional && pnpm type-check && pnpm lint`
 
