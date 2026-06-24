@@ -1,0 +1,105 @@
+/**
+ * Calendar theming — override Schedule-X CSS variables to use the
+ * shadcn design tokens defined in `src/app/globals.css`.
+ *
+ * The Schedule-X default theme is Material-3 colored (purple/grey).
+ * The project uses Tailwind/shadcn's `oklch` token system, so we
+ * remap the `--sx-color-*` family to the `var(--color-*)` / `var(--*)`
+ * tokens via `:root` and `.dark` (matching the two modes in
+ * `globals.css`).
+ *
+ * Per design.md AD1–AD6, this is the only CSS surface for the
+ * calendar — the per-status event colors come from
+ * `STATUS_CALENDAR_COLORS` (consumed by the `calendars` config), NOT
+ * from CSS.
+ *
+ * The file is imported by the calendar wrapper (so it only ships on
+ * the calendar route, not the rest of the app) and overrides `:root`
+ * AFTER the Schedule-X theme so the cascade resolves to our tokens.
+ */
+
+.sx-react-calendar-wrapper,
+.sx__calendar-wrapper {
+  /* ── Primary (today's date, selected view, focused event) ── */
+  --sx-color-primary: var(--color-primary);
+  --sx-color-on-primary: var(--color-primary-foreground);
+  --sx-color-primary-container: var(--color-primary);
+  --sx-color-on-primary-container: var(--color-primary-foreground);
+
+  /* ── Surfaces (grid background, time axis, header) ── */
+  --sx-color-surface: var(--color-background);
+  --sx-color-surface-dim: var(--color-muted);
+  --sx-color-surface-bright: var(--color-card);
+  --sx-color-on-surface: var(--color-foreground);
+  --sx-color-surface-container: var(--color-muted);
+  --sx-color-surface-container-low: var(--color-background);
+  --sx-color-surface-container-high: var(--color-card);
+  --sx-color-background: var(--color-background);
+  --sx-color-on-background: var(--color-foreground);
+
+  /* ── Secondary / tertiary / accent (less prominent surfaces) ── */
+  --sx-color-secondary: var(--color-secondary);
+  --sx-color-on-secondary: var(--color-secondary-foreground);
+  --sx-color-secondary-container: var(--color-muted);
+  --sx-color-on-secondary-container: var(--color-secondary-foreground);
+  --sx-color-tertiary: var(--color-accent);
+  --sx-color-on-tertiary: var(--color-accent-foreground);
+  --sx-color-tertiary-container: var(--color-accent);
+  --sx-color-on-tertiary-container: var(--color-accent-foreground);
+
+  /* ── Outline (borders, dividers) ── */
+  --sx-color-outline: var(--color-border);
+  --sx-color-outline-variant: var(--color-border);
+  --sx-color-neutral: var(--color-muted-foreground);
+  --sx-color-neutral-variant: var(--color-muted-foreground);
+
+  /* ── Tint used by hover / focus glows ── */
+  --sx-color-surface-tint: var(--color-primary);
+
+  /* ── Typography — match shadcn font tokens ── */
+  --sx-font-family: var(--font-sans);
+
+  /* ── Geometry — match shadcn radius tokens ── */
+  --sx-rounding-extra-small: calc(var(--radius) - 4px);
+  --sx-rounding-small: var(--radius);
+  --sx-rounding-medium: var(--radius);
+  --sx-rounding-large: calc(var(--radius) + 4px);
+  --sx-rounding-extra-large: calc(var(--radius) + 8px);
+}
+
+.dark .sx-react-calendar-wrapper,
+.dark .sx__calendar-wrapper {
+  --sx-color-primary: var(--color-primary);
+  --sx-color-on-primary: var(--color-primary-foreground);
+  --sx-color-surface: var(--color-background);
+  --sx-color-on-surface: var(--color-foreground);
+  --sx-color-surface-container: var(--color-muted);
+  --sx-color-background: var(--color-background);
+  --sx-color-on-background: var(--color-foreground);
+  --sx-color-outline: var(--color-border);
+}
+
+/* ── Calendar-day boundaries (Argentine working hours) ──────────────
+ * The grid is 08:00–20:00 in 30-minute slots, matching the spec's
+ * "30-min slots 08:00–20:00". The actual slot config is passed via
+ * `dayGridOptions`/`weekGridOptions` in PR #2; the visual outline
+ * below is the supporting layer.
+ */
+.sx__timegrid-day,
+.sx__week-grid-day {
+  font-family: var(--font-sans);
+}
+
+.sx__time-axis,
+.sx__week-grid-time-axis {
+  font-family: var(--font-sans);
+  color: var(--color-muted-foreground);
+}
+
+/* Calendar header (Lun–Dom) — Argentinian Spanish, no Material caps */
+.sx__calendar-header,
+.sx__week-grid-header,
+.sx__month-grid-header {
+  font-family: var(--font-sans);
+  color: var(--color-foreground);
+}
