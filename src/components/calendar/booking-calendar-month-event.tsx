@@ -4,8 +4,14 @@
  * Renders the per-day indicator inside a month-grid cell. Schedule-X
  * calls this component with the first event of the day and a list of
  * the other events sharing the same day — the visual is a colored dot
- * and a count badge, the click target stays the cell (Schedule-X wires
- * that to the day view navigation via `onClickDate`).
+ * and (optionally) a count badge. The click target stays the cell
+ * (Schedule-X wires that to the day view navigation via
+ * `onClickDate`).
+ *
+ * Mobile (≤ 768px): the cell is small, so the component renders the
+ * dot only — the count is dropped to save horizontal space. The
+ * `useMediaQuery` hook drives the flag and re-renders when the
+ * viewport crosses the breakpoint.
  *
  * The component is a Client Component because the calendar only loads
  * on the client.
@@ -14,6 +20,8 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+
+import { useMediaQuery } from "@/hooks/use-media-query";
 
 import type { TimeGridCalendarEvent } from "./booking-calendar-event";
 
@@ -36,6 +44,8 @@ export function BookingCalendarMonthEvent({
   eventsOnDay,
   calendarEventPlacement,
 }: BookingCalendarMonthEventProps) {
+  const isMobile = useMediaQuery("(max-width: 768px)");
+
   // When Schedule-X passes the full month list as `events`, use its
   // length; otherwise fall back to the single event passed via
   // `calendarEvent` (one event on the day).
@@ -55,12 +65,16 @@ export function BookingCalendarMonthEvent({
         aria-hidden="true"
         className="size-1.5 shrink-0 rounded-full bg-current"
       />
-      <span
-        className="font-medium tabular-nums"
-        data-testid="month-event-count"
-      >
-        {count}
-      </span>
+      {/* Mobile collapses the indicator to a dot only — the count
+          is too wide for the small cell. */}
+      {isMobile ? null : (
+        <span
+          className="font-medium tabular-nums"
+          data-testid="month-event-count"
+        >
+          {count}
+        </span>
+      )}
     </div>
   );
 }

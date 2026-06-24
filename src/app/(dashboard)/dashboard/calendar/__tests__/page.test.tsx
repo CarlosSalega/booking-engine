@@ -30,9 +30,12 @@ import { act, cleanup, render, screen } from "@testing-library/react";
 // Mocks
 // ---------------------------------------------------------------------------
 
-const useMediaQueryMock = vi.fn().mockReturnValue(false);
+const mocks = vi.hoisted(() => ({
+  useMediaQueryMock: vi.fn().mockReturnValue(false),
+}));
+
 vi.mock("@/hooks/use-media-query", () => ({
-  useMediaQuery: useMediaQueryMock,
+  useMediaQuery: mocks.useMediaQueryMock,
 }));
 
 vi.mock("next/headers", () => ({
@@ -176,7 +179,7 @@ beforeEach(() => {
       specialties: ["Odontología"],
     },
   ]);
-  useMediaQueryMock.mockReturnValue(false);
+  mocks.useMediaQueryMock.mockReturnValue(false);
 });
 
 afterEach(() => {

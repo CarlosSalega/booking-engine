@@ -21,7 +21,7 @@
  */
 
 import "temporal-polyfill/global";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 
 import { BookingStatus } from "@/modules/bookings/domain/booking";
@@ -29,6 +29,14 @@ import type { EnrichedBooking } from "@/modules/bookings/data/booking-data.types
 
 import { BookingCalendarEvent } from "../booking-calendar-event";
 import { BookingCalendarMonthEvent } from "../booking-calendar-month-event";
+
+const mocks = vi.hoisted(() => ({
+  useMediaQueryMock: vi.fn().mockReturnValue(false),
+}));
+
+vi.mock("@/hooks/use-media-query", () => ({
+  useMediaQuery: mocks.useMediaQueryMock,
+}));
 
 function makeEnrichedBooking(
   overrides: Partial<EnrichedBooking> = {},
@@ -84,6 +92,10 @@ const baseCalendarEvent = {
 // ---------------------------------------------------------------------------
 
 describe("BookingCalendarEvent", () => {
+  afterEach(() => {
+    mocks.useMediaQueryMock.mockReturnValue(false);
+  });
+
   it("renders the patient's display name as the title", () => {
     render(
       <BookingCalendarEvent
@@ -179,5 +191,23 @@ describe("BookingCalendarMonthEvent", () => {
     );
     const dot = container.querySelector('[data-testid="month-event-dot"]');
     expect(dot).toBeInTheDocument();
+  });
+
+  it("renders dot-only (no count) on mobile viewports (≤ 768px)", () => {
+    mocks.useMediaQueryMock.mockReturnValue(true);
+    const { container } = render(
+      <BookingCalendarMonthEvent
+        calendarEvent={baseCalendarEvent}
+        eventsOnDay={[baseCalendarEvent]}
+      />,
+    );
+    // The dot is still there.
+    expect(
+      container.querySelector('[data-testid="month-event-dot"]'),
+    ).toBeInTheDocument();
+    // The count is hidden on mobile to save space.
+    expect(
+      container.querySelector('[data-testid="month-event-count"]'),
+    ).not.toBeInTheDocument();
   });
 });

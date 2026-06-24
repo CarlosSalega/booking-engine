@@ -8,8 +8,11 @@
  */
 
 export { BookingCalendar } from "./booking-calendar";
+export { BookingCalendarEmpty } from "./booking-calendar-empty";
 export { BookingCalendarEvent } from "./booking-calendar-event";
 export { BookingCalendarMonthEvent } from "./booking-calendar-month-event";
+export { BookingCalendarPopover } from "./booking-calendar-popover";
+export { BookingCalendarToolbar, type CalendarView } from "./booking-calendar-toolbar";
 export {
   bookingToCalendarEvent,
   computeDateRange,

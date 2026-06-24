@@ -38,9 +38,12 @@ import type { UserRoleType } from "@/modules/auth/domain/roles";
 // Mocks
 // ---------------------------------------------------------------------------
 
-const useMediaQueryMock = vi.fn().mockReturnValue(false);
+const mocks = vi.hoisted(() => ({
+  useMediaQueryMock: vi.fn().mockReturnValue(false),
+}));
+
 vi.mock("@/hooks/use-media-query", () => ({
-  useMediaQuery: useMediaQueryMock,
+  useMediaQuery: mocks.useMediaQueryMock,
 }));
 
 const replaceMock = vi.fn();
@@ -120,7 +123,7 @@ function setup(props: Partial<ToolbarProps> = {}) {
 beforeEach(() => {
   vi.clearAllMocks();
   currentParams.forEach((_, key) => currentParams.delete(key));
-  useMediaQueryMock.mockReturnValue(false);
+  mocks.useMediaQueryMock.mockReturnValue(false);
 });
 
 afterEach(() => {

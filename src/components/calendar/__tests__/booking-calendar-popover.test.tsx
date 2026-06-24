@@ -39,9 +39,12 @@ import type { UserRoleType } from "@/modules/auth/domain/roles";
 // Mocks — declared BEFORE importing the component under test.
 // ---------------------------------------------------------------------------
 
-const useMediaQueryMock = vi.fn().mockReturnValue(false);
+const mocks = vi.hoisted(() => ({
+  useMediaQueryMock: vi.fn().mockReturnValue(false),
+}));
+
 vi.mock("@/hooks/use-media-query", () => ({
-  useMediaQuery: useMediaQueryMock,
+  useMediaQuery: mocks.useMediaQueryMock,
 }));
 
 const pushMock = vi.fn();
@@ -141,7 +144,7 @@ const ADMIN_ROLE: UserRoleType = "ADMIN";
 beforeEach(() => {
   vi.clearAllMocks();
   // Default: desktop viewport, all server actions return success.
-  useMediaQueryMock.mockReturnValue(false);
+  mocks.useMediaQueryMock.mockReturnValue(false);
   confirmBookingMock.mockResolvedValue({ success: true });
   cancelBookingMock.mockResolvedValue({ success: true });
   completeBookingMock.mockResolvedValue({ success: true });
@@ -354,7 +357,7 @@ describe("BookingCalendarPopover — Ver detalle navigation", () => {
 
 describe("BookingCalendarPopover — mobile (≤768px) renders Sheet", () => {
   beforeEach(() => {
-    useMediaQueryMock.mockReturnValue(true);
+    mocks.useMediaQueryMock.mockReturnValue(true);
   });
 
   it("renders the Sheet variant instead of the Popover", () => {
