@@ -64,9 +64,16 @@ interface BookingCalendarToolbarProps {
   role: UserRoleType;
   /** Active professionals to populate the filter (admin/secretary only). */
   professionals: ProfessionalOption[];
-  onViewChange: (view: CalendarView) => void;
-  onDateChange: (date: string) => void;
-  onProfessionalIdChange: (professionalId: string | undefined) => void;
+  /**
+   * Optional callbacks. The toolbar handles URL sync via
+   * `router.replace` regardless — these are for the rare case where
+   * a parent wants to react to the change (e.g. for analytics or
+   * to drive a parallel URL state). When omitted, the toolbar
+   * silently does its URL update.
+   */
+  onViewChange?: (view: CalendarView) => void;
+  onDateChange?: (date: string) => void;
+  onProfessionalIdChange?: (professionalId: string | undefined) => void;
 }
 
 const ALL_PROFESSIONALS = "__all__";
@@ -107,7 +114,7 @@ export function BookingCalendarToolbar({
 
   const handleViewChange = useCallback(
     (next: CalendarView) => {
-      onViewChange(next);
+      onViewChange?.(next);
       updateUrl((params) => {
         // The URL is the source of truth for the calendar state
         // (AD3 in design.md). We always write the FULL state so
@@ -127,7 +134,7 @@ export function BookingCalendarToolbar({
 
   const handleHoy = useCallback(() => {
     const today = todayISO();
-    onDateChange(today);
+    onDateChange?.(today);
     updateUrl((params) => {
       params.set("date", today);
       params.set("view", view);
@@ -142,7 +149,7 @@ export function BookingCalendarToolbar({
   const handleProfessionalChange = useCallback(
     (value: string) => {
       const next = value === ALL_PROFESSIONALS ? undefined : value;
-      onProfessionalIdChange(next);
+      onProfessionalIdChange?.(next);
       updateUrl((params) => {
         if (next) {
           params.set("professionalId", next);
