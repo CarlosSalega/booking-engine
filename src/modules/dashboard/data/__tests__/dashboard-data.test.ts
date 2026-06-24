@@ -57,11 +57,11 @@ const ORG_ID = "00000000-0000-4000-8000-000000000001";
 
 describe("getDashboardMetrics", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   afterEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("returns non-negative numeric metrics and scopes queries by organizationId", async () => {
@@ -138,7 +138,7 @@ describe("getDashboardMetrics", () => {
 
 describe("getTodayBookings", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("queries bookings with startTime between today and tomorrow and includes relations", async () => {
@@ -182,7 +182,7 @@ describe("getTodayBookings", () => {
 
 describe("getRecentActivity", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("merges bookings, payments, and patients and sorts by timestamp desc", async () => {
@@ -234,7 +234,7 @@ describe("getRecentActivity", () => {
 
 describe("getTopServices", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("groups bookings by service name and returns them sorted by count desc", async () => {
@@ -269,7 +269,7 @@ describe("getTopServices", () => {
 
 describe("getRevenueByMonth", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("returns 6 monthly buckets (zero-filled) and aggregates APPROVED payments", async () => {
@@ -308,15 +308,19 @@ describe("getRevenueByMonth", () => {
 
 describe("getBookingsByDay", () => {
   beforeEach(() => {
-    vi.clearAllMocks();
+    vi.resetAllMocks();
   });
 
   it("returns 7 daily buckets (zero-filled) and counts bookings by created date", async () => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-    const twoDaysAgo = new Date(today);
-    twoDaysAgo.setDate(today.getDate() - 2);
+    // Normalize to start of day so dateKey(toISOString) matches the
+    // implementation's daysAgoStart buckets regardless of local timezone.
+    const startOfDay = (d: Date) => {
+      d.setHours(0, 0, 0, 0);
+      return d;
+    };
+    const today = startOfDay(new Date());
+    const yesterday = startOfDay(new Date(today.getTime() - 24 * 60 * 60 * 1000));
+    const twoDaysAgo = startOfDay(new Date(today.getTime() - 48 * 60 * 60 * 1000));
 
     prismaMock.booking.findMany.mockResolvedValueOnce([
       { createdAt: today },
