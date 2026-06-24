@@ -39,13 +39,13 @@ Verify: `pnpm test professional && pnpm type-check && pnpm lint`
 
 ## PR #2 — Actions
 
-- [ ] 2.1 Add `actions/professional-actions.schema.ts` + `.types.ts` (`ProfessionalResult<T>`, inputs)
-- [ ] 2.2 RED: `__tests__/create-professional.test.ts` (RBAC, Zod, P2002 dup-email)
-- [ ] 2.3 GREEN: `create-professional.action.ts` (Zod → auth → RBAC PROFESSIONAL block → split-write → revalidate)
-- [ ] 2.4 RED: `__tests__/update-professional.test.ts` (not found, wrong org, validation)
-- [ ] 2.5 GREEN: `update-professional.action.ts` (Zod → getById guard → split-write → revalidate)
-- [ ] 2.6 RED: `__tests__/change-professional-status.test.ts` (RBAC, invalid status)
-- [ ] 2.7 GREEN: `change-professional-status.action.ts` (flip → revalidate); barrels
+- [x] 2.1 Add `actions/professional-actions.schema.ts` + `.types.ts` (`ProfessionalResult<T>`, inputs)
+- [x] 2.2 RED: `__tests__/create-professional.test.ts` (RBAC, Zod, P2002 dup-email)
+- [x] 2.3 GREEN: `create-professional.action.ts` (Zod → auth → RBAC PROFESSIONAL block → split-write → revalidate)
+- [x] 2.4 RED: `__tests__/update-professional.test.ts` (not found, wrong org, validation)
+- [x] 2.5 GREEN: `update-professional.action.ts` (Zod → getById guard → split-write → revalidate)
+- [x] 2.6 RED: `__tests__/change-professional-status.test.ts` (RBAC, invalid status)
+- [x] 2.7 GREEN: `change-professional-status.action.ts` (flip → revalidate); barrels
 
 Verify: `pnpm test professionals/actions && pnpm type-check && pnpm lint`
 
