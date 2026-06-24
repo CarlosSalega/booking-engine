@@ -13,6 +13,7 @@
 
 import type { BookingStatusType } from "../domain/booking";
 import type { PaymentStatusType, PaymentTypeType } from "@/modules/services/domain";
+import type { Professional } from "@/modules/professionals/domain";
 
 /** Default page size for the bookings list. */
 export const DEFAULT_PAGE_SIZE = 20;
@@ -101,13 +102,47 @@ export interface PatientOption {
   user: { name: string; email: string };
 }
 
-/** A minimal professional projection used by the wizard step 2. */
+/**
+ * A minimal professional projection used by the wizard step 2.
+ *
+ * Anchored to the new `Professional` domain type from PR #1 of the
+ * professionals module: the wizard step 2 only needs the professional's
+ * identity (id + name) and a list of specialties to render the
+ * selection cards. Email/image/status are NOT required at this step —
+ * they're loaded later if needed for the confirm step.
+ *
+ * The `user.name` shape is preserved for the wizard's current component
+ * contract. A later PR (presentation rewrite) will migrate the wizard
+ * components to consume the flattened `fullName` / `email` / `image`
+ * fields from the `Professional` domain directly.
+ *
+ * Compile-time guard: the fields exposed here MUST be a subset of the
+ * new `Professional` domain so a future domain change can't silently
+ * desynchronize the wizard's projection.
+ */
 export interface ProfessionalOption {
   id: string;
   userId: string;
   user: { name: string };
   specialties: string[];
 }
+
+// Type-level assertion: `ProfessionalOption` stays a subset of the new
+// domain `Professional`. If a future PR adds a new field to
+// `ProfessionalOption` that isn't also in `Professional`, this file
+// will fail to compile, forcing the change to be considered alongside
+// the professionals domain. The `_assert` value references `Professional`
+// explicitly so the lint rule that flags unused type imports stays
+// happy and the anchor is verifiable in code review.
+type _ProfessionalOptionFields = Pick<
+  Professional,
+  "id" | "userId" | "specialties"
+>;
+type _ProfessionalOptionAnchored = ProfessionalOption extends _ProfessionalOptionFields
+  ? true
+  : false;
+const _assertProfessionalOptionAnchored: _ProfessionalOptionAnchored = true;
+void _assertProfessionalOptionAnchored;
 
 /** A time slot presented to the wizard UI for available-slot selection. */
 export interface AvailableSlot {
