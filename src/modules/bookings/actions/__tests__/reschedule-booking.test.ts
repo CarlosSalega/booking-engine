@@ -186,9 +186,11 @@ describe("rescheduleBooking", () => {
     expect(txMock.booking.create).not.toHaveBeenCalled();
   });
 
-  it("rejects when the booking is PENDING (state machine: only CONFIRMED → RESCHEDULED)", async () => {
+  it("rejects when the booking is AWAITING_PAYMENT (state machine: only CONFIRMED/PENDING → RESCHEDULED)", async () => {
+    // AWAITING_PAYMENT is not allowed to be rescheduled — the state
+    // machine only accepts PENDING or CONFIRMED → RESCHEDULED.
     prismaMock.booking.findFirst.mockResolvedValueOnce(
-      confirmedBooking({ status: "PENDING" }),
+      confirmedBooking({ status: "AWAITING_PAYMENT" }),
     );
     getSessionMock.mockResolvedValueOnce(sessionFor("ADMIN"));
 
