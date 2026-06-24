@@ -64,10 +64,10 @@ Verify: `pnpm test professional && pnpm type-check && pnpm lint`
 
 ## PR #4 — Detail + Create + Edit
 
-- [ ] 4.1 Add `components/professionals/professional-form.tsx` (name, email, specialties via TagInput, license, bio, status) + tests
-- [ ] 4.2 Add `components/professionals/professional-detail-card.tsx` (info + status dropdown wired to action) + tests
-- [ ] 4.3 Add `app/(dashboard)/dashboard/professionals/new/page.tsx` (form, redirect on success)
-- [ ] 4.4 Add `app/(dashboard)/dashboard/professionals/[id]/edit/page.tsx` (fetch → form, 404 on null)
-- [ ] 4.5 Add `app/(dashboard)/dashboard/professionals/[id]/page.tsx` (notFound, RBAC-gated edit/toggle)
+- [x] 4.1 Add `components/professionals/professional-form.tsx` (name, email, specialties via TagInput, license, bio, status) + tests
+- [x] 4.2 Add `components/professionals/professional-detail-card.tsx` (info + status dropdown wired to action) + tests
+- [x] 4.3 Add `app/(dashboard)/dashboard/professionals/new/page.tsx` (form, redirect on success)
+- [x] 4.4 Add `app/(dashboard)/dashboard/professionals/[id]/edit/page.tsx` (fetch → form, 404 on null)
+- [x] 4.5 Add `app/(dashboard)/dashboard/professionals/[id]/page.tsx` (notFound, RBAC-gated edit/toggle)
 
 Verify: `pnpm test && pnpm type-check && pnpm lint && pnpm test:coverage`
