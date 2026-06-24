@@ -115,7 +115,6 @@ describe("bookingToCalendarEvent", () => {
       endTime: new Date("2026-06-22T13:30:00Z"),
     });
     const event = bookingToCalendarEvent(booking);
-    expect(Temporal.ZonedDateTime.compare(event.start, event.start)).toBe(0);
     expect(event.start.timeZoneId).toBe(TZ);
     expect(event.start.year).toBe(2026);
     expect(event.start.month).toBe(6);

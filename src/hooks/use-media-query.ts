@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * `useMediaQuery` — reactive CSS media query hook.
  *

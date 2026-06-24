@@ -1,3 +1,5 @@
+"use client";
+
 /**
  * `BookingCalendar` — the Client Component that wraps Schedule-X.
  *

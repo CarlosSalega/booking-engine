@@ -65,6 +65,16 @@ vi.mock("@/modules/bookings/data/booking-data", () => ({
 // (which depends on `window`, the Temporal polyfill, and a real
 // DOM layout) — the page test asserts on the props the page hands
 // to the wrapper, not the wrapper's internal rendering.
+vi.mock("@/components/calendar/booking-calendar-data-wrapper", () => ({
+  BookingCalendarDataWrapper: (props: Record<string, unknown>) => (
+    <div
+      data-testid="mock-booking-calendar"
+      data-default-view={String(props["defaultView"] ?? "")}
+      data-bookings={JSON.stringify(props["bookings"] ?? [])}
+    />
+  ),
+}));
+
 vi.mock("@/components/calendar/booking-calendar", () => ({
   BookingCalendar: (props: Record<string, unknown>) => (
     <div

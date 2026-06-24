@@ -8,6 +8,7 @@
  */
 
 export { BookingCalendar } from "./booking-calendar";
+export { BookingCalendarDataWrapper } from "./booking-calendar-data-wrapper";
 export { BookingCalendarEmpty } from "./booking-calendar-empty";
 export { BookingCalendarEvent } from "./booking-calendar-event";
 export { BookingCalendarMonthEvent } from "./booking-calendar-month-event";

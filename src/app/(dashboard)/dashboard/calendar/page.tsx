@@ -46,7 +46,7 @@ import {
   tzArg,
   type CalendarViewName,
 } from "@/components/calendar";
-import { BookingCalendar } from "@/components/calendar/booking-calendar";
+import { BookingCalendarDataWrapper } from "@/components/calendar/booking-calendar-data-wrapper";
 import { BookingCalendarEmpty } from "@/components/calendar/booking-calendar-empty";
 import { BookingCalendarToolbar } from "@/components/calendar/booking-calendar-toolbar";
 
@@ -242,7 +242,7 @@ async function CalendarDataWrapper({
       {isEmpty ? (
         <BookingCalendarEmpty view={view} role={role} />
       ) : (
-        <BookingCalendar
+        <BookingCalendarDataWrapper
           bookings={serialized as unknown as EnrichedBooking[]}
           defaultView={defaultView}
         />

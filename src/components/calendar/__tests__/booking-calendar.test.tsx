@@ -154,7 +154,6 @@ describe("BookingCalendar — useNextCalendarApp config", () => {
       end: Temporal.ZonedDateTime;
     }>;
     const first = events[0]!;
-    expect(Temporal.ZonedDateTime.compare(first.start, first.start)).toBe(0);
     expect(first.start.timeZoneId).toBe("America/Argentina/Buenos_Aires");
   });
 

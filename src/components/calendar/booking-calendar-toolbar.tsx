@@ -146,6 +146,29 @@ export function BookingCalendarToolbar({
     });
   }, [onDateChange, updateUrl, view, professionalId]);
 
+  // Shift the visible date by ±1 day. On mobile, this is the primary
+  // way to navigate (the Schedule-X header arrows are too small to
+  // reliably tap). The toolbar preserves the current view — switching
+  // views is done through the view-toggle buttons.
+  const shiftDate = useCallback(
+    (deltaDays: number) => {
+      const next = Temporal.PlainDate.from(date)
+        .add({ days: deltaDays })
+        .toString();
+      onDateChange?.(next);
+      updateUrl((params) => {
+        params.set("date", next);
+        params.set("view", view);
+        if (professionalId) {
+          params.set("professionalId", professionalId);
+        } else {
+          params.delete("professionalId");
+        }
+      });
+    },
+    [onDateChange, updateUrl, view, date, professionalId],
+  );
+
   const handleProfessionalChange = useCallback(
     (value: string) => {
       const next = value === ALL_PROFESSIONALS ? undefined : value;
@@ -236,6 +259,7 @@ export function BookingCalendarToolbar({
             size="icon-sm"
             aria-label="Día anterior"
             data-testid="toolbar-prev"
+            onClick={() => shiftDate(-1)}
           >
             <ChevronLeft className="size-4" />
           </Button>
@@ -245,6 +269,7 @@ export function BookingCalendarToolbar({
             size="icon-sm"
             aria-label="Día siguiente"
             data-testid="toolbar-next"
+            onClick={() => shiftDate(1)}
           >
             <ChevronRight className="size-4" />
           </Button>
