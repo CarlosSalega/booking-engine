@@ -14,12 +14,18 @@ export type BookingStatusType = (typeof BookingStatus)[keyof typeof BookingStatu
  * Booking status state machine.
  * - Self-transitions always return true.
  * - Terminal states (CANCELLED, COMPLETED, NO_SHOW, RESCHEDULED) have no outgoing edges.
+ *
+ * PENDING can go to RESCHEDULED so the calendar popover can offer
+ * "Reprogramar" without first forcing the operator to Confirm the
+ * booking. (CONFIRMED → RESCHEDULED is still the canonical path —
+ * the calendar popover renders the same action on both states.)
  */
 const TRANSITIONS: Record<BookingStatusType, BookingStatusType[]> = {
   [BookingStatus.PENDING]: [
     BookingStatus.CONFIRMED,
     BookingStatus.CANCELLED,
     BookingStatus.AWAITING_PAYMENT,
+    BookingStatus.RESCHEDULED,
   ],
   [BookingStatus.CONFIRMED]: [
     BookingStatus.RESCHEDULED,
