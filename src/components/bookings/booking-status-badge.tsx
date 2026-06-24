@@ -25,6 +25,7 @@ import {
   type BookingStatusType,
 } from "@/modules/bookings/domain/booking";
 import { getBookingStatusLabel } from "@/modules/bookings/presentation/formatters";
+import { STATUS_TONE_CLASS } from "@/modules/bookings/presentation/status-tones";
 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -47,21 +48,6 @@ export const BOOKING_STATUS_BADGE_VARIANT: Record<
   [BookingStatus.COMPLETED]: "default",
   [BookingStatus.NO_SHOW]: "destructive",
   [BookingStatus.AWAITING_PAYMENT]: "outline",
-};
-
-/**
- * Status → Tailwind class for the per-status color tone. Layered on
- * top of the variant. Mirrors the dashboard's `today-bookings.tsx`
- * so the visual vocabulary is consistent across modules.
- */
-const STATUS_TONE_CLASS: Record<BookingStatusType, string> = {
-  [BookingStatus.PENDING]: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30",
-  [BookingStatus.CONFIRMED]: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
-  [BookingStatus.CANCELLED]: "",
-  [BookingStatus.RESCHEDULED]: "bg-violet-500/15 text-violet-700 dark:text-violet-300",
-  [BookingStatus.COMPLETED]: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  [BookingStatus.NO_SHOW]: "",
-  [BookingStatus.AWAITING_PAYMENT]: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30",
 };
 
 interface BookingStatusBadgeProps {
