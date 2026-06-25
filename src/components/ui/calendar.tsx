@@ -31,6 +31,14 @@ function Calendar({
           "--rdp-day_button-width": "2rem",
           "--rdp-day_button-height": "2rem",
           "--rdp-months-gap": "3rem",
+          // Theme accent — maps to globals.css --primary (green)
+          "--rdp-accent-color": "hsl(var(--primary))",
+          "--rdp-accent-background-color": "hsl(var(--primary) / 0.15)",
+          "--rdp-range_start-date-background-color": "hsl(var(--primary))",
+          "--rdp-range_end-date-background-color": "hsl(var(--primary))",
+          "--rdp-range_start-color": "hsl(var(--primary-foreground))",
+          "--rdp-range_end-color": "hsl(var(--primary-foreground))",
+          "--rdp-today-color": "hsl(var(--primary))",
         } as React.CSSProperties
       }
       components={{
@@ -62,13 +70,15 @@ function Calendar({
         [UI.Week]: "flex w-full mt-1",
         [UI.Day]: cn(
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
-          props.mode === "range"
-            ? "[&:has([aria-selected])]:bg-accent [&:has(.rdp-range_end)]:rounded-r-md [&:has(.rdp-range_start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
-            : "[&:has([aria-selected])]:rounded-md",
+          props.mode === "range" &&
+            "[&:has([aria-selected])]:bg-primary/10 [&:has(.rdp-range_end)]:rounded-r-md [&:has(.rdp-range_start)]:rounded-l-md",
         ),
         [UI.DayButton]: cn(
           buttonVariants({ variant: "ghost" }),
-          "size-8 p-0 font-normal aria-selected:opacity-100",
+          "size-8 p-0 font-normal",
+          "hover:bg-primary/15",
+          "aria-selected:bg-primary aria-selected:text-primary-foreground",
+          "aria-selected:hover:bg-primary/90",
         ),
         [UI.WeekNumber]: "text-xs text-muted-foreground",
         // Day flags — appended to Day element when the flag is active
