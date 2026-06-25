@@ -3,20 +3,14 @@
  *
  * Filters supported (all map to URL searchParams):
  * - `status` (multi) — checkboxes, one per BookingStatus
- * - `professionalId` (single) — dropdown of professionals offering a service
- * - `serviceId` (single) — dropdown of ACTIVE services
- * - `dateFrom` / `dateTo` (range) — date inputs
+ * - `professionalId` (single) — shadcn Select of professionals
+ * - `serviceId` (single) — shadcn Select of ACTIVE services
+ * - `dateFrom` / `dateTo` (range) — DateInput (DD/MM/YYYY display)
  *
  * The component reads its current value from `useSearchParams`, so
  * a deep link to `/dashboard/bookings?status=PENDING` pre-populates
  * the form. On change, the component rebuilds the URL and pushes it
  * via `router.push`, which re-runs the Server Component.
- *
- * The dropdowns are intentionally native `<select>` elements: the
- * shadcn/ui `Select` is not installed in this project, and the
- * spec's filter UX is simple enough that a native picker is the
- * pragmatic choice for PR #3. We can swap to a richer picker later
- * without changing the data flow.
  */
 
 "use client";
@@ -25,13 +19,23 @@ import { useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RotateCcw } from "lucide-react";
 
-import { BookingStatus, type BookingStatusType } from "@/modules/bookings/domain/booking";
+import {
+  BookingStatus,
+  type BookingStatusType,
+} from "@/modules/bookings/domain/booking";
 import { BOOKING_STATUS_LABEL } from "@/modules/bookings/presentation/formatters";
 import type { ProfessionalOption } from "@/modules/bookings/data/booking-data.types";
 import type { ServiceOption } from "@/modules/bookings/data/booking-data.types";
 
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { DateInput } from "@/components/ui/date-input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface BookingFiltersProps {
   professionals: ProfessionalOption[];
@@ -48,6 +52,8 @@ const ALL_STATUSES: BookingStatusType[] = [
   BookingStatus.AWAITING_PAYMENT,
 ];
 
+const ALL_VALUE = "__all__";
+
 export function BookingFilters({ professionals, services }: BookingFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -63,7 +69,9 @@ export function BookingFilters({ professionals, services }: BookingFiltersProps)
       // Reset pagination on any filter change.
       params.delete("page");
       const query = params.toString();
-      router.push(query ? `/dashboard/bookings?${query}` : "/dashboard/bookings");
+      router.push(
+        query ? `/dashboard/bookings?${query}` : "/dashboard/bookings",
+      );
     },
     [router, searchParams],
   );
@@ -83,14 +91,14 @@ export function BookingFilters({ professionals, services }: BookingFiltersProps)
 
   function setProfessional(value: string) {
     commit((params) => {
-      if (value === "") params.delete("professionalId");
+      if (value === ALL_VALUE) params.delete("professionalId");
       else params.set("professionalId", value);
     });
   }
 
   function setService(value: string) {
     commit((params) => {
-      if (value === "") params.delete("serviceId");
+      if (value === ALL_VALUE) params.delete("serviceId");
       else params.set("serviceId", value);
     });
   }
@@ -147,80 +155,84 @@ export function BookingFilters({ professionals, services }: BookingFiltersProps)
         </div>
       </div>
 
-      {/* Dropdowns + date range */}
+      {/* Selects + date range */}
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Professional */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="filter-professional"
-            className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-          >
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Profesional
-          </label>
-          <select
-            id="filter-professional"
-            value={searchParams.get("professionalId") ?? ""}
-            onChange={(e) => setProfessional(e.target.value)}
-            className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+          </span>
+          <Select
+            value={searchParams.get("professionalId") || ALL_VALUE}
+            onValueChange={setProfessional}
           >
-            <option value="">Todos</option>
-            {professionals.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.user.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger
+              className="h-8 w-full"
+              aria-label="Filtrar por profesional"
+              data-testid="filter-professional"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_VALUE}>Todos</SelectItem>
+              {professionals.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
+        {/* Service */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="filter-service"
-            className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-          >
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Servicio
-          </label>
-          <select
-            id="filter-service"
-            value={searchParams.get("serviceId") ?? ""}
-            onChange={(e) => setService(e.target.value)}
-            className="h-8 w-full rounded-lg border border-input bg-transparent px-2.5 text-sm transition-colors focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none"
+          </span>
+          <Select
+            value={searchParams.get("serviceId") || ALL_VALUE}
+            onValueChange={setService}
           >
-            <option value="">Todos</option>
-            {services.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.name}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger
+              className="h-8 w-full"
+              aria-label="Filtrar por servicio"
+              data-testid="filter-service"
+            >
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_VALUE}>Todos</SelectItem>
+              {services.map((s) => (
+                <SelectItem key={s.id} value={s.id}>
+                  {s.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
+        {/* Date from */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="filter-date-from"
-            className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-          >
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Desde
-          </label>
-          <Input
+          </span>
+          <DateInput
             id="filter-date-from"
-            type="date"
             value={searchParams.get("dateFrom") ?? ""}
-            onChange={(e) => setDateRange("dateFrom", e.target.value)}
+            onChange={(v) => setDateRange("dateFrom", v)}
             className="h-8"
           />
         </div>
 
+        {/* Date to */}
         <div className="space-y-1.5">
-          <label
-            htmlFor="filter-date-to"
-            className="text-xs font-medium uppercase tracking-wide text-muted-foreground"
-          >
+          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             Hasta
-          </label>
-          <Input
+          </span>
+          <DateInput
             id="filter-date-to"
-            type="date"
             value={searchParams.get("dateTo") ?? ""}
-            onChange={(e) => setDateRange("dateTo", e.target.value)}
+            onChange={(v) => setDateRange("dateTo", v)}
             className="h-8"
           />
         </div>
