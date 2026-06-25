@@ -76,7 +76,7 @@ function Calendar({
         [UI.DayButton]: cn(
           buttonVariants({ variant: "ghost" }),
           "size-8 p-0 font-normal",
-          "hover:bg-primary-hover hover:text-muted-foreground",
+          "hover:bg-primary-hover hover:text-muted",
           "aria-selected:bg-primary aria-selected:text-primary-foreground",
           "aria-selected:hover:bg-primary-hover",
         ),
