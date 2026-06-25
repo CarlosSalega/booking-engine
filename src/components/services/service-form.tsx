@@ -195,7 +195,7 @@ export function ServiceForm({ mode, professionals, service }: ServiceFormProps) 
   const showDeposit = values.paymentType === PaymentType.DEPOSIT;
   const cancelHref =
     mode === "create"
-      ? "/dashboard/services/new"
+      ? "/dashboard/services"
       : `/dashboard/services/${service?.id ?? ""}`;
 
   return (

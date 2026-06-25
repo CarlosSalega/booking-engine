@@ -471,10 +471,10 @@ describe("ServiceForm — valid submit (edit)", () => {
 // ---------------------------------------------------------------------------
 
 describe("ServiceForm — cancel link", () => {
-  it("renders a Cancel link to /dashboard/services/new (create mode)", () => {
+  it("renders a Cancel link to /dashboard/services (create mode)", () => {
     renderCreateForm();
     const link = screen.getByRole("link", { name: /cancelar/i });
-    expect(link).toHaveAttribute("href", "/dashboard/services/new");
+    expect(link).toHaveAttribute("href", "/dashboard/services");
   });
 
   it("renders a Cancel link to /dashboard/services/{id} (edit mode)", () => {
