@@ -42,7 +42,7 @@ function Calendar({
         [UI.Month]: "flex flex-col gap-4",
         [UI.MonthCaption]: "flex justify-center items-center pt-1 relative h-8",
         [UI.CaptionLabel]: "text-sm font-medium",
-        [UI.Nav]: "flex items-center gap-1 absolute",
+        [UI.Nav]: "flex items-center gap-1",
         [UI.Chevron]: cn(
           buttonVariants({ variant: "outline" }),
           "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
