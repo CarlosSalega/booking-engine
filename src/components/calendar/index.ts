@@ -14,6 +14,7 @@ export { BookingCalendarEvent } from "./booking-calendar-event";
 export { BookingCalendarMonthEvent } from "./booking-calendar-month-event";
 export { BookingCalendarPopover } from "./booking-calendar-popover";
 export { BookingCalendarToolbar, type CalendarView } from "./booking-calendar-toolbar";
+export { CalendarSkeleton } from "./calendar-skeleton";
 export {
   bookingToCalendarEvent,
   computeDateRange,
