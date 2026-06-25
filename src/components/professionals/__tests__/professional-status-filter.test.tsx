@@ -1,10 +1,9 @@
 /**
  * Tests for the `ProfessionalStatusFilter` Client Component.
  *
- * Mirrors the `ServiceStatusFilter` and `PatientStatusFilter` test
- * strategy: render the component, simulate a `change` event on the
- * native `<select>` and assert that `router.push` was called with
- * the right URL (with the new `?status=...` param + `?page=` reset).
+ * Uses the shadcn/ui `Select` (Radix under the hood). The trigger is a
+ * `<button role="combobox">`; options render in a portal with
+ * `role="option"`. Selection flow: click trigger → click option.
  *
  * Spec scenarios covered (from
  * `openspec/changes/professionals/specs/professionals-presentation/spec.md`):
@@ -30,7 +29,6 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => currentParams,
 }));
 
-import { ProfessionalStatus } from "@/modules/professionals/domain/professional";
 import { ProfessionalStatusFilter } from "@/components/professionals/professional-status-filter";
 
 beforeEach(() => {
@@ -38,49 +36,54 @@ beforeEach(() => {
   currentParams = new URLSearchParams();
 });
 
+async function selectOption(label: string) {
+  const user = userEvent.setup();
+  const trigger = screen.getByTestId("professional-status-filter");
+  await user.click(trigger);
+  await user.click(screen.getByRole("option", { name: label }));
+}
+
+function currentDisplayText(): string {
+  const trigger = screen.getByTestId("professional-status-filter");
+  return trigger.textContent ?? "";
+}
+
 describe("ProfessionalStatusFilter — initial render", () => {
-  it("renders the three options: Todos, Activo, Inactivo", () => {
+  it("renders the three options: Todos, Activo, Inactivo", async () => {
+    const user = userEvent.setup();
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId("professional-status-filter");
-    const options = Array.from(select.querySelectorAll("option"));
+
+    const trigger = screen.getByTestId("professional-status-filter");
+    await user.click(trigger);
+
+    const options = screen.getAllByRole("option");
     const labels = options.map((o) => o.textContent);
     expect(labels).toEqual(["Todos", "Activo", "Inactivo"]);
   });
 
   it("pre-selects 'Todos' when the URL has no ?status param", () => {
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId(
-      "professional-status-filter",
-    ) as HTMLSelectElement;
-    expect(select.value).toBe("");
+    expect(currentDisplayText()).toBe("Todos");
   });
 
   it("pre-selects ACTIVE when the URL has ?status=ACTIVE", () => {
     currentParams = new URLSearchParams("status=ACTIVE");
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId(
-      "professional-status-filter",
-    ) as HTMLSelectElement;
-    expect(select.value).toBe(ProfessionalStatus.ACTIVE);
+    expect(currentDisplayText()).toBe("Activo");
   });
 
   it("pre-selects INACTIVE when the URL has ?status=INACTIVE", () => {
     currentParams = new URLSearchParams("status=INACTIVE");
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId(
-      "professional-status-filter",
-    ) as HTMLSelectElement;
-    expect(select.value).toBe(ProfessionalStatus.INACTIVE);
+    expect(currentDisplayText()).toBe("Inactivo");
   });
 });
 
 describe("ProfessionalStatusFilter — change handler", () => {
   it("pushes a URL with ?status=ACTIVE when ACTIVE is selected", async () => {
-    const user = userEvent.setup();
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId("professional-status-filter");
 
-    await user.selectOptions(select, ProfessionalStatus.ACTIVE);
+    await selectOption("Activo");
 
     expect(pushMock).toHaveBeenCalledTimes(1);
     const arg = pushMock.mock.calls[0]?.[0] as string;
@@ -89,11 +92,9 @@ describe("ProfessionalStatusFilter — change handler", () => {
   });
 
   it("pushes a URL with ?status=INACTIVE when INACTIVE is selected", async () => {
-    const user = userEvent.setup();
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId("professional-status-filter");
 
-    await user.selectOptions(select, ProfessionalStatus.INACTIVE);
+    await selectOption("Inactivo");
 
     expect(pushMock).toHaveBeenCalledTimes(1);
     const arg = pushMock.mock.calls[0]?.[0] as string;
@@ -101,12 +102,10 @@ describe("ProfessionalStatusFilter — change handler", () => {
   });
 
   it("removes ?status= when 'Todos' is selected", async () => {
-    const user = userEvent.setup();
     currentParams = new URLSearchParams("status=ACTIVE");
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId("professional-status-filter");
 
-    await user.selectOptions(select, "");
+    await selectOption("Todos");
 
     expect(pushMock).toHaveBeenCalledTimes(1);
     const arg = pushMock.mock.calls[0]?.[0] as string;
@@ -115,12 +114,10 @@ describe("ProfessionalStatusFilter — change handler", () => {
   });
 
   it("resets ?page= to 1 when the filter changes (so the user lands on page 1)", async () => {
-    const user = userEvent.setup();
     currentParams = new URLSearchParams("page=5&status=ACTIVE");
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId("professional-status-filter");
 
-    await user.selectOptions(select, ProfessionalStatus.INACTIVE);
+    await selectOption("Inactivo");
 
     const arg = pushMock.mock.calls[0]?.[0] as string;
     expect(arg).toContain("status=INACTIVE");
@@ -128,12 +125,10 @@ describe("ProfessionalStatusFilter — change handler", () => {
   });
 
   it("preserves other URL params (e.g. ?search=) when changing the filter", async () => {
-    const user = userEvent.setup();
     currentParams = new URLSearchParams("search=garcia");
     render(<ProfessionalStatusFilter />);
-    const select = screen.getByTestId("professional-status-filter");
 
-    await user.selectOptions(select, ProfessionalStatus.ACTIVE);
+    await selectOption("Activo");
 
     const arg = pushMock.mock.calls[0]?.[0] as string;
     expect(arg).toContain("search=garcia");
