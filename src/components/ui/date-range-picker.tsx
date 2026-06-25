@@ -20,7 +20,7 @@ interface DateRangePickerProps {
   from: string
   /** ISO date value (YYYY-MM-DD) or empty string. */
   to: string
-  /** Called with { from, to } ISO strings when the user picks a range. */
+  /** Called when the range is committed (both dates selected or cleared). */
   onChange: (range: { from: string; to: string }) => void
   className?: string
 }
@@ -44,36 +44,63 @@ export function DateRangePicker({
   onChange,
   className,
 }: DateRangePickerProps) {
-  const [open, setOpen] = React.useState(false)
   const fromDate = React.useMemo(() => parseDate(from), [from])
   const toDate = React.useMemo(() => parseDate(to), [to])
 
-  // Responsive: 2 months on tablet+, 1 on mobile
   const isDesktop = useMediaQuery("(min-width: 640px)")
 
-  const selected = React.useMemo(
-    () =>
-      fromDate || toDate ? { from: fromDate, to: toDate } : undefined,
+  // --- Local buffer for in-progress selection ---
+  // We buffer the selection locally while the user is picking dates.
+  // The URL is only updated when the range is complete (both dates)
+  // or explicitly cleared. This prevents router.push from closing
+  // the popover mid-selection.
+
+  const [pendingFrom, setPendingFrom] = React.useState<Date | undefined>(undefined)
+  const [pendingTo, setPendingTo] = React.useState<Date | undefined>(undefined)
+
+  // When the popover opens, initialise the buffer from the URL values
+  // so the previously-committed range is visible immediately.
+  const handleOpenChange = React.useCallback(
+    (nextOpen: boolean) => {
+      if (nextOpen) {
+        // Initialise buffer from committed URL values
+        setPendingFrom(fromDate)
+        setPendingTo(toDate)
+      } else {
+        // Discard partial selection — user closed without completing
+        setPendingFrom(undefined)
+        setPendingTo(undefined)
+      }
+    },
     [fromDate, toDate],
   )
 
+  // The value shown in the calendar: use pending buffer while
+  // selecting, fall back to URL values.
+  const displayRange = React.useMemo(() => {
+    const f = pendingFrom ?? fromDate
+    const t = pendingTo ?? toDate
+    return f || t ? { from: f, to: t } : undefined
+  }, [pendingFrom, pendingTo, fromDate, toDate])
+
   const handleSelect = React.useCallback(
     (range: { from?: Date; to?: Date } | undefined) => {
-      if (range?.from && range?.to) {
+      if (!range) {
+        setPendingFrom(undefined)
+        setPendingTo(undefined)
+        onChange({ from: "", to: "" })
+        return
+      }
+
+      setPendingFrom(range.from)
+      setPendingTo(range.to)
+
+      // Only commit to URL when the range is complete
+      if (range.from && range.to) {
         onChange({
           from: formatISO(range.from),
           to: formatISO(range.to),
         })
-        setOpen(false)
-      } else if (range?.from && !range?.to) {
-        onChange({
-          from: formatISO(range.from),
-          to: "",
-        })
-        // Keep popover open while user picks the second date
-      } else {
-        onChange({ from: "", to: "" })
-        setOpen(false)
       }
     },
     [onChange],
@@ -86,7 +113,7 @@ export function DateRangePicker({
       : "Seleccionar fechas"
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
@@ -103,7 +130,7 @@ export function DateRangePicker({
       <PopoverContent className="w-auto p-0" align="start">
         <Calendar
           mode="range"
-          selected={selected}
+          selected={displayRange}
           onSelect={handleSelect}
           locale={es}
           weekStartsOn={1}
