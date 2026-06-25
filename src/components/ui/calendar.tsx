@@ -18,10 +18,15 @@ function Calendar({
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
-      className={cn(
-        "p-3 [--rdp-day-width:2rem] [--rdp-day-height:2rem] [--rdp-day_button-width:2rem] [--rdp-day_button-height:2rem] [--rdp-weekday-padding:0.25rem_0rem]",
-        className,
-      )}
+      className={cn("p-3", className)}
+      style={
+        {
+          "--rdp-day-width": "2rem",
+          "--rdp-day-height": "2rem",
+          "--rdp-day_button-width": "2rem",
+          "--rdp-day_button-height": "2rem",
+        } as React.CSSProperties
+      }
       components={{
         Chevron: ({ orientation, ...chevronProps }) => {
           if (orientation === "left") {
@@ -44,7 +49,7 @@ function Calendar({
         [UI.MonthGrid]: "w-full border-collapse space-y-1",
         [UI.Weekdays]: "flex",
         [UI.Weekday]:
-          "text-muted-foreground font-normal text-[0.8rem] text-center",
+          "text-muted-foreground w-8 font-normal text-[0.8rem] text-center [padding:0.25rem_0]",
         [UI.Week]: "flex w-full mt-1",
         [UI.Day]: cn(
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
@@ -54,7 +59,7 @@ function Calendar({
         ),
         [UI.DayButton]: cn(
           buttonVariants({ variant: "ghost" }),
-          "p-0 font-normal aria-selected:opacity-100",
+          "size-8 p-0 font-normal aria-selected:opacity-100",
         ),
         // Selection states are applied as additional classes via the
         // SelectionState enum, not as UI elements.
