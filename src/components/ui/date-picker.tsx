@@ -70,7 +70,7 @@ export function DatePicker({
         >
           <CalendarIcon className="mr-2 size-4" />
           {date ? (
-            format(date, "PPP", { locale: es })
+            format(date, "dd/MM/yy", { locale: es })
           ) : (
             <span>{placeholder}</span>
           )}
