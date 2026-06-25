@@ -55,20 +55,20 @@ Branch: `feature/payments-data` (from `main`)
 
 Branch: `feature/payments-actions` (from `feature/payments-data`)
 
-- [ ] 2.1 [TEST RED] Write `src/modules/payments/actions/__tests__/retry-payment.test.ts` — test unauthenticated call returns `{ success: false, error: "No autorizado" }`
-- [ ] 2.2 [IMPL GREEN] Create `src/modules/payments/actions/payment-actions.schema.ts` — `retryPaymentSchema = z.object({ paymentId: z.string().uuid("ID de pago inválido") })`
-- [ ] 2.3 [IMPL GREEN] Create `src/modules/payments/actions/payment-actions.types.ts` — `PaymentResult<T> = { success: true; data: T } | { success: false; error: string }`
-- [ ] 2.4 [IMPL GREEN] Create `src/modules/payments/actions/retry-payment.action.ts` with `"use server"` — Zod parse → `auth.api.getSession()` → return "No autorizado" on miss
-- [ ] 2.5 [TEST RED] Add test — `retryPayment` rejects PROFESSIONAL role with "No autorizado"
-- [ ] 2.6 [TEST RED] Add test — `retryPayment` rejects PATIENT role with "No autorizado"
-- [ ] 2.7 [IMPL GREEN] Add RBAC guard — allow only `USER_ROLE.ADMIN` and `USER_ROLE.SECRETARY`
-- [ ] 2.8 [TEST RED] Add test — `retryPayment({ paymentId: "not-a-uuid" })` returns "ID de pago inválido"
-- [ ] 2.9 [TEST RED] Add test — `retryPayment` returns "Pago no encontrado" when payment missing in org
-- [ ] 2.10 [TEST RED] Add test — `retryPayment` returns "No se puede reintentar este pago" when `canRetry()` is false
-- [ ] 2.11 [IMPL GREEN] Wire `getOrganizationId()` + `getPaymentById` + `retryPayment` data calls; map errors to Spanish messages
-- [ ] 2.12 [IMPL GREEN] On success: `revalidatePath("/dashboard/payments")` + `revalidatePath("/dashboard/payments/[id]", "page")` + return `{ success: true, data }`
-- [ ] 2.13 [BARREL] Create `src/modules/payments/actions/index.ts` exporting `retryPayment` and types
-- [ ] 2.14 [VERIFY] Run `pnpm test` and `pnpm type-check` — all action tests green
+- [x] 2.1 [TEST RED] Write `src/modules/payments/actions/__tests__/retry-payment.test.ts` — test unauthenticated call returns `{ success: false, error: "No autorizado" }`
+- [x] 2.2 [IMPL GREEN] Create `src/modules/payments/actions/payment-actions.schema.ts` — `retryPaymentSchema = z.object({ paymentId: z.string().uuid("ID de pago inválido") })`
+- [x] 2.3 [IMPL GREEN] Create `src/modules/payments/actions/payment-actions.types.ts` — `PaymentResult<T> = { success: true; data: T } | { success: false; error: string }`
+- [x] 2.4 [IMPL GREEN] Create `src/modules/payments/actions/retry-payment.action.ts` with `"use server"` — Zod parse → `auth.api.getSession()` → return "No autorizado" on miss
+- [x] 2.5 [TEST RED] Add test — `retryPayment` rejects PROFESSIONAL role with "No autorizado"
+- [x] 2.6 [TEST RED] Add test — `retryPayment` rejects PATIENT role with "No autorizado"
+- [x] 2.7 [IMPL GREEN] Add RBAC guard — allow only `USER_ROLE.ADMIN` and `USER_ROLE.SECRETARY`
+- [x] 2.8 [TEST RED] Add test — `retryPayment({ paymentId: "not-a-uuid" })` returns "ID de pago inválido"
+- [x] 2.9 [TEST RED] Add test — `retryPayment` returns "Pago no encontrado" when payment missing in org
+- [x] 2.10 [TEST RED] Add test — `retryPayment` returns "No se puede reintentar este pago" when `canRetry()` is false
+- [x] 2.11 [IMPL GREEN] Wire `getOrganizationId()` + `getPaymentById` + `retryPayment` data calls; map errors to Spanish messages
+- [x] 2.12 [IMPL GREEN] On success: `revalidatePath("/dashboard/payments")` + `revalidatePath("/dashboard/payments/[id]", "page")` + return `{ success: true, data }`
+- [x] 2.13 [BARREL] Create `src/modules/payments/actions/index.ts` exporting `retryPayment` and types
+- [x] 2.14 [VERIFY] Run `pnpm test` and `pnpm type-check` — all action tests green
 
 ---
 
