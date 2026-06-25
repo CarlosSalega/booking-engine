@@ -212,6 +212,9 @@ export function BookingCalendar({
     locale: "es-AR",
     firstDayOfWeek: 1,
     translations: { esAR: ES_AR_TRANSLATIONS },
+    weekOptions: {
+      timeAxisFormatOptions: { hour: "2-digit", minute: "2-digit", hour12: false },
+    },
     callbacks: {
       onEventClick: (event) => {
         // Schedule-X hands the event straight back; it has the `_booking`
