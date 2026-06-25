@@ -13,11 +13,16 @@ function Calendar({
   className,
   classNames,
   showOutsideDays = true,
+  navLayout = "around",
   ...props
-}: React.ComponentProps<typeof DayPicker>) {
+}: React.ComponentProps<typeof DayPicker> & {
+  /** @default "around" — places arrows at the sides of the caption. */
+  navLayout?: "around" | "after" | undefined
+}) {
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
+      navLayout={navLayout}
       className={cn("p-3", className)}
       style={
         {
@@ -42,10 +47,13 @@ function Calendar({
         [UI.Month]: "flex flex-col gap-4",
         [UI.MonthCaption]: "flex justify-center items-center pt-1 relative h-8",
         [UI.CaptionLabel]: "text-sm font-medium",
-        [UI.Nav]: "flex items-center gap-1",
-        [UI.Chevron]: cn(
+        [UI.PreviousMonthButton]: cn(
           buttonVariants({ variant: "outline" }),
-          "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+          "absolute left-0 top-0 size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
+        ),
+        [UI.NextMonthButton]: cn(
+          buttonVariants({ variant: "outline" }),
+          "absolute right-0 top-0 size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         ),
         [UI.MonthGrid]: "w-full border-collapse space-y-1",
         [UI.Weekdays]: "flex",
@@ -62,8 +70,6 @@ function Calendar({
           buttonVariants({ variant: "ghost" }),
           "size-8 p-0 font-normal aria-selected:opacity-100",
         ),
-        // Selection states are applied as additional classes via the
-        // SelectionState enum, not as UI elements.
         [UI.WeekNumber]: "text-xs text-muted-foreground",
         ...classNames,
       }}
