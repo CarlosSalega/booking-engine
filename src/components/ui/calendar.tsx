@@ -25,6 +25,7 @@ function Calendar({
           "--rdp-day-height": "2rem",
           "--rdp-day_button-width": "2rem",
           "--rdp-day_button-height": "2rem",
+          "--rdp-months-gap": "1rem",
         } as React.CSSProperties
       }
       components={{
