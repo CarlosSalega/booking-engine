@@ -50,6 +50,7 @@ import { STATUS_HEX } from "@/modules/bookings/presentation/status-tones";
 
 import {
   bookingToCalendarEvent,
+  tzArg,
 } from "./booking-calendar-utils";
 import { BookingCalendarEvent } from "./booking-calendar-event";
 import { BookingCalendarMonthEvent } from "./booking-calendar-month-event";
@@ -211,6 +212,7 @@ export function BookingCalendar({
     defaultView: effectiveDefaultView,
     locale: "es-AR",
     firstDayOfWeek: 1,
+    timezone: tzArg,
     translations: { esAR: ES_AR_TRANSLATIONS },
     weekOptions: {
       timeAxisFormatOptions: { hour: "2-digit", minute: "2-digit", hour12: false },
