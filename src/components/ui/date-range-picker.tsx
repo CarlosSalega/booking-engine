@@ -99,7 +99,7 @@ export function DateRangePicker({
           locale={es}
           weekStartsOn={1}
           numberOfMonths={isDesktop ? 2 : 1}
-          showOutsideDays={false}
+          showOutsideDays={true}
           fixedWeeks
         />
       </PopoverContent>

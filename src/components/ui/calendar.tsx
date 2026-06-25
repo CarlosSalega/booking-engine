@@ -62,6 +62,7 @@ function Calendar({
         [UI.Week]: "flex w-full mt-1",
         [UI.Day]: cn(
           "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
+          "[&.rdp-outside]:opacity-20",
           props.mode === "range"
             ? "[&:has([aria-selected])]:bg-accent [&:has(.rdp-range_end)]:rounded-r-md [&:has(.rdp-range_start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
             : "[&:has([aria-selected])]:rounded-md",
