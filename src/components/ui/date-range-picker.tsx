@@ -44,31 +44,40 @@ export function DateRangePicker({
   onChange,
   className,
 }: DateRangePickerProps) {
-  const fromDate = parseDate(from)
-  const toDate = parseDate(to)
+  const [open, setOpen] = React.useState(false)
+  const fromDate = React.useMemo(() => parseDate(from), [from])
+  const toDate = React.useMemo(() => parseDate(to), [to])
 
   // Responsive: 2 months on tablet+, 1 on mobile
   const isDesktop = useMediaQuery("(min-width: 640px)")
 
-  const selected = fromDate || toDate
-    ? { from: fromDate, to: toDate }
-    : undefined
+  const selected = React.useMemo(
+    () =>
+      fromDate || toDate ? { from: fromDate, to: toDate } : undefined,
+    [fromDate, toDate],
+  )
 
-  function handleSelect(range: { from?: Date; to?: Date } | undefined) {
-    if (range?.from && range?.to) {
-      onChange({
-        from: formatISO(range.from),
-        to: formatISO(range.to),
-      })
-    } else if (range?.from && !range?.to) {
-      onChange({
-        from: formatISO(range.from),
-        to: "",
-      })
-    } else {
-      onChange({ from: "", to: "" })
-    }
-  }
+  const handleSelect = React.useCallback(
+    (range: { from?: Date; to?: Date } | undefined) => {
+      if (range?.from && range?.to) {
+        onChange({
+          from: formatISO(range.from),
+          to: formatISO(range.to),
+        })
+        setOpen(false)
+      } else if (range?.from && !range?.to) {
+        onChange({
+          from: formatISO(range.from),
+          to: "",
+        })
+        // Keep popover open while user picks the second date
+      } else {
+        onChange({ from: "", to: "" })
+        setOpen(false)
+      }
+    },
+    [onChange],
+  )
 
   const label = fromDate && toDate
     ? `${format(fromDate, "dd/MM/yy", { locale: es })} – ${format(toDate, "dd/MM/yy", { locale: es })}`
@@ -77,7 +86,7 @@ export function DateRangePicker({
       : "Seleccionar fechas"
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="outline"
