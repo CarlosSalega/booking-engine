@@ -42,3 +42,8 @@ export { DEFAULT_PAGE_SIZE } from "./data/payment-data.types";
 
 // Server Actions + their schemas + result/input types
 export * from "./actions";
+
+// Presentation formatters (es-AR status labels, ARS currency formatting).
+// Client Components should import from `@/modules/payments/presentation`
+// (or via this barrel) rather than reaching into formatters.ts directly.
+export * from "./presentation";

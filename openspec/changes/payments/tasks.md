@@ -76,13 +76,13 @@ Branch: `feature/payments-actions` (from `feature/payments-data`)
 
 Branch: `feature/payments-presentation` (from `feature/payments-actions`)
 
-- [ ] 3.1 [TEST RED] Write `src/modules/payments/presentation/__tests__/formatters.test.ts` — test `getPaymentStatusLabel` returns es-AR label for all 5 statuses
-- [ ] 3.2 [IMPL GREEN] Create `src/modules/payments/presentation/formatters.ts` with `PAYMENT_STATUS_LABEL` const map (PENDING→"Pendiente", APPROVED→"Aprobado", REJECTED→"Rechazado", CANCELLED→"Cancelado", IN_PROCESS→"En proceso")
-- [ ] 3.3 [IMPL GREEN] Implement `getPaymentStatusLabel(status: ProviderPaymentStatusType): string` from the map
-- [ ] 3.4 [TEST RED] Add test — `formatCurrency(5000)` returns `"$ 5.000,00"` and `formatCurrency(2500.5)` returns `"$ 2.500,50"`
-- [ ] 3.5 [IMPL GREEN] Implement `formatCurrency(amount: number): string` using `Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" })`
-- [ ] 3.6 [BARREL] Create `src/modules/payments/presentation/index.ts` exporting formatters
-- [ ] 3.7 [VERIFY] Run `pnpm test` and `pnpm type-check` — formatter tests green
+- [x] 3.1 [TEST RED] Write `src/modules/payments/presentation/__tests__/formatters.test.ts` — test `getPaymentStatusLabel` returns es-AR label for all 5 statuses
+- [x] 3.2 [IMPL GREEN] Create `src/modules/payments/presentation/formatters.ts` with `PAYMENT_STATUS_LABEL` const map (PENDING→"Pendiente", APPROVED→"Aprobado", REJECTED→"Rechazado", CANCELLED→"Cancelado", IN_PROCESS→"En proceso")
+- [x] 3.3 [IMPL GREEN] Implement `getPaymentStatusLabel(status: ProviderPaymentStatusType): string` from the map (with "Desconocido" fallback for unknown)
+- [x] 3.4 [TEST RED] Add test — `formatCurrency(5000)` returns `"$ 5.000,00"` and `formatCurrency(2500.5)` returns `"$ 2.500,50"`
+- [x] 3.5 [IMPL GREEN] Implement `formatCurrency(amount: number): string` using `Intl.NumberFormat("es-AR", { style: "currency", currency: "ARS" })`
+- [x] 3.6 [BARREL] Create `src/modules/payments/presentation/index.ts` exporting formatters
+- [x] 3.7 [VERIFY] Run `pnpm test` and `pnpm type-check` — formatter tests green (17 new tests, 1090/1090 total passing)
 
 ---
 
@@ -90,24 +90,24 @@ Branch: `feature/payments-presentation` (from `feature/payments-actions`)
 
 Branch: `feature/payments-pages` (from `feature/payments-presentation`)
 
-- [ ] 4.1 [TEST RED] Write `src/components/payments/__tests__/payment-status-badge.test.tsx` — test badge renders correct `variant` per `ProviderPaymentStatus`
-- [ ] 4.2 [IMPL GREEN] Create `src/components/payments/payment-status-badge.tsx` with shadcn `Badge` — 5-color variant map (yellow/green/red/gray/blue)
-- [ ] 4.3 [TEST RED] Write `src/components/payments/__tests__/payment-table-skeleton.test.tsx` — test renders 5 shimmer rows
-- [ ] 4.4 [IMPL GREEN] Create `src/components/payments/payment-table-skeleton.tsx` with 5 skeleton rows matching 7-column layout
-- [ ] 4.5 [TEST RED] Write `src/components/payments/__tests__/payment-empty-state.test.tsx` — test renders "No hay pagos" message
-- [ ] 4.6 [IMPL GREEN] Create `src/components/payments/payment-empty-state.tsx` with centered illustration + label
-- [ ] 4.7 [TEST RED] Write `src/components/payments/__tests__/payment-status-filter.test.tsx` — test selection pushes `?status=` to URL
-- [ ] 4.8 [IMPL GREEN] Create `src/components/payments/payment-status-filter.tsx` — Client `Select` with 5 statuses + "Todos" default, `router.push` on change
-- [ ] 4.9 [TEST RED] Write `src/components/payments/__tests__/payment-search-bar.test.tsx` — test debounced (300ms) input pushes `?search=` to URL
-- [ ] 4.10 [IMPL GREEN] Create `src/components/payments/payment-search-bar.tsx` — Client `Input` with 300ms debounce, `router.push` on settle
-- [ ] 4.11 [TEST RED] Write `src/components/payments/__tests__/payment-table.test.tsx` — test renders 7 columns and links row to detail page
-- [ ] 4.12 [IMPL GREEN] Create `src/components/payments/payment-table.tsx` — Client table with columns Fecha reserva / Paciente / Profesional / Servicio / Monto / Estado / Acciones
-- [ ] 4.13 [TEST RED] Write `src/components/payments/__tests__/payment-detail-card.test.tsx` — test shows retry button when `canRetry()` true, hides when false
-- [ ] 4.14 [IMPL GREEN] Create `src/components/payments/payment-detail-card.tsx` — Card with all `EnrichedPayment` fields, "Ver reserva" link, retry `Button` (calls `retryPayment` action, shows toast on error)
-- [ ] 4.15 [IMPL GREEN] Replace `src/app/(dashboard)/dashboard/payments/page.tsx` — Server Component with `Suspense` → `PaymentTableDataWrapper` (async, calls `getPayments(orgId, filters)`) → `PaymentTable` + filter/search bar
-- [ ] 4.16 [IMPL GREEN] Create `src/app/(dashboard)/dashboard/payments/[id]/page.tsx` — Server Component, `getPaymentById` → `notFound()` on `PaymentNotFoundError`, renders `PaymentDetailCard`
-- [ ] 4.17 [BARREL] Extend `src/modules/payments/index.ts` with `export * from "./presentation"`
-- [ ] 4.18 [VERIFY] Run `pnpm test` and `pnpm type-check` — full suite green, pages render under RBAC guard at `(dashboard)` layout
+- [x] 4.1 [TEST RED] Write `src/components/payments/__tests__/payment-status-badge.test.tsx` — test badge renders correct `variant` per `ProviderPaymentStatus`
+- [x] 4.2 [IMPL GREEN] Create `src/components/payments/payment-status-badge.tsx` with shadcn `Badge` — 5-color variant map (yellow/green/red/gray/blue)
+- [x] 4.3 [TEST RED] Write `src/components/payments/__tests__/payment-table-skeleton.test.tsx` — test renders 5 shimmer rows
+- [x] 4.4 [IMPL GREEN] Create `src/components/payments/payment-table-skeleton.tsx` with 5 skeleton rows matching 7-column layout
+- [x] 4.5 [TEST RED] Write `src/components/payments/__tests__/payment-empty-state.test.tsx` — test renders "No hay pagos" message
+- [x] 4.6 [IMPL GREEN] Create `src/components/payments/payment-empty-state.tsx` with centered illustration + label
+- [x] 4.7 [TEST RED] Write `src/components/payments/__tests__/payment-status-filter.test.tsx` — test selection pushes `?status=` to URL
+- [x] 4.8 [IMPL GREEN] Create `src/components/payments/payment-status-filter.tsx` — Client `Select` with 5 statuses + "Todos" default, `router.push` on change
+- [x] 4.9 [TEST RED] Write `src/components/payments/__tests__/payment-search-bar.test.tsx` — test debounced (300ms) input pushes `?search=` to URL
+- [x] 4.10 [IMPL GREEN] Create `src/components/payments/payment-search-bar.tsx` — Client `Input` with 300ms debounce, `router.push` on settle
+- [x] 4.11 [TEST RED] Write `src/components/payments/__tests__/payment-table.test.tsx` — test renders 7 columns and links row to detail page
+- [x] 4.12 [IMPL GREEN] Create `src/components/payments/payment-table.tsx` — Client table with columns Fecha reserva / Paciente / Profesional / Servicio / Monto / Estado / Acciones
+- [x] 4.13 [TEST RED] Write `src/components/payments/__tests__/payment-detail-card.test.tsx` — test shows retry button when `canRetry()` true, hides when false
+- [x] 4.14 [IMPL GREEN] Create `src/components/payments/payment-detail-card.tsx` — Card with all `EnrichedPayment` fields, "Ver reserva" link, retry `Button` (calls `retryPayment` action, shows toast on error)
+- [x] 4.15 [IMPL GREEN] Replace `src/app/(dashboard)/dashboard/payments/page.tsx` — Server Component with `Suspense` → `PaymentTableDataWrapper` (async, calls `getPayments(orgId, filters)`) → `PaymentTable` + filter/search bar
+- [x] 4.16 [IMPL GREEN] Create `src/app/(dashboard)/dashboard/payments/[id]/page.tsx` — Server Component, `getPaymentById` → `notFound()` on `PaymentNotFoundError`, renders `PaymentDetailCard`
+- [x] 4.17 [BARREL] Extend `src/modules/payments/index.ts` with `export * from "./presentation"`
+- [x] 4.18 [VERIFY] Run `pnpm test` and `pnpm type-check` — full suite green, pages render under RBAC guard at `(dashboard)` layout
 
 ---
 
