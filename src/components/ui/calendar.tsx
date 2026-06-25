@@ -1,7 +1,9 @@
 "use client"
 
 import * as React from "react"
-import { DayPicker } from "react-day-picker"
+import { DayPicker, UI } from "react-day-picker"
+import "react-day-picker/style.css"
+
 import { ChevronLeft, ChevronRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
@@ -20,49 +22,40 @@ function Calendar({
       components={{
         Chevron: ({ orientation, ...chevronProps }) => {
           if (orientation === "left") {
-            return <ChevronLeft className="size-4" {...chevronProps as Record<string, unknown>} />
+            return <ChevronLeft className="size-4" {...chevronProps  as Record<string, unknown>} />
           }
-          return <ChevronRight className="size-4" {...chevronProps as Record<string, unknown>} />
+          return <ChevronRight className="size-4" {...chevronProps  as Record<string, unknown>} />
         },
       }}
       classNames={{
-        months: "flex flex-col sm:flex-row gap-2",
-        month: "flex flex-col gap-4",
-        caption: "flex justify-center items-center pt-1 relative h-8",
-        caption_label: "text-sm font-medium",
-        nav: "flex items-center gap-1",
-        nav_button: cn(
+        [UI.Root]: "",
+        [UI.Months]: "flex flex-col sm:flex-row gap-2",
+        [UI.Month]: "flex flex-col gap-4",
+        [UI.MonthCaption]: "flex justify-center items-center pt-1 relative h-8",
+        [UI.CaptionLabel]: "text-sm font-medium",
+        [UI.Nav]: "flex items-center gap-1 absolute",
+        [UI.Chevron]: cn(
           buttonVariants({ variant: "outline" }),
           "size-7 bg-transparent p-0 opacity-50 hover:opacity-100",
         ),
-        table: "w-full border-collapse space-y-1",
-        head_row: "flex",
-        head_cell:
+        [UI.MonthGrid]: "w-full border-collapse space-y-1",
+        [UI.Weekdays]: "flex",
+        [UI.Weekday]:
           "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem]",
-        row: "flex w-full mt-1",
-        cell: cn(
-          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-range-end)]:rounded-r-md",
+        [UI.Week]: "flex w-full mt-1",
+        [UI.Day]: cn(
+          "relative p-0 text-center text-sm focus-within:relative focus-within:z-20",
           props.mode === "range"
-            ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
+            ? "[&:has([aria-selected])]:bg-accent [&:has(.rdp-range_end)]:rounded-r-md [&:has(.rdp-range_start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
             : "[&:has([aria-selected])]:rounded-md",
         ),
-        day: cn(
+        [UI.DayButton]: cn(
           buttonVariants({ variant: "ghost" }),
           "size-8 p-0 font-normal aria-selected:opacity-100",
         ),
-        day_range_start:
-          "day-range-start aria-selected:bg-primary aria-selected:text-primary-foreground",
-        day_range_end:
-          "day-range-end aria-selected:bg-primary aria-selected:text-primary-foreground",
-        day_selected:
-          "bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground focus:bg-primary focus:text-primary-foreground",
-        day_today: "bg-accent/50 text-accent-foreground font-semibold",
-        day_outside:
-          "day-outside text-muted-foreground aria-selected:text-muted-foreground aria-selected:bg-accent/50",
-        day_disabled: "text-muted-foreground opacity-50",
-        day_range_middle:
-          "aria-selected:bg-accent aria-selected:text-accent-foreground",
-        day_hidden: "invisible",
+        // Selection states are applied as additional classes via the
+        // SelectionState enum, not as UI elements.
+        [UI.WeekNumber]: "text-xs text-muted-foreground w-8",
         ...classNames,
       }}
       {...props}
