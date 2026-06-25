@@ -236,7 +236,7 @@ export function BookingCalendarToolbar({
         data-testid="toolbar-current-date"
       >
         <CalendarIcon className="size-4 text-muted-foreground" />
-        <span className="font-mono tabular-nums">{date}</span>
+        <span className="font-mono tabular-nums">{formatDisplayDate(date)}</span>
       </div>
 
       {/* "Hoy" button */}
@@ -316,4 +316,14 @@ function todayISO(): string {
   const m = String(now.getMonth() + 1).padStart(2, "0");
   const d = String(now.getDate()).padStart(2, "0");
   return `${y}-${m}-${d}`;
+}
+
+/**
+ * Convert an ISO date string (YYYY-MM-DD) to the Argentinian display
+ * format DD/MM/YYYY. The internal format stays ISO for URL params;
+ * this is purely for the visual date badge in the toolbar.
+ */
+function formatDisplayDate(isoDate: string): string {
+  const [y, m, d] = isoDate.split("-");
+  return `${d}/${m}/${y}`;
 }
