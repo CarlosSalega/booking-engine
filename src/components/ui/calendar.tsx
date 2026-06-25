@@ -76,9 +76,9 @@ function Calendar({
         [UI.DayButton]: cn(
           buttonVariants({ variant: "ghost" }),
           "size-8 p-0 font-normal",
-          "hover:bg-primary/15",
+          "hover:bg-primary-hover",
           "aria-selected:bg-primary aria-selected:text-primary-foreground",
-          "aria-selected:hover:bg-primary/90",
+          "aria-selected:hover:bg-primary-hover",
         ),
         [UI.WeekNumber]: "text-xs text-muted-foreground",
         // Day flags — appended to Day element when the flag is active
