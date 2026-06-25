@@ -50,11 +50,52 @@ import { STATUS_HEX } from "@/modules/bookings/presentation/status-tones";
 
 import {
   bookingToCalendarEvent,
-  type CalendarAppEvent,
 } from "./booking-calendar-utils";
 import { BookingCalendarEvent } from "./booking-calendar-event";
 import { BookingCalendarMonthEvent } from "./booking-calendar-month-event";
 import { useMediaQuery } from "@/hooks/use-media-query";
+
+// ---------------------------------------------------------------------------
+// es-AR translations for Schedule-X built-in strings
+// ---------------------------------------------------------------------------
+
+const ES_AR_TRANSLATIONS = {
+  // Calendar header
+  Today: "Hoy",
+  Week: "Semana",
+  Day: "Día",
+  Month: "Mes",
+  List: "Lista",
+  View: "Vista",
+  "Select View": "Seleccionar vista",
+
+  // Navigation
+  "Next period": "Período siguiente",
+  "Previous period": "Período anterior",
+
+  // Events
+  "No events": "Sin turnos",
+  "+ 1 event": "+ 1 turno",
+  "+ {{n}} events": "+ {{n}} turnos",
+  "Full day- and multiple day events": "Turnos de día completo",
+  "Link to 1 more event on {{date}}": "1 turno más el {{date}}",
+  "Link to {{n}} more events on {{date}}": "{{n}} turnos más el {{date}}",
+  to: "a",
+  CW: "SC",
+
+  // Date picker
+  Date: "Fecha",
+  "MM/DD/YYYY": "DD/MM/YYYY",
+  "Choose Date": "Elegir fecha",
+  "Next month": "Mes siguiente",
+  "Previous month": "Mes anterior",
+
+  // Time picker
+  Time: "Hora",
+  Cancel: "Cancelar",
+  OK: "Aceptar",
+  "Select time": "Seleccionar hora",
+} as const;
 
 // ---------------------------------------------------------------------------
 // Public types
@@ -170,6 +211,7 @@ export function BookingCalendar({
     defaultView: effectiveDefaultView,
     locale: "es-AR",
     firstDayOfWeek: 1,
+    translations: { esAR: ES_AR_TRANSLATIONS },
     callbacks: {
       onEventClick: (event) => {
         // Schedule-X hands the event straight back; it has the `_booking`
