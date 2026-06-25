@@ -28,7 +28,7 @@ import type { ProfessionalOption } from "@/modules/bookings/data/booking-data.ty
 import type { ServiceOption } from "@/modules/bookings/data/booking-data.types";
 
 import { Button } from "@/components/ui/button";
-import { DateInput } from "@/components/ui/date-input";
+import { DateRangePicker } from "@/components/ui/date-range-picker";
 import {
   Select,
   SelectContent,
@@ -103,10 +103,12 @@ export function BookingFilters({ professionals, services }: BookingFiltersProps)
     });
   }
 
-  function setDateRange(key: "dateFrom" | "dateTo", value: string) {
+  function setDateRange(range: { from: string; to: string }) {
     commit((params) => {
-      if (value === "") params.delete(key);
-      else params.set(key, value);
+      if (range.from) params.set("dateFrom", range.from);
+      else params.delete("dateFrom");
+      if (range.to) params.set("dateTo", range.to);
+      else params.delete("dateTo");
     });
   }
 
@@ -211,28 +213,15 @@ export function BookingFilters({ professionals, services }: BookingFiltersProps)
           </Select>
         </div>
 
-        {/* Date from */}
-        <div className="space-y-1.5">
+        {/* Date range */}
+        <div className="space-y-1.5 sm:col-span-2">
           <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Desde
+            Fechas
           </span>
-          <DateInput
-            id="filter-date-from"
-            value={searchParams.get("dateFrom") ?? ""}
-            onChange={(v) => setDateRange("dateFrom", v)}
-            className="h-8"
-          />
-        </div>
-
-        {/* Date to */}
-        <div className="space-y-1.5">
-          <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Hasta
-          </span>
-          <DateInput
-            id="filter-date-to"
-            value={searchParams.get("dateTo") ?? ""}
-            onChange={(v) => setDateRange("dateTo", v)}
+          <DateRangePicker
+            from={searchParams.get("dateFrom") ?? ""}
+            to={searchParams.get("dateTo") ?? ""}
+            onChange={setDateRange}
             className="h-8"
           />
         </div>
