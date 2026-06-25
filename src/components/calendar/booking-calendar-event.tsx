@@ -27,13 +27,18 @@ import { cn } from "@/lib/utils";
  * custom component. The full `CalendarAppEvent` is exported from
  * `booking-calendar-utils.ts`; this is a structural subset for the
  * component's own prop type.
+ *
+ * `start` / `end` are typed as `string | Temporal.ZonedDateTime`
+ * because Schedule-X passes the original Temporal objects through
+ * to custom components — it does NOT stringify them. The runtime
+ * value depends on what `bookingToCalendarEvent` returned.
  */
 export interface TimeGridCalendarEvent {
   id: string | number;
   title: string;
   description?: string;
-  start: string;
-  end: string;
+  start: string | Temporal.ZonedDateTime;
+  end: string | Temporal.ZonedDateTime;
   calendarId?: string;
 }
 
@@ -51,19 +56,22 @@ const AR_LOCALE = "es-AR";
  * presentation layer but uses Temporal — it has to be local to this
  * file because the calendar only loads on the client.
  *
- * The event ISO strings are constructed by `bookingToCalendarEvent`
- * which embeds the Argentina TZ bracket annotation
- * (e.g. `…-03:00[America/Argentina/Buenos_Aires]`), so we can parse
- * them directly. For strings without a bracket (e.g. UTC `…Z` ISO),
- * we route through `Instant` + `toZonedDateTimeISO(tzArg)` — the
- * same bridge the mapper uses — so the displayed wall-clock time
- * matches the user's time zone.
+ * Schedule-X passes the original Temporal objects through to custom
+ * components (no stringification), so we accept both shapes:
+ * - `Temporal.ZonedDateTime` — from `bookingToCalendarEvent` (common).
+ * - `string` — ISO with bracket (e.g. `…-03:00[America/…]`) or plain
+ *   UTC (`…Z`). Strings without a bracket route through
+ *   `Instant` + `toZonedDateTimeISO(tzArg)` so the displayed
+ *   wall-clock time matches the user's time zone.
  */
-function formatHourMinute(value: string): string {
-  const hasTzAnnotation = value.includes("[");
-  const zdt = hasTzAnnotation
-    ? Temporal.ZonedDateTime.from(value)
-    : Temporal.Instant.from(value).toZonedDateTimeISO(tzArg);
+function formatHourMinute(value: string | Temporal.ZonedDateTime): string {
+  const zdt =
+    typeof value === "string"
+      ? value.includes("[")
+        ? Temporal.ZonedDateTime.from(value)
+        : Temporal.Instant.from(value).toZonedDateTimeISO(tzArg)
+      : value; // already a ZonedDateTime from bookingToCalendarEvent
+
   return new Intl.DateTimeFormat(AR_LOCALE, {
     hour: "2-digit",
     minute: "2-digit",
