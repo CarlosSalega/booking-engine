@@ -13,6 +13,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { useMediaQuery } from "@/hooks/use-media-query"
 
 interface DateRangePickerProps {
   /** ISO date value (YYYY-MM-DD) or empty string. */
@@ -46,6 +47,9 @@ export function DateRangePicker({
   const fromDate = parseDate(from)
   const toDate = parseDate(to)
 
+  // Responsive: 2 months on tablet+, 1 on mobile
+  const isDesktop = useMediaQuery("(min-width: 640px)")
+
   const selected = fromDate || toDate
     ? { from: fromDate, to: toDate }
     : undefined
@@ -57,14 +61,11 @@ export function DateRangePicker({
         to: formatISO(range.to),
       })
     } else if (range?.from && !range?.to) {
-      // User picked the first date — emit partial so the URL updates
-      // optimistically (only dateFrom is set until the second click)
       onChange({
         from: formatISO(range.from),
         to: "",
       })
     } else {
-      // Cleared
       onChange({ from: "", to: "" })
     }
   }
@@ -97,7 +98,9 @@ export function DateRangePicker({
           onSelect={handleSelect}
           locale={es}
           weekStartsOn={1}
-          numberOfMonths={2}
+          numberOfMonths={isDesktop ? 2 : 1}
+          showOutsideDays={false}
+          fixedWeeks
         />
       </PopoverContent>
     </Popover>
