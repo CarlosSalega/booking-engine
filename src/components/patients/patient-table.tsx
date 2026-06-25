@@ -24,7 +24,7 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 import type { EnrichedPatient } from "@/modules/patients/data/patient-data.types";
@@ -57,13 +57,13 @@ export function PatientTable({
   pageSize,
 }: PatientTableProps) {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   const hasPrev = page > 1;
   const hasNext = page < totalPages;
 
   function pageHref(p: number): string {
-    if (typeof window === "undefined") return "#";
-    const params = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(searchParams.toString());
     if (p <= 1) params.delete("page");
     else params.set("page", String(p));
     const query = params.toString();
