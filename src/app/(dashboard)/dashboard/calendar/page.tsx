@@ -30,6 +30,7 @@
 import { Suspense } from "react";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { Temporal } from "temporal-polyfill";
 
 import { auth } from "@/core/auth/auth-instance";
 import { USER_ROLE, type UserRoleType } from "@/modules/auth/domain/roles";
@@ -49,6 +50,7 @@ import {
 import { BookingCalendarDataWrapper } from "@/components/calendar/booking-calendar-data-wrapper";
 import { BookingCalendarEmpty } from "@/components/calendar/booking-calendar-empty";
 import { BookingCalendarToolbar } from "@/components/calendar/booking-calendar-toolbar";
+import { CalendarSkeleton } from "@/components/calendar/calendar-skeleton";
 
 // (The mobile default view — "day" on ≤ 768px viewports — is the
 // BookingCalendar wrapper's concern. The page is a Server Component
@@ -160,7 +162,7 @@ export default async function CalendarPage({ searchParams }: CalendarPageProps) 
       </div>
 
       <div className="px-4 lg:px-6">
-        <Suspense fallback={null}>
+        <Suspense fallback={<CalendarSkeleton />}>
           <CalendarDataWrapper
             organizationId={organizationId}
             date={date}

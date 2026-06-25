@@ -32,6 +32,7 @@
 import { useCallback } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
+import { Temporal } from "temporal-polyfill";
 
 import type { ProfessionalOption } from "@/modules/bookings/data/booking-data.types";
 import type { UserRoleType } from "@/modules/auth/domain/roles";
