@@ -5,17 +5,29 @@ import { auth } from "./auth-instance";
 /**
  * Public route prefixes that always bypass the session check.
  * These match the auth surface area: auth pages, Better Auth HTTP handler,
- * Next.js internals, and the favicon.
+ * Next.js internals, the favicon, and the public landing page.
+ *
+ * `"/"` is an exact match — it does NOT act as a prefix for other paths
+ * (`"/"` does not start with `"/dashboard"`). The matcher is consumed by
+ * `isPublicPath()` which performs an exact-or-prefix check per entry.
  */
-const PUBLIC_PREFIXES = [
+export const PUBLIC_PREFIXES = [
   "/login",
   "/register",
   "/api/auth",
   "/_next",
   "/favicon.ico",
+  "/",
 ] as const;
 
-function isPublicPath(pathname: string): boolean {
+/**
+ * Returns `true` when `pathname` matches one of the public route prefixes.
+ *
+ * Exported for unit testing — see `src/core/auth/__tests__/auth-proxy.test.ts`.
+ * The proxy in `src/app/proxy.ts` short-circuits on these paths before
+ * hitting Better Auth (defense in depth with the matcher regex).
+ */
+export function isPublicPath(pathname: string): boolean {
   return PUBLIC_PREFIXES.some(
     (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
   );

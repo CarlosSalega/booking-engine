@@ -1,29 +1,91 @@
 /**
  * Public landing / root entry point.
  *
- * - Unauthenticated users see a minimal landing and a link to /login.
- * - Authenticated non-PATIENT users (ADMIN, SECRETARY, PROFESSIONAL)
- *   are bounced to /dashboard so the operator panel is the first
- *   thing they see.
- * - PATIENT users stay on this page — they do not have access to the
- *   dashboard. A real patient-facing landing will replace this in a
- *   later change.
+ * Server-rendered landing for Dra. Alejandra Pasqualetti (facial
+ * injectables). Replaces the placeholder with a 7-section public
+ * marketing page.
  *
- * Auth is enforced at the routing layer by `src/app/proxy.ts`, which
- * redirects unauthenticated requests to /login. This page is reached
- * only when there is a valid session, so we don't re-check.
+ * Auth behavior (preserved from the original placeholder):
+ *   - Unauthenticated users see the landing (PUBLIC_PREFIXES includes "/").
+ *   - Authenticated non-PATIENT users (ADMIN, SECRETARY, PROFESSIONAL)
+ *     are bounced to /dashboard so the operator panel is the first
+ *     thing they see.
+ *   - PATIENT users stay on this page.
+ *
+ * The proxy in `src/app/proxy.ts` short-circuits unauthenticated
+ * requests to "/" before hitting Better Auth (design AD3 — defense
+ * in depth with the PUBLIC_PREFIXES check).
  */
 
+import type { Metadata } from "next";
 import { headers } from "next/headers";
-import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { auth } from "@/core/auth/auth-instance";
 import { USER_ROLE } from "@/modules/auth/domain/roles";
 
-import { Button } from "@/components/ui/button";
+import { AboutSection } from "./_landing/about-section";
+import { BookingCta } from "./_landing/booking-cta";
+import { FloatingWhatsApp } from "./_landing/floating-whatsapp";
+import { HowItWorksSection } from "./_landing/how-it-works-section";
+import { LandingFooter } from "./_landing/landing-footer";
+import { LocationsSection } from "./_landing/locations-section";
+import { ServicesSection } from "./_landing/services-section";
+import { FaqSection } from "./_landing/faq-section";
+import { HeroSection } from "./_landing/hero-section";
+import {
+  aboutData,
+  buildJsonLd,
+  DEFAULT_ORGANIZATION_ID,
+  faqItems,
+  getWhatsAppNumber,
+  heroData,
+  howItWorksSteps,
+  landingMetadata,
+  locations,
+} from "./_landing/data";
+
+const PRACTICE_NAME = "Dra. Alejandra Pasqualetti";
+const LOCATION_SUMMARY = "Nuñez, CABA · Pilar, Buenos Aires";
+
+// ---------------------------------------------------------------------------
+// Metadata — title, description, OG, canonical. Server-rendered for SEO
+// (LND-002).
+// ---------------------------------------------------------------------------
+
+export function generateMetadata(): Metadata {
+  return {
+    title: landingMetadata.title,
+    description: landingMetadata.description,
+    openGraph: {
+      title: landingMetadata.title,
+      description: landingMetadata.description,
+      url: "/",
+      siteName: PRACTICE_NAME,
+      images: [
+        {
+          url: "/placeholder.webp",
+          width: 1200,
+          height: 630,
+          alt: heroData.imageAlt,
+        },
+      ],
+      locale: "es_AR",
+      type: "website",
+    },
+    alternates: {
+      canonical: "/",
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Page component
+// ---------------------------------------------------------------------------
 
 export default async function HomePage() {
+  // 1. Resolve the session for the role-based redirect (LND-001 /
+  //    LND-012 — non-PATIENT must still go to /dashboard).
   const session = await auth.api.getSession({
     headers: await headers(),
   });
@@ -35,27 +97,61 @@ export default async function HomePage() {
     }
   }
 
+  // 2. Resolve the WhatsApp number from env (with fallback).
+  const whatsappNumber = getWhatsAppNumber();
+
+  // 3. Build the JSON-LD payload. Origin is taken from the request
+  //    headers; fall back to localhost for build-time rendering.
+  const headerList = await headers();
+  const proto = headerList.get("x-forwarded-proto") ?? "http";
+  const host = headerList.get("host") ?? "localhost:3000";
+  const origin = `${proto}://${host}`;
+  const jsonLd = buildJsonLd(whatsappNumber, origin);
+
+  // 4. Render the landing.
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-background p-6 text-center">
-      <div className="space-y-2">
-        <h1 className="text-3xl font-semibold tracking-tight text-foreground">
-          Booking Engine
-        </h1>
-        <p className="text-sm text-muted-foreground">
-          Plataforma de reservas y gestión para consultorios.
-        </p>
-      </div>
-      <div className="flex flex-col gap-2 sm:flex-row">
-        {session ? (
-          <Button asChild>
-            <Link href="/login">Cerrar sesión e ingresar con otra cuenta</Link>
-          </Button>
-        ) : (
-          <Button asChild>
-            <Link href="/login">Iniciar sesión</Link>
-          </Button>
-        )}
-      </div>
-    </main>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLd }}
+      />
+      <main>
+        <HeroSection
+          name={heroData.name}
+          title={heroData.title}
+          tagline={heroData.tagline}
+          ctaText={heroData.ctaText}
+          imageSrc={heroData.imageSrc}
+          imageAlt={heroData.imageAlt}
+        />
+        <AboutSection
+          bio={[...aboutData.bio]}
+          credentials={aboutData.credentials}
+          image={aboutData.image}
+          imageAlt={aboutData.imageAlt}
+        />
+        <ServicesSection
+          organizationId={DEFAULT_ORGANIZATION_ID}
+          whatsappNumber={whatsappNumber}
+          doctorName={PRACTICE_NAME}
+        />
+        <LocationsSection locations={locations} />
+        <HowItWorksSection steps={howItWorksSteps} />
+        <FaqSection items={faqItems} />
+        <BookingCta
+          whatsappNumber={whatsappNumber}
+          doctorName={PRACTICE_NAME}
+        />
+        <LandingFooter
+          practiceName={PRACTICE_NAME}
+          locationSummary={LOCATION_SUMMARY}
+          whatsappNumber={whatsappNumber}
+        />
+      </main>
+      <FloatingWhatsApp
+        phoneNumber={whatsappNumber}
+        message={`Hola ${PRACTICE_NAME}, quisiera agendar un turno para una consulta.`}
+      />
+    </>
   );
 }

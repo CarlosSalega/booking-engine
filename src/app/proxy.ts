@@ -22,6 +22,9 @@ export default function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!api/auth|_next/static|_next/image|favicon.ico|login|register).*)",
+    // `$` matches end-of-string — anchors "/" so the proxy skips exactly
+    // the landing root and nothing else. Defense in depth with
+    // `isPublicPath` in `auth-proxy.ts`.
+    "/((?!api/auth|_next/static|_next/image|favicon.ico|login|register|$).*)",
   ],
 };

@@ -16,7 +16,13 @@ const fontMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Booking Engine",
+  // Default metadata — overridden by `generateMetadata()` in
+  // `src/app/page.tsx` for the public landing. Kept as a sensible
+  // fallback for the rest of the app (login, dashboard, etc.).
+  title: {
+    default: "Booking Engine",
+    template: "%s · Booking Engine",
+  },
   description: "Plataforma de reservas y gestión para consultorios.",
 };
 
