@@ -50,6 +50,7 @@ import { STATUS_HEX } from "@/modules/bookings/presentation/status-tones";
 
 import {
   bookingToCalendarEvent,
+  type CalendarAppEvent,
   tzArg,
 } from "./booking-calendar-utils";
 import { BookingCalendarEvent } from "./booking-calendar-event";
@@ -107,7 +108,7 @@ const ES_AR_TRANSLATIONS = {
  * popover. Re-exported from the event component so consumers can
  * import it from a single module.
  */
-export type { CalendarAppEvent } from "./booking-calendar-utils";
+export type { CalendarAppEvent };
 
 interface BookingCalendarProps {
   /** Bookings to render. Server Component serializes Dates to ISO strings
