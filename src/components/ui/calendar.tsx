@@ -19,21 +19,6 @@ function Calendar({
   /** @default "around" — places arrows at the sides of the caption. */
   navLayout?: "around" | "after" | undefined
 }) {
-  // DEBUG: verify selected prop reaches DayPicker
-  // eslint-disable-next-line no-console
-  if (typeof window !== "undefined" && (props as { mode?: string }).mode === "range") {
-    const s = (props as { selected?: { from?: unknown; to?: unknown } }).selected
-    console.log("[Calendar→DayPicker]", {
-      mode: (props as { mode?: string }).mode,
-      selected: s,
-      from: s?.from,
-      to: s?.to,
-      fromIsDate: s?.from instanceof Date,
-      toIsDate: s?.to instanceof Date,
-      fromType: typeof s?.from,
-      toType: typeof s?.to,
-    })
-  }
   return (
     <DayPicker
       showOutsideDays={showOutsideDays}
