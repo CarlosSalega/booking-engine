@@ -17,6 +17,7 @@
  * in depth with the PUBLIC_PREFIXES check).
  */
 
+import { Suspense } from "react";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
@@ -80,10 +81,45 @@ export function generateMetadata(): Metadata {
 }
 
 // ---------------------------------------------------------------------------
-// Page component
+// Page wrapper — Suspense boundary so the static Hero streams immediately
+// while the session check (headers / DB) resolves in the background.
+// Next.js 16 requires dynamic APIs (headers, cookies, searchParams) inside
+// <Suspense> to avoid blocking the entire route.
 // ---------------------------------------------------------------------------
 
-export default async function HomePage() {
+export default function HomePage() {
+  return (
+    <Suspense fallback={<LandingShell />}>
+      <HomePageContent />
+    </Suspense>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Fallback shell — renders the Hero section immediately so the user sees
+// the most important content while the session + remaining sections load.
+// ---------------------------------------------------------------------------
+
+function LandingShell() {
+  return (
+    <main>
+      <HeroSection
+        name={heroData.name}
+        title={heroData.title}
+        tagline={heroData.tagline}
+        ctaText={heroData.ctaText}
+        imageSrc={heroData.imageSrc}
+        imageAlt={heroData.imageAlt}
+      />
+    </main>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Async content — session check, redirect, and full landing page render.
+// ---------------------------------------------------------------------------
+
+async function HomePageContent() {
   // 1. Resolve the session for the role-based redirect (LND-001 /
   //    LND-012 — non-PATIENT must still go to /dashboard).
   const session = await auth.api.getSession({
