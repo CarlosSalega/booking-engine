@@ -34,3 +34,24 @@ if (typeof Element !== "undefined") {
     };
   }
 }
+
+// jsdom does not implement `ResizeObserver`, but Radix UI's Switch
+// (and other primitives) use `@radix-ui/react-use-size` to measure
+// the root element. Provide a no-op polyfill so the component can
+// mount without throwing — the returned size is never read in our
+// tests, so an empty observation is fine.
+if (typeof globalThis.ResizeObserver === "undefined") {
+  class ResizeObserverPolyfill {
+    observe() {
+      // no-op
+    }
+    unobserve() {
+      // no-op
+    }
+    disconnect() {
+      // no-op
+    }
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).ResizeObserver = ResizeObserverPolyfill;
+}
