@@ -126,7 +126,7 @@ const NAV_GROUPS: NavGroup[] = [
         title: "Configuración",
         url: "/dashboard/settings",
         icon: Settings2,
-        roles: [USER_ROLE.ADMIN],
+        roles: [USER_ROLE.ADMIN, USER_ROLE.SECRETARY],
       },
       {
         title: "Soporte",
