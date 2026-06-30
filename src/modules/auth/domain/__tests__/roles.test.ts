@@ -1,9 +1,10 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, expectTypeOf, it } from "vitest";
 
 import {
   ROLE_PERMISSIONS,
   SESSION_DURATION,
   USER_ROLE,
+  type PermissionKey,
   type UserRoleType,
 } from "../roles";
 
@@ -72,5 +73,62 @@ describe("ROLE_PERMISSIONS", () => {
   it("grants PROFESSIONAL own-scope management but not user:manage", () => {
     expect(ROLE_PERMISSIONS.PROFESSIONAL).toContain("service:manage:own");
     expect(ROLE_PERMISSIONS.PROFESSIONAL).not.toContain("user:manage");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Settings permissions — `settings:manage` (ADMIN) / `settings:view` (ADMIN+SECRETARY)
+//
+// Spec source: `openspec/changes/settings/specs/auth-core/spec.md`
+//   - Requirement: Settings Permissions
+//   - Requirement: Settings Permission Type
+// ---------------------------------------------------------------------------
+
+describe("ROLE_PERMISSIONS — settings permissions", () => {
+  it("grants ADMIN both `settings:manage` and `settings:view`", () => {
+    expect(ROLE_PERMISSIONS.ADMIN).toContain("settings:manage");
+    expect(ROLE_PERMISSIONS.ADMIN).toContain("settings:view");
+  });
+
+  it("grants SECRETARY `settings:view` but NOT `settings:manage` (read-only)", () => {
+    expect(ROLE_PERMISSIONS.SECRETARY).toContain("settings:view");
+    expect(ROLE_PERMISSIONS.SECRETARY).not.toContain("settings:manage");
+  });
+
+  it("grants PROFESSIONAL neither `settings:manage` nor `settings:view`", () => {
+    expect(ROLE_PERMISSIONS.PROFESSIONAL).not.toContain("settings:manage");
+    expect(ROLE_PERMISSIONS.PROFESSIONAL).not.toContain("settings:view");
+  });
+
+  it("grants PATIENT neither `settings:manage` nor `settings:view`", () => {
+    expect(ROLE_PERMISSIONS.PATIENT).not.toContain("settings:manage");
+    expect(ROLE_PERMISSIONS.PATIENT).not.toContain("settings:view");
+  });
+});
+
+describe("PermissionKey type — settings literals", () => {
+  it("includes `settings:manage` in the union", () => {
+    // Compile-time + runtime check: the union is wider than just the
+    // existing entries. `expectTypeOf` compiles only if the literal
+    // belongs to the union; the `.toEqualTypeOf` would not work here
+    // (the union is bigger), so we check assignability both ways.
+    expectTypeOf<"settings:manage">().toMatchTypeOf<PermissionKey>();
+  });
+
+  it("includes `settings:view` in the union", () => {
+    expectTypeOf<"settings:view">().toMatchTypeOf<PermissionKey>();
+  });
+
+  it("a function parameter typed `PermissionKey` accepts `settings:view`", () => {
+    // Concrete assignability: the value MUST be a valid PermissionKey.
+    // The `void` argument is intentional — ESLint treats `_p` as
+    // a real identifier; using `void` documents that we only care
+    // about the call itself compiling.
+    const accepts = (p: PermissionKey): true => {
+      void p;
+      return true;
+    };
+    const result: true = accepts("settings:view");
+    expect(result).toBe(true);
   });
 });

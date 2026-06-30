@@ -28,6 +28,8 @@ export const ROLE_PERMISSIONS = {
     "booking:manage",
     "payment:manage",
     "report:view",
+    "settings:manage",
+    "settings:view",
   ],
   PROFESSIONAL: [
     "service:manage:own",
@@ -41,6 +43,7 @@ export const ROLE_PERMISSIONS = {
     "patient:view",
     "schedule:view",
     "payment:collect",
+    "settings:view",
   ],
 } as const satisfies Record<UserRoleType, readonly string[]>;
 

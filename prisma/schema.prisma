@@ -201,3 +201,28 @@ model Payment {
   @@index([bookingId])
   @@index([status])
 }
+
+// OrganizationSettings — one row per organization. Tenant-scoped global
+// configuration: business identity, booking rules, cancellation rules.
+// Source of truth: `src/modules/settings/domain/settings.schema.ts`
+// (Zod) and `src/modules/settings/data/settings-data.ts` (Prisma).
+model OrganizationSettings {
+  id                     String   @id @default(uuid())
+  organizationId         String   @unique
+  name                   String   @default("")
+  description            String?
+  address                String?
+  timezone               String   @default("America/Argentina/Buenos_Aires")
+  phone                  String?
+  email                  String?
+  defaultDurationMinutes Int      @default(30)
+  minAdvanceBookingHours Int      @default(1)
+  maxBookingsPerDay      Int      @default(50)
+  bufferMinutes          Int      @default(0)
+  cancellationEnabled    Boolean  @default(true)
+  cancellationLimitHours Int      @default(24)
+  createdAt              DateTime @default(now())
+  updatedAt              DateTime @updatedAt
+
+  @@index([organizationId])
+}
