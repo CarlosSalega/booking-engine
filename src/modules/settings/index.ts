@@ -49,8 +49,19 @@ export type {
 // available via the action subpath.
 export * from "./actions";
 
-// Presentation — Client Components (the settings page guard). The
-// page itself is a Server Component living in the App Router and
-// imports directly from the file (not via the barrel). Only the
-// guard is re-exported here for completeness.
-export { SettingsGuard } from "./presentation";
+// Presentation — Client Components (the settings page guard + tab
+// forms) and the Server Component body (`SettingsPage`). The route
+// file in the App Router imports `SettingsPage` from here so the
+// page entry stays a thin wrapper. Only the guard, the tab forms,
+// and the RSC body are re-exported.
+export {
+  SettingsGuard,
+  TimezoneSelect,
+  TIMEZONES,
+  DEFAULT_TIMEZONE,
+  BusinessTab,
+  BookingsTab,
+  CancellationsTab,
+  SettingsPage,
+  type TimezoneValue,
+} from "./presentation";

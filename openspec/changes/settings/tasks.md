@@ -70,18 +70,18 @@ Chain strategy: stacked-to-main
 
 ## Phase 4: PR #4 — Business + Bookings Tabs
 
-- [ ] 4.1 [IMPL GREEN] `src/modules/settings/presentation/timezone-select.tsx` — native `<select>` with curated IANA list (≥15), `value` + `onChange` props, `disabled` honored
-- [ ] 4.2 [TEST RED] `src/modules/settings/presentation/__tests__/business-tab.test.tsx` — mock actions + `next/navigation`; pre-fills from props, Zod client validate (email/regex), submit success toast, error inline, `readOnly` disables all fields (RED)
-- [ ] 4.3 [IMPL GREEN] `src/modules/settings/presentation/tabs/business-tab.tsx` — Client Component, `useTransition+useState`, fields: name, description, address, `<TimezoneSelect>`, phone, email; `safeParse` → `updateBusiness`; Spanish labels
-- [ ] 4.4 [TEST RED] `src/modules/settings/presentation/__tests__/bookings-tab.test.tsx` — range guards (5–480, 0–168, 1–200, 0–120), submit success, error inline (RED)
-- [ ] 4.5 [IMPL GREEN] `src/modules/settings/presentation/tabs/bookings-tab.tsx` — Client Component, fields: defaultDurationMinutes, minAdvanceBookingHours, maxBookingsPerDay, bufferMinutes; helper text per range; `updateBookings`
-- [ ] 4.6 [VERIFY] `pnpm test`; `pnpm type-check`; `pnpm lint`
+- [x] 4.1 [IMPL GREEN] `src/modules/settings/presentation/timezone-select.tsx` — native `<select>` with curated IANA list (≥15), `value` + `onChange` props, `disabled` honored
+- [x] 4.2 [TEST RED] `src/modules/settings/presentation/__tests__/business-tab.test.tsx` — mock actions + `next/navigation`; pre-fills from props, Zod client validate (email/regex), submit success toast, error inline, `readOnly` disables all fields (RED)
+- [x] 4.3 [IMPL GREEN] `src/modules/settings/presentation/tabs/business-tab.tsx` — Client Component, `useTransition+useState`, fields: name, description, address, `<TimezoneSelect>`, phone, email; `safeParse` → `updateBusiness`; Spanish labels
+- [x] 4.4 [TEST RED] `src/modules/settings/presentation/__tests__/bookings-tab.test.tsx` — range guards (5–480, 0–168, 1–200, 0–120), submit success, error inline (RED)
+- [x] 4.5 [IMPL GREEN] `src/modules/settings/presentation/tabs/bookings-tab.tsx` — Client Component, fields: defaultDurationMinutes, minAdvanceBookingHours, maxBookingsPerDay, bufferMinutes; helper text per range; `updateBookings`
+- [x] 4.6 [VERIFY] `pnpm test`; `pnpm type-check`; `pnpm lint`
 
 ## Phase 5: PR #5 — Cancellations Tab + Page Wiring
 
-- [ ] 5.1 [TEST RED] `src/modules/settings/presentation/__tests__/cancellations-tab.test.tsx` — toggle disables/enables hours field, submit success, error inline (RED)
-- [ ] 5.2 [IMPL GREEN] `src/modules/settings/presentation/tabs/cancellations-tab.tsx` — Client Component, fields: `cancellationEnabled` (Switch), `cancellationLimitHours` (number, disabled when toggle off); `updateCancellations`
-- [ ] 5.3 [IMPL GREEN] `src/modules/settings/presentation/settings-page.tsx` — RSC: read cached `getSettings(orgId)`, render `<SettingsGuard>` → `<Tabs>` (Negocio / Reservas / Cancelaciones) → the 3 tab components
-- [ ] 5.4 [TEST RED] `src/modules/settings/presentation/__tests__/settings-page.test.tsx` — render RSC, three tabs visible, "View-only" banner when SECRETARY, pre-fills from cache
-- [ ] 5.5 [VERIFY] `pnpm test`; `pnpm type-check`; `pnpm lint`
-- [ ] 5.6 [SMOKE] Manual: ADMIN login → `/dashboard/settings` → save all 3 tabs → values persist; SECRETARY login → fields disabled, banner visible; PROFESSIONAL → redirect to `/dashboard`
+- [x] 5.1 [TEST RED] `src/modules/settings/presentation/__tests__/cancellations-tab.test.tsx` — toggle disables/enables hours field, submit success, error inline (RED)
+- [x] 5.2 [IMPL GREEN] `src/modules/settings/presentation/tabs/cancellations-tab.tsx` — Client Component, fields: `cancellationEnabled` (Switch), `cancellationLimitHours` (number, disabled when toggle off); `updateCancellations`
+- [x] 5.3 [IMPL GREEN] `src/modules/settings/presentation/settings-page.tsx` — RSC: read cached `getSettings(orgId)`, render `<SettingsGuard>` → `<Tabs>` (Negocio / Reservas / Cancelaciones) → the 3 tab components
+- [x] 5.4 [TEST RED] `src/modules/settings/presentation/__tests__/settings-page.test.tsx` — render RSC, three tabs visible, "View-only" banner when SECRETARY, pre-fills from cache
+- [x] 5.5 [VERIFY] `pnpm test`; `pnpm type-check`; `pnpm lint`
+- [x] 5.6 [SMOKE] Manual: ADMIN login → `/dashboard/settings` → save all 3 tabs → values persist; SECRETARY login → fields disabled, banner visible; PROFESSIONAL → redirect to `/dashboard`
