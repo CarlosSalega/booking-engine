@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import "./globals.css";
@@ -34,7 +35,9 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body className={`${fontSans.variable} ${fontMono.variable} antialiased`}>
-        <TooltipProvider>{children}</TooltipProvider>
+        <Suspense>
+          <TooltipProvider>{children}</TooltipProvider>
+        </Suspense>
         <Toaster
           position="top-right"
           toastOptions={{
