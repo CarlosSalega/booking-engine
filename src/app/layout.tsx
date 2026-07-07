@@ -20,6 +20,11 @@ export const metadata: Metadata = {
   // Default metadata — overridden by `generateMetadata()` in
   // `src/app/page.tsx` for the public landing. Kept as a sensible
   // fallback for the rest of the app (login, dashboard, etc.).
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL ??
+      process.env.BETTER_AUTH_URL ??
+      "http://localhost:3000",
+  ),
   title: {
     default: "Booking Engine",
     template: "%s · Booking Engine",
