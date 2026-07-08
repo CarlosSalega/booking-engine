@@ -46,25 +46,25 @@ Chain strategy: feature-branch-chain
 
 ## Phase 2: Data — Track 2 (PR #2–PR #3)
 
-- [ ] 2.1 **RED**: Create `src/modules/analytics/data/__tests__/revenue-metrics.test.ts` — mocked Prisma: getRevenueMetrics empty, with data, null amounts (AND-003, AND-005)
-- [ ] 2.2 **GREEN**: Create `src/modules/analytics/data/analytics-data.ts` — getRevenueMetrics() using `payment.groupBy` + `_sum`
-- [ ] 2.3 **RED**: Create `src/modules/analytics/data/__tests__/booking-metrics.test.ts` — getBookingMetrics: empty, confirmed-only, mixed statuses
-- [ ] 2.4 **GREEN**: Add getBookingMetrics() using `booking.groupBy` + `_count`
-- [ ] 2.5 Create `src/modules/analytics/data/index.ts` — barrel (revenue + booking)
+- [x] 2.1 **RED**: Create `src/modules/analytics/data/__tests__/revenue-metrics.test.ts` — mocked Prisma: getRevenueMetrics empty, with data, null amounts (AND-003, AND-005)
+- [x] 2.2 **GREEN**: Create `src/modules/analytics/data/analytics-data.ts` — getRevenueMetrics() using `payment.groupBy` + `_sum`
+- [x] 2.3 **RED**: Create `src/modules/analytics/data/__tests__/booking-metrics.test.ts` — getBookingMetrics: empty, confirmed-only, mixed statuses
+- [x] 2.4 **GREEN**: Add getBookingMetrics() using `booking.groupBy` + `_count`
+- [x] 2.5 Create `src/modules/analytics/data/index.ts` — barrel (revenue + booking)
 
 ## Phase 3: Data — Track 2 continued (PR #3)
 
-- [ ] 3.1 **RED**: Create `src/modules/analytics/data/__tests__/occupancy-metrics.test.ts` — getOccupancyMetrics: empty, partial slots, full
-- [ ] 3.2 **GREEN**: Add getOccupancyMetrics() using `booking.count` + available slots calculation
-- [ ] 3.3 **RED**: Create `src/modules/analytics/data/__tests__/patient-metrics.test.ts` — getPatientMetrics: new vs returning, empty
-- [ ] 3.4 **GREEN**: Add getPatientMetrics() using `patient.groupBy`
-- [ ] 3.5 **RED**: Create `src/modules/analytics/data/__tests__/service-metrics.test.ts` — getTopServices: ranked, empty, null revenue
-- [ ] 3.6 **GREEN**: Add getTopServices() using `booking.groupBy` with service join
-- [ ] 3.7 **RED**: Create `src/modules/analytics/data/__tests__/professional-metrics.test.ts` — getTopProfessionals: ranked, filtered, empty
-- [ ] 3.8 **GREEN**: Add getTopProfessionals() using `booking.groupBy` with professional join
-- [ ] 3.9 **RED**: Create `src/modules/analytics/data/__tests__/temporal-metrics.test.ts` — getPeakHours + getDayDistribution: empty, multiple hours/days
-- [ ] 3.10 **GREEN**: Add getPeakHours() + getDayDistribution() using `booking.groupBy` on hour/dayOfWeek
-- [ ] 3.11 **REFACTOR**: Update `src/modules/analytics/data/index.ts` — export all 10 functions
+- [x] 3.1 **RED**: Create `src/modules/analytics/data/__tests__/occupancy-metrics.test.ts` — getOccupancyMetrics: empty, partial slots, full
+- [x] 3.2 **GREEN**: Add getOccupancyMetrics() using `booking.count` + available slots calculation
+- [x] 3.3 **RED**: Create `src/modules/analytics/data/__tests__/patient-metrics.test.ts` — getPatientMetrics: new vs returning, empty
+- [x] 3.4 **GREEN**: Add getPatientMetrics() using `patient.groupBy`
+- [x] 3.5 **RED**: Create `src/modules/analytics/data/__tests__/service-metrics.test.ts` — getTopServices: ranked, empty, null revenue
+- [x] 3.6 **GREEN**: Add getTopServices() using `booking.groupBy` with service join
+- [x] 3.7 **RED**: Create `src/modules/analytics/data/__tests__/professional-metrics.test.ts` — getTopProfessionals: ranked, filtered, empty
+- [x] 3.8 **GREEN**: Add getTopProfessionals() using `booking.groupBy` with professional join
+- [x] 3.9 **RED**: Create `src/modules/analytics/data/__tests__/temporal-metrics.test.ts` — getPeakHours + getDayDistribution: empty, multiple hours/days
+- [x] 3.10 **GREEN**: Add getPeakHours() + getDayDistribution() using `booking.groupBy` on hour/dayOfWeek
+- [x] 3.11 **REFACTOR**: Update `src/modules/analytics/data/index.ts` — export all 10 functions
 
 ## Phase 4: Actions — Track 3 (PR #4)
 
