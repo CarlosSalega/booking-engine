@@ -68,12 +68,12 @@ Chain strategy: feature-branch-chain
 
 ## Phase 4: Actions — Track 3 (PR #4)
 
-- [ ] 4.1 **RED**: Create `src/modules/analytics/actions/__tests__/analytics-actions.types.test.ts` — AnalyticsResult<T> discriminated union narrowing
-- [ ] 4.2 **GREEN**: Create `src/modules/analytics/actions/analytics-actions.types.ts` — AnalyticsResult<T>, AnalyticsQueryInput (mirrors SettingsResult pattern)
-- [ ] 4.3 **RED**: Create `src/modules/analytics/actions/__tests__/analytics-actions.test.ts` — ADMIN full access, SECRETARY full, PROFESSIONAL auto-scoped, PATIENT blocked, unauthenticated, Zod validation error, Prisma error (ANA-001–ANA-004 scenarios)
-- [ ] 4.4 **GREEN**: Create `src/modules/analytics/actions/analytics-actions.ts` — getAnalyticsAction: Zod validate → getSession → RBAC → parallel data calls → AnalyticsResult
-- [ ] 4.5 Create `src/modules/auth/domain/roles.ts` — add `"analytics:view"` to ADMIN, SECRETARY, PROFESSIONAL arrays (AUTH-016)
-- [ ] 4.6 Create `src/modules/analytics/actions/index.ts` — barrel exports
+- [x] 4.1 **RED**: Create `src/modules/analytics/actions/__tests__/analytics-actions.types.test.ts` — AnalyticsResult<T> discriminated union narrowing
+- [x] 4.2 **GREEN**: Create `src/modules/analytics/actions/analytics-actions.types.ts` — AnalyticsResult<T>, AnalyticsQueryInput (mirrors SettingsResult pattern)
+- [x] 4.3 **RED**: Create `src/modules/analytics/actions/__tests__/analytics-actions.test.ts` — ADMIN full access, SECRETARY full, PROFESSIONAL auto-scoped, PATIENT blocked, unauthenticated, Zod validation error, Prisma error (ANA-001–ANA-004 scenarios)
+- [x] 4.4 **GREEN**: Create `src/modules/analytics/actions/analytics-actions.ts` — getAnalyticsAction: Zod validate → getSession → RBAC → parallel data calls → AnalyticsResult
+- [x] 4.5 Create `src/modules/auth/domain/roles.ts` — add `"analytics:view"` to ADMIN, SECRETARY, PROFESSIONAL arrays (AUTH-016)
+- [x] 4.6 Create `src/modules/analytics/actions/index.ts` — barrel exports
 
 ## Phase 5: Presentation Core — Track 4 (PR #5)
 
