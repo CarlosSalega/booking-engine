@@ -21,6 +21,7 @@ import type { DateRange } from "../domain/types";
 import { getAnalyticsAction } from "../actions/analytics-actions";
 import { AnalyticsEmpty } from "./analytics-empty";
 import { AnalyticsError } from "./analytics-error-wrapper";
+import { BookingsChartClient, OccupancyChartClient, RevenueChartClient } from "./analytics-charts";
 import { DateRangeFilter } from "./date-range-filter";
 import { KPICards } from "./kpi-cards";
 
@@ -90,7 +91,11 @@ export async function AnalyticsPage({ searchParams }: AnalyticsPageProps) {
     <div className="space-y-6">
       <DateRangeFilter />
       <KPICards data={data} />
-      {/* Charts will be added in Phase 6 (PR #6) */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <RevenueChartClient data={data.revenue} />
+        <BookingsChartClient data={data.bookings} />
+      </div>
+      <OccupancyChartClient data={data.occupancy} />
     </div>
   );
 }

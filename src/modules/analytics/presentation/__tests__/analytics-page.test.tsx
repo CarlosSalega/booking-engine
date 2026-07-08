@@ -27,6 +27,19 @@ vi.mock("../date-range-filter", () => ({
   DateRangeFilter: () => <div data-testid="date-range-filter" />,
 }));
 
+// Mock chart wrappers — they use next/dynamic + Recharts (browser APIs).
+vi.mock("../analytics-charts", () => ({
+  RevenueChartClient: ({ data }: { data: unknown }) => (
+    <div data-testid="revenue-chart" data-chart-data={JSON.stringify(data)} />
+  ),
+  BookingsChartClient: ({ data }: { data: unknown }) => (
+    <div data-testid="bookings-chart" data-chart-data={JSON.stringify(data)} />
+  ),
+  OccupancyChartClient: ({ data }: { data: unknown }) => (
+    <div data-testid="occupancy-chart" data-chart-data={JSON.stringify(data)} />
+  ),
+}));
+
 const { AnalyticsPage } = await import("../analytics-page");
 
 // ---------------------------------------------------------------------------
@@ -133,5 +146,15 @@ describe("AnalyticsPage", () => {
         dateRange: { preset: "7d" },
       }),
     );
+  });
+
+  it("renders chart components with data", async () => {
+    mockGetAnalyticsAction.mockResolvedValueOnce({ success: true, data: fullData });
+
+    render(await AnalyticsPage({ searchParams: { preset: "30d" } }));
+
+    expect(screen.getByTestId("revenue-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("bookings-chart")).toBeInTheDocument();
+    expect(screen.getByTestId("occupancy-chart")).toBeInTheDocument();
   });
 });

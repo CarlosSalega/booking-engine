@@ -93,12 +93,12 @@ Chain strategy: feature-branch-chain
 
 ## Phase 6: Presentation Charts — Track 4 continued (PR #6)
 
-- [ ] 6.1 **RED**: Create `src/modules/analytics/presentation/__tests__/revenue-chart.test.tsx` — renders AreaChart with data, empty state (ANP-004)
-- [ ] 6.2 **GREEN**: Create `src/modules/analytics/presentation/revenue-chart.tsx` — dynamic import Recharts AreaChart, ResponsiveContainer
-- [ ] 6.3 **RED**: Create `src/modules/analytics/presentation/__tests__/bookings-chart.test.tsx` — renders PieChart with segments (ANP-005)
-- [ ] 6.4 **GREEN**: Create `src/modules/analytics/presentation/bookings-chart.tsx` — dynamic import Recharts PieChart
-- [ ] 6.5 **RED**: Create `src/modules/analytics/presentation/__tests__/occupancy-chart.test.tsx` — renders BarChart with percentage (ANP-006)
-- [ ] 6.6 **GREEN**: Create `src/modules/analytics/presentation/occupancy-chart.tsx` — dynamic import Recharts BarChart
+- [x] 6.1 **RED**: Create `src/modules/analytics/presentation/__tests__/revenue-chart.test.tsx` — renders AreaChart with data, empty state (ANP-004)
+- [x] 6.2 **GREEN**: Create `src/modules/analytics/presentation/revenue-chart.tsx` — dynamic import Recharts AreaChart, ResponsiveContainer
+- [x] 6.3 **RED**: Create `src/modules/analytics/presentation/__tests__/bookings-chart.test.tsx` — renders PieChart with segments (ANP-005)
+- [x] 6.4 **GREEN**: Create `src/modules/analytics/presentation/bookings-chart.tsx` — dynamic import Recharts PieChart
+- [x] 6.5 **RED**: Create `src/modules/analytics/presentation/__tests__/occupancy-chart.test.tsx` — renders BarChart with percentage (ANP-006)
+- [x] 6.6 **GREEN**: Create `src/modules/analytics/presentation/occupancy-chart.tsx` — dynamic import Recharts BarChart
 
 ## Phase 7: Presentation Lists & Temporal — Track 4 continued (PR #7)
 
