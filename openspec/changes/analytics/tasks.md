@@ -77,19 +77,19 @@ Chain strategy: feature-branch-chain
 
 ## Phase 5: Presentation Core — Track 4 (PR #5)
 
-- [ ] 5.1 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-skeleton.test.tsx` — renders skeleton UI
-- [ ] 5.2 **GREEN**: Create `src/modules/analytics/presentation/analytics-skeleton.tsx` — full-page loading skeleton
-- [ ] 5.3 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-empty.test.tsx` — renders empty state message
-- [ ] 5.4 **GREEN**: Create `src/modules/analytics/presentation/analytics-empty.tsx` — "No data available for this period"
-- [ ] 5.5 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-error.test.tsx` — renders error + retry button
-- [ ] 5.6 **GREEN**: Create `src/modules/analytics/presentation/analytics-error.tsx` — error boundary fallback with retry
-- [ ] 5.7 **RED**: Create `src/modules/analytics/presentation/__tests__/kpi-cards.test.tsx` — formatted revenue, occupancy %, booking count, patient count (ANP-003)
-- [ ] 5.8 **GREEN**: Create `src/modules/analytics/presentation/kpi-cards.tsx` — 4 KPI cards, Server Component
-- [ ] 5.9 **RED**: Create `src/modules/analytics/presentation/__tests__/date-range-filter.test.tsx` — preset click triggers refetch, custom range validation (ANP-002)
-- [ ] 5.10 **GREEN**: Create `src/modules/analytics/presentation/date-range-filter.tsx` — Client Component with presets + custom inputs, useTransition
-- [ ] 5.11 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-page.test.tsx` — renders all children, empty state, error state (ANP-001)
-- [ ] 5.12 **GREEN**: Create `src/modules/analytics/presentation/analytics-page.tsx` — RSC body: awaits action, renders KPI + charts directly
-- [ ] 5.13 Modify `src/components/dashboard/sidebar.tsx` — add "Analíticas" nav item (BarChart3 icon) for ADMIN/SECRETARY/PROFESSIONAL
+- [x] 5.1 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-skeleton.test.tsx` — renders skeleton UI
+- [x] 5.2 **GREEN**: Create `src/modules/analytics/presentation/analytics-skeleton.tsx` — full-page loading skeleton
+- [x] 5.3 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-empty.test.tsx` — renders empty state message
+- [x] 5.4 **GREEN**: Create `src/modules/analytics/presentation/analytics-empty.tsx` — "No data available for this period"
+- [x] 5.5 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-error.test.tsx` — renders error + retry button
+- [x] 5.6 **GREEN**: Create `src/modules/analytics/presentation/analytics-error.tsx` — error boundary fallback with retry
+- [x] 5.7 **RED**: Create `src/modules/analytics/presentation/__tests__/kpi-cards.test.tsx` — formatted revenue, occupancy %, booking count, patient count (ANP-003)
+- [x] 5.8 **GREEN**: Create `src/modules/analytics/presentation/kpi-cards.tsx` — 4 KPI cards, Server Component
+- [x] 5.9 **RED**: Create `src/modules/analytics/presentation/__tests__/date-range-filter.test.tsx` — preset click triggers refetch, custom range validation (ANP-002)
+- [x] 5.10 **GREEN**: Create `src/modules/analytics/presentation/date-range-filter.tsx` — Client Component with presets + custom inputs, useTransition
+- [x] 5.11 **RED**: Create `src/modules/analytics/presentation/__tests__/analytics-page.test.tsx` — renders all children, empty state, error state (ANP-001)
+- [x] 5.12 **GREEN**: Create `src/modules/analytics/presentation/analytics-page.tsx` — RSC body: awaits action, renders KPI + charts directly
+- [x] 5.13 Modify `src/components/dashboard/sidebar.tsx` — add "Analíticas" nav item (BarChart3 icon) for ADMIN/SECRETARY/PROFESSIONAL
 
 ## Phase 6: Presentation Charts — Track 4 continued (PR #6)
 

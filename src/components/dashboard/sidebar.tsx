@@ -16,6 +16,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  BarChart3,
   CalendarDays,
   CalendarRange,
   CreditCard,
@@ -80,6 +81,12 @@ const NAV_GROUPS: NavGroup[] = [
         title: "Calendario",
         url: "/dashboard/calendar",
         icon: CalendarRange,
+        roles: [USER_ROLE.ADMIN, USER_ROLE.SECRETARY, USER_ROLE.PROFESSIONAL],
+      },
+      {
+        title: "Analíticas",
+        url: "/dashboard/analytics",
+        icon: BarChart3,
         roles: [USER_ROLE.ADMIN, USER_ROLE.SECRETARY, USER_ROLE.PROFESSIONAL],
       },
     ],
