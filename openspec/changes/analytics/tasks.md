@@ -102,12 +102,12 @@ Chain strategy: feature-branch-chain
 
 ## Phase 7: Presentation Lists & Temporal — Track 4 continued (PR #7)
 
-- [ ] 7.1 **RED**: Create `src/modules/analytics/presentation/__tests__/temporal-charts.test.tsx` — peak hours + day-of-week charts (ANP-007 partial)
-- [ ] 7.2 **GREEN**: Create `src/modules/analytics/presentation/temporal-charts.tsx` — two BarCharts: peak hours + day distribution
-- [ ] 7.3 **RED**: Create `src/modules/analytics/presentation/__tests__/top-services.test.tsx` — ranked list, empty (ANP-007)
-- [ ] 7.4 **GREEN**: Create `src/modules/analytics/presentation/top-services.tsx` — ranked service list component
-- [ ] 7.5 **RED**: Create `src/modules/analytics/presentation/__tests__/top-professionals.test.tsx` — ranked list + filter visibility per role (ANP-007, ANP-008)
-- [ ] 7.6 **GREEN**: Create `src/modules/analytics/presentation/top-professionals.tsx` — ranked professional list + filter dropdown
+- [x] 7.1 **RED**: Create `src/modules/analytics/presentation/__tests__/temporal-charts.test.tsx` — peak hours + day-of-week charts (ANP-007 partial)
+- [x] 7.2 **GREEN**: Create `src/modules/analytics/presentation/temporal-charts.tsx` — two BarCharts: peak hours + day distribution
+- [x] 7.3 **RED**: Create `src/modules/analytics/presentation/__tests__/top-services.test.tsx` — ranked list, empty (ANP-007)
+- [x] 7.4 **GREEN**: Create `src/modules/analytics/presentation/top-services.tsx` — ranked service list component
+- [x] 7.5 **RED**: Create `src/modules/analytics/presentation/__tests__/top-professionals.test.tsx` — ranked list + filter visibility per role (ANP-007, ANP-008)
+- [x] 7.6 **GREEN**: Create `src/modules/analytics/presentation/top-professionals.tsx` — ranked professional list + filter dropdown
 
 ## Phase 8: Integration — Track 5 (PR #8)
 

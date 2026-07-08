@@ -21,9 +21,11 @@ import type { DateRange } from "../domain/types";
 import { getAnalyticsAction } from "../actions/analytics-actions";
 import { AnalyticsEmpty } from "./analytics-empty";
 import { AnalyticsError } from "./analytics-error-wrapper";
-import { BookingsChartClient, OccupancyChartClient, RevenueChartClient } from "./analytics-charts";
+import { BookingsChartClient, OccupancyChartClient, RevenueChartClient, TemporalChartsClient } from "./analytics-charts";
 import { DateRangeFilter } from "./date-range-filter";
 import { KPICards } from "./kpi-cards";
+import { TopProfessionals } from "./top-professionals";
+import { TopServices } from "./top-services";
 
 interface AnalyticsPageProps {
   searchParams: Record<string, string | string[] | undefined>;
@@ -96,6 +98,11 @@ export async function AnalyticsPage({ searchParams }: AnalyticsPageProps) {
         <BookingsChartClient data={data.bookings} />
       </div>
       <OccupancyChartClient data={data.occupancy} />
+      <div className="grid gap-6 lg:grid-cols-2">
+        <TopServices data={data.topServices} />
+        <TopProfessionals data={data.topProfessionals} />
+      </div>
+      <TemporalChartsClient peakHours={data.peakHours} dayDistribution={data.dayDistribution} />
     </div>
   );
 }

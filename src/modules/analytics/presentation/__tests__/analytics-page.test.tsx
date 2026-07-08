@@ -38,6 +38,22 @@ vi.mock("../analytics-charts", () => ({
   OccupancyChartClient: ({ data }: { data: unknown }) => (
     <div data-testid="occupancy-chart" data-chart-data={JSON.stringify(data)} />
   ),
+  TemporalChartsClient: ({ peakHours, dayDistribution }: { peakHours: unknown; dayDistribution: unknown }) => (
+    <div data-testid="temporal-charts" data-peak={JSON.stringify(peakHours)} data-day={JSON.stringify(dayDistribution)} />
+  ),
+}));
+
+// Mock list components — they import formatCurrency from dashboard.
+vi.mock("../top-services", () => ({
+  TopServices: ({ data }: { data: unknown }) => (
+    <div data-testid="top-services" data-services={JSON.stringify(data)} />
+  ),
+}));
+
+vi.mock("../top-professionals", () => ({
+  TopProfessionals: ({ data }: { data: unknown }) => (
+    <div data-testid="top-professionals" data-professionals={JSON.stringify(data)} />
+  ),
 }));
 
 const { AnalyticsPage } = await import("../analytics-page");
@@ -156,5 +172,15 @@ describe("AnalyticsPage", () => {
     expect(screen.getByTestId("revenue-chart")).toBeInTheDocument();
     expect(screen.getByTestId("bookings-chart")).toBeInTheDocument();
     expect(screen.getByTestId("occupancy-chart")).toBeInTheDocument();
+  });
+
+  it("renders top lists and temporal charts with data", async () => {
+    mockGetAnalyticsAction.mockResolvedValueOnce({ success: true, data: fullData });
+
+    render(await AnalyticsPage({ searchParams: { preset: "30d" } }));
+
+    expect(screen.getByTestId("top-services")).toBeInTheDocument();
+    expect(screen.getByTestId("top-professionals")).toBeInTheDocument();
+    expect(screen.getByTestId("temporal-charts")).toBeInTheDocument();
   });
 });

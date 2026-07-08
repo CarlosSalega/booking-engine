@@ -13,7 +13,7 @@
 import dynamic from "next/dynamic";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import type { BookingMetric, OccupancyMetric, RevenueMetric } from "../domain/types";
+import type { BookingMetric, DayDistributionMetric, OccupancyMetric, PeakHourMetric, RevenueMetric } from "../domain/types";
 
 const RevenueChart = dynamic(
   () => import("./revenue-chart").then((m) => m.RevenueChart),
@@ -30,6 +30,11 @@ const OccupancyChart = dynamic(
   { ssr: false, loading: () => <Skeleton className="h-[340px] w-full rounded-xl" /> },
 );
 
+const TemporalChartsComp = dynamic(
+  () => import("./temporal-charts").then((m) => m.TemporalCharts),
+  { ssr: false, loading: () => <Skeleton className="h-[340px] w-full rounded-xl" /> },
+);
+
 export function RevenueChartClient({ data }: { data: RevenueMetric }) {
   return <RevenueChart data={data} />;
 }
@@ -40,4 +45,14 @@ export function BookingsChartClient({ data }: { data: BookingMetric }) {
 
 export function OccupancyChartClient({ data }: { data: OccupancyMetric }) {
   return <OccupancyChart data={data} />;
+}
+
+export function TemporalChartsClient({
+  peakHours,
+  dayDistribution,
+}: {
+  peakHours: PeakHourMetric[];
+  dayDistribution: DayDistributionMetric[];
+}) {
+  return <TemporalChartsComp peakHours={peakHours} dayDistribution={dayDistribution} />;
 }
