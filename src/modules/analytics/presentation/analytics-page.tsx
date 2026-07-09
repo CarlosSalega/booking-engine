@@ -17,7 +17,7 @@
  * streaming benefit.
  */
 
-import type { DateRange } from "../domain/types";
+import type { AnalyticsResponse, DateRange } from "../domain/types";
 import { getAnalyticsAction } from "../actions/analytics-actions";
 import { AnalyticsEmpty } from "./analytics-empty";
 import { AnalyticsError } from "./analytics-error-wrapper";
@@ -56,7 +56,7 @@ function parseDateRange(params: Record<string, string | string[] | undefined>): 
 /**
  * Check if all metrics are empty/zero — triggers the empty state.
  */
-function isEmpty(data: Awaited<ReturnType<typeof getAnalyticsAction>> extends { success: true; data: infer D } ? D : never): boolean {
+function isEmpty(data: AnalyticsResponse): boolean {
   return (
     data.revenue.total === 0 &&
     data.bookings.total === 0 &&

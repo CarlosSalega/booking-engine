@@ -14,7 +14,7 @@ const prismaMock = {
     findMany: vi.fn(),
   },
   payment: {
-    groupBy: vi.fn(),
+    findMany: vi.fn(),
   },
 };
 
@@ -53,10 +53,11 @@ describe("getTopServices", () => {
       { id: "svc-1", name: "Consulta General", price: 200 },
       { id: "svc-2", name: "Limpieza Dental", price: 200 },
     ]);
-    // 3. payment.groupBy → revenue per service
-    prismaMock.payment.groupBy.mockResolvedValueOnce([
-      { booking: { serviceId: "svc-1" }, _sum: { amount: 3000 } },
-      { booking: { serviceId: "svc-2" }, _sum: { amount: 1600 } },
+    // 3. payment.findMany → revenue per service
+    prismaMock.payment.findMany.mockResolvedValueOnce([
+      { amount: 2000, booking: { serviceId: "svc-1" } },
+      { amount: 1000, booking: { serviceId: "svc-1" } },
+      { amount: 1600, booking: { serviceId: "svc-2" } },
     ]);
 
     const result = await getTopServices(ORG_ID, RANGE);
@@ -78,7 +79,7 @@ describe("getTopServices", () => {
     prismaMock.service.findMany.mockResolvedValueOnce([
       { id: "svc-1", name: "Free Service", price: 0 },
     ]);
-    prismaMock.payment.groupBy.mockResolvedValueOnce([]);
+    prismaMock.payment.findMany.mockResolvedValueOnce([]);
 
     const result = await getTopServices(ORG_ID, RANGE);
 

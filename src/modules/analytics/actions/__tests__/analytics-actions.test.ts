@@ -27,6 +27,8 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import type { AnalyticsQueryInput } from "../analytics-actions.types";
+
 // ---------------------------------------------------------------------------
 // Mocks — declared BEFORE the import of the action under test.
 // ---------------------------------------------------------------------------
@@ -391,7 +393,7 @@ describe("getAnalyticsAction", () => {
     it("rejects custom dateRange without from/to", async () => {
       const result = await getAnalyticsAction({
         dateRange: { preset: "custom" },
-      });
+      } as unknown as AnalyticsQueryInput);
 
       expect(result.success).toBe(false);
       if (!result.success) {

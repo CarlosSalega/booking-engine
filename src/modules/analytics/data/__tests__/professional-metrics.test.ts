@@ -14,7 +14,7 @@ const prismaMock = {
     findMany: vi.fn(),
   },
   payment: {
-    groupBy: vi.fn(),
+    findMany: vi.fn(),
   },
 };
 
@@ -53,10 +53,11 @@ describe("getTopProfessionals", () => {
       { id: "prof-1", user: { name: "Dr. García" } },
       { id: "prof-2", user: { name: "Dra. López" } },
     ]);
-    // 3. payment.groupBy → revenue per professional
-    prismaMock.payment.groupBy.mockResolvedValueOnce([
-      { booking: { professionalId: "prof-1" }, _sum: { amount: 4000 } },
-      { booking: { professionalId: "prof-2" }, _sum: { amount: 2400 } },
+    // 3. payment.findMany → revenue per professional
+    prismaMock.payment.findMany.mockResolvedValueOnce([
+      { amount: 2500, booking: { professionalId: "prof-1" } },
+      { amount: 1500, booking: { professionalId: "prof-1" } },
+      { amount: 2400, booking: { professionalId: "prof-2" } },
     ]);
 
     const result = await getTopProfessionals(ORG_ID, RANGE);
@@ -79,7 +80,7 @@ describe("getTopProfessionals", () => {
     prismaMock.professional.findMany.mockResolvedValueOnce([
       { id: "prof-1", user: { name: "Dr. Test" } },
     ]);
-    prismaMock.payment.groupBy.mockResolvedValueOnce([]);
+    prismaMock.payment.findMany.mockResolvedValueOnce([]);
 
     const result = await getTopProfessionals(ORG_ID, RANGE);
 

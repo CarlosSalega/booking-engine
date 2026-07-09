@@ -46,7 +46,7 @@ import {
   getTopProfessionals,
   getTopServices,
 } from "../data/analytics-data";
-import { analyticsQuerySchema } from "../domain/schemas";
+import { analyticsQuerySchema, isDateRange } from "../domain/schemas";
 import type { AnalyticsResponse } from "../domain/types";
 import type { AnalyticsQueryInput, AnalyticsResult } from "./analytics-actions.types";
 
@@ -75,7 +75,13 @@ export async function getAnalyticsAction(
     };
   }
 
-  const { dateRange, professionalUserId: manualProfessionalId } = parsed.data;
+  const { dateRange: rawDateRange, professionalUserId: manualProfessionalId } = parsed.data;
+
+  // Narrow dateRange to domain type (isDateRange guards custom from/to).
+  if (!isDateRange(rawDateRange)) {
+    return { success: false, error: "Datos inválidos" };
+  }
+  const dateRange = rawDateRange;
 
   // 2. Auth
   const session = await auth.api.getSession({ headers: await headers() });

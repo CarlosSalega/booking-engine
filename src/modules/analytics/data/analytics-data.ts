@@ -406,8 +406,9 @@ export async function getTopServices(
   const serviceMap = new Map(services.map((s) => [s.id, s]));
 
   // Fetch revenue per service from approved payments.
-  const revenueRows = await prisma.payment.groupBy({
-    by: ["booking.serviceId"],
+  // Prisma does not support groupBy on relation paths (e.g. "booking.serviceId"),
+  // so we query payments with booking data and aggregate in memory.
+  const paymentRows = await prisma.payment.findMany({
     where: {
       organizationId,
       status: APPROVED_PAYMENT_STATUS,
@@ -416,11 +417,16 @@ export async function getTopServices(
         serviceId: { in: serviceIds },
       },
     },
-    _sum: { amount: true },
+    select: {
+      amount: true,
+      booking: { select: { serviceId: true } },
+    },
   });
-  const revenueMap = new Map(
-    revenueRows.map((r) => [r.booking.serviceId, r._sum.amount ?? 0]),
-  );
+  const revenueMap = new Map<string, number>();
+  for (const payment of paymentRows) {
+    const sid = payment.booking.serviceId;
+    revenueMap.set(sid, (revenueMap.get(sid) ?? 0) + payment.amount);
+  }
 
   return rows.map((row) => {
     const service = serviceMap.get(row.serviceId);
@@ -476,8 +482,9 @@ export async function getTopProfessionals(
   const profMap = new Map(professionals.map((p) => [p.id, p.user.name]));
 
   // Fetch revenue per professional from approved payments.
-  const revenueRows = await prisma.payment.groupBy({
-    by: ["booking.professionalId"],
+  // Prisma does not support groupBy on relation paths (e.g. "booking.professionalId"),
+  // so we query payments with booking data and aggregate in memory.
+  const paymentRows = await prisma.payment.findMany({
     where: {
       organizationId,
       status: APPROVED_PAYMENT_STATUS,
@@ -486,11 +493,16 @@ export async function getTopProfessionals(
         professionalId: { in: profIds },
       },
     },
-    _sum: { amount: true },
+    select: {
+      amount: true,
+      booking: { select: { professionalId: true } },
+    },
   });
-  const revenueMap = new Map(
-    revenueRows.map((r) => [r.booking.professionalId, r._sum.amount ?? 0]),
-  );
+  const revenueMap = new Map<string, number>();
+  for (const payment of paymentRows) {
+    const pid = payment.booking.professionalId;
+    revenueMap.set(pid, (revenueMap.get(pid) ?? 0) + payment.amount);
+  }
 
   return rows.map((row) => ({
     professionalUserId: row.professionalId,
