@@ -111,6 +111,6 @@ Chain strategy: feature-branch-chain
 
 ## Phase 8: Integration — Track 5 (PR #8)
 
-- [ ] 8.1 Create `src/app/(dashboard)/dashboard/analytics/page.tsx` — route entry: Header + single `<Suspense fallback={<AnalyticsSkeleton />}>` wrapping `<AnalyticsPage />` (ANP-001, ANP-011)
-- [ ] 8.2 Create `src/modules/analytics/index.ts` — module barrel
-- [ ] 8.3 **REFACTOR**: Run `pnpm vitest run` — all tests green, `pnpm type-check` passes, `pnpm lint` passes
+- [x] 8.1 Create `src/app/(dashboard)/dashboard/analytics/page.tsx` — route entry: Header + single `<Suspense fallback={<AnalyticsSkeleton />}>` wrapping `<AnalyticsPage />` (ANP-001, ANP-011)
+- [x] 8.2 Create `src/modules/analytics/index.ts` — module barrel
+- [x] 8.3 **REFACTOR**: Run `pnpm vitest run` — all tests green, `pnpm type-check` passes, `pnpm lint` passes
