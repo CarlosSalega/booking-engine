@@ -9,13 +9,14 @@
  *
  * The RSC contract under test:
  *  1. Resolves the current `organizationId` via `getOrganizationId()`.
- *  2. Reads the cached settings row via `getSettings(orgId)`.
- *  3. Wraps the tab tree in `<SettingsGuard>` (function-as-children).
+ *  2. Resolves the session server-side via `auth.api.getSession()`
+ *     and derives `readOnly` from the user's role (ADMIN → false,
+ *     SECRETARY → true, PROFESSIONAL → redirect).
+ *  3. Reads the cached settings row via `getSettings(orgId)`.
  *  4. Renders three shadcn/ui `<Tabs />`: Negocio, Reservas,
  *     Cancelaciones.
- *  5. Shows a "View-only" banner when the guard resolves with
- *     `readOnly=true` (SECRETARY role) and does NOT show it when
- *     `readOnly=false` (ADMIN).
+ *  5. Shows a "View-only" banner when `readOnly=true` (SECRETARY)
+ *     and does NOT show it when `readOnly=false` (ADMIN).
  *  6. Passes the cached settings + the `readOnly` flag down to
  *     each tab form (pre-fill + RBAC).
  *
@@ -25,11 +26,13 @@
  * (Radix updates the active tab → the new content mounts).
  *
  * Mocking strategy:
+ *  - `next/headers` → returns an empty Headers object.
+ *  - `auth.api.getSession` → returns a per-test session with a
+ *    configurable role (ADMIN = readOnly=false, SECRETARY =
+ *    readOnly=true, PROFESSIONAL = redirect).
+ *  - `next/navigation` `redirect` → captured via mock for assertion.
  *  - `getOrganizationId` + `getSettings` are mocked at the data
  *    layer so the test never hits Prisma / the real cache.
- *  - `SettingsGuard` is mocked as a thin proxy that calls its
- *    children callback with a per-test `readOnly` value. The
- *    guard's RBAC routing is covered by `settings-guard.test.tsx`.
  *  - The three tab components are mocked as thin proxies — the
  *    page test focuses on the page's own contract (data flow,
  *    tab structure, banner). The forms' contracts are covered by
@@ -59,6 +62,11 @@ vi.mock("next/headers", () => ({
   headers: vi.fn().mockResolvedValue(new Headers()),
 }));
 
+const redirectMock = vi.fn();
+vi.mock("next/navigation", () => ({
+  redirect: redirectMock,
+}));
+
 const getOrganizationIdMock = vi.fn();
 vi.mock("@/modules/dashboard/data/get-organization-id", () => ({
   getOrganizationId: getOrganizationIdMock,
@@ -73,15 +81,23 @@ vi.mock("@/modules/settings", async (importOriginal) => {
   };
 });
 
-// Module-level flag the test toggles to control the guard's
-// `readOnly` value (mirrors the function-as-children pattern).
-let mockReadOnly = false;
-vi.mock("@/modules/settings/presentation/settings-guard", () => ({
-  SettingsGuard: ({
-    children,
-  }: {
-    children: (readOnly: boolean) => React.ReactNode;
-  }) => <>{children(mockReadOnly)}</>,
+// Module-level flag the test toggles to control the mock session
+// role, which drives the `readOnly` flag in SettingsPage.
+let mockSessionRole: string | undefined = "ADMIN";
+
+const getSessionMock = vi.fn().mockImplementation(() => {
+  if (!mockSessionRole) return Promise.resolve(null);
+  return Promise.resolve({
+    user: { role: mockSessionRole },
+  });
+});
+
+vi.mock("@/core/auth/auth-instance", () => ({
+  auth: {
+    api: {
+      getSession: getSessionMock,
+    },
+  },
 }));
 
 // The three tab forms are mocked as thin proxies so the test focuses
@@ -189,7 +205,9 @@ describe("SettingsPage — RSC body", () => {
   beforeEach(() => {
     getOrganizationIdMock.mockReset();
     getSettingsMock.mockReset();
-    mockReadOnly = false;
+    getSessionMock.mockClear();
+    redirectMock.mockReset();
+    mockSessionRole = "ADMIN";
     getOrganizationIdMock.mockResolvedValue(ORG_ID);
     getSettingsMock.mockResolvedValue(baseSettings);
   });
@@ -226,7 +244,7 @@ describe("SettingsPage — RSC body", () => {
   // -------------------------------------------------------------------------
 
   it("does NOT show the 'View-only' banner when readOnly=false (ADMIN)", async () => {
-    mockReadOnly = false;
+    mockSessionRole = "ADMIN";
     await renderPage();
     expect(
       screen.queryByTestId("settings-readonly-banner"),
@@ -234,19 +252,18 @@ describe("SettingsPage — RSC body", () => {
   });
 
   it("shows the 'View-only' banner when readOnly=true (SECRETARY)", async () => {
-    mockReadOnly = true;
+    mockSessionRole = "SECRETARY";
     await renderPage();
     const banner = screen.getByTestId("settings-readonly-banner");
     expect(banner).toBeInTheDocument();
-    // Banner copy is the same Spanish string shipped by the
-    // SettingsGuard contract.
+    // Banner copy is in Argentinian Spanish.
     expect(banner.textContent?.toLowerCase()).toMatch(
       /s[oó]lo lectura|read.only|lectura/,
     );
   });
 
   it("places the read-only banner outside the TabsList (header zone)", async () => {
-    mockReadOnly = true;
+    mockSessionRole = "SECRETARY";
     await renderPage();
     const banner = screen.getByTestId("settings-readonly-banner");
     const tablist = screen.getByRole("tablist");
@@ -301,7 +318,7 @@ describe("SettingsPage — RSC body", () => {
   // -------------------------------------------------------------------------
 
   it("forwards readOnly=true to the business tab when SECRETARY", async () => {
-    mockReadOnly = true;
+    mockSessionRole = "SECRETARY";
     await renderPage();
     expect(
       screen.getByTestId("tab-business-form"),
@@ -310,7 +327,7 @@ describe("SettingsPage — RSC body", () => {
 
   it("forwards readOnly=true to the bookings tab when SECRETARY (after switching tabs)", async () => {
     const user = userEvent.setup();
-    mockReadOnly = true;
+    mockSessionRole = "SECRETARY";
     await renderPage();
     await user.click(screen.getByRole("tab", { name: /reservas/i }));
     expect(
@@ -320,7 +337,7 @@ describe("SettingsPage — RSC body", () => {
 
   it("forwards readOnly=true to the cancellations tab when SECRETARY (after switching tabs)", async () => {
     const user = userEvent.setup();
-    mockReadOnly = true;
+    mockSessionRole = "SECRETARY";
     await renderPage();
     await user.click(screen.getByRole("tab", { name: /cancelaciones/i }));
     expect(
@@ -329,10 +346,20 @@ describe("SettingsPage — RSC body", () => {
   });
 
   it("forwards readOnly=false to the business tab when ADMIN", async () => {
-    mockReadOnly = false;
+    mockSessionRole = "ADMIN";
     await renderPage();
     expect(
       screen.getByTestId("tab-business-form"),
     ).toHaveAttribute("data-readonly", "false");
+  });
+
+  // -------------------------------------------------------------------------
+  // PROFESSIONAL redirect
+  // -------------------------------------------------------------------------
+
+  it("redirects PROFESSIONAL users to /dashboard", async () => {
+    mockSessionRole = "PROFESSIONAL";
+    await SettingsPage();
+    expect(redirectMock).toHaveBeenCalledWith("/dashboard");
   });
 });
