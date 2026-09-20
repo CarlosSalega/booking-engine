@@ -31,6 +31,7 @@ import { revalidatePath } from "next/cache";
 
 import { auth } from "@/core/auth";
 import { prisma } from "@/lib/prisma";
+import { isSlotWithinSchedule } from "@/modules/availability";
 import { USER_ROLE } from "@/modules/auth/domain";
 import { BookingStatus, calculateEndTime } from "@/modules/bookings/domain";
 import { getOrganizationId } from "@/modules/dashboard/data/get-organization-id";
@@ -93,6 +94,16 @@ export async function createBooking(
           endTime: { gt: parsed.data.startTime },
         },
       });
+      const schedule = await tx.professionalScheduleInterval.findMany({
+        where: { organizationId, professionalId: parsed.data.professionalId },
+        select: { dayOfWeek: true, startMinute: true, endMinute: true },
+      });
+      if (
+        schedule.length > 0 &&
+        !isSlotWithinSchedule(schedule, parsed.data.startTime, endTime)
+      ) {
+        throw new OutsideScheduleError();
+      }
       if (overlap) {
         // Throw to abort the transaction; the catch block below translates
         // this into the user-facing "occupied" error.
@@ -114,6 +125,12 @@ export async function createBooking(
   } catch (error) {
     if (error instanceof OverlapError) {
       return { success: false, error: "El horario está ocupado" };
+    }
+    if (error instanceof OutsideScheduleError) {
+      return {
+        success: false,
+        error: "El horario está fuera de la disponibilidad del profesional",
+      };
     }
     throw error;
   }
@@ -141,6 +158,13 @@ class OverlapError extends Error {
   constructor() {
     super("Slot overlap detected");
     this.name = "OverlapError";
+  }
+}
+
+class OutsideScheduleError extends Error {
+  constructor() {
+    super("Booking is outside the professional schedule");
+    this.name = "OutsideScheduleError";
   }
 }
 

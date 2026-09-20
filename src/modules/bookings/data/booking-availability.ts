@@ -11,25 +11,20 @@
  * - `checkAvailability` is NOT atomic — the create/reschedule
  *   `prisma.$transaction` is the final arbiter. This function is
  *   a good-faith preview for the wizard.
- * - Slot grid: 30-min increments, 08:00–20:00 local time.
+ * - Configured weekly intervals drive the slot grid; empty schedules use the
+ *   explicit legacy fallback of 08:00–20:00 every day.
  * - CANCELLED and NO_SHOW bookings are excluded from overlap checks.
  */
 
 import { prisma } from "@/lib/prisma";
 
-import { isOverlapping, type TimeSlot } from "../domain/time-slot";
+import {
+  calculateAvailableSlots,
+  DEFAULT_WEEKLY_SCHEDULE,
+} from "@/modules/availability";
+import { getProfessionalSchedule } from "@/modules/schedules/data/schedule-data";
+import type { TimeSlot } from "../domain/time-slot";
 import type { AvailableSlot } from "./booking-data.types";
-
-// ---------------------------------------------------------------------------
-// Constants — single source of truth for the slot grid.
-// ---------------------------------------------------------------------------
-
-/** Business hours: earliest slot start. */
-const DAY_START_HOUR = 8;
-/** Business hours: latest slot start (slots may end after this). */
-const DAY_END_HOUR = 20;
-/** Grid step in minutes. */
-const SLOT_STEP_MINUTES = 30;
 
 // ---------------------------------------------------------------------------
 // checkAvailability
@@ -74,7 +69,7 @@ export async function checkAvailability(
  * List open 30-min slots for the given date and service. The function:
  *   1. Reads the service's `durationMinutes`.
  *   2. Queries active bookings for the professional on that date.
- *   3. Generates the 30-min grid from 08:00 to 20:00 (24 slots).
+ *   3. Generates the 30-min grid inside the configured intervals.
  *   4. Filters out slots that overlap with any active booking.
  *
  * @param organizationId Tenant scope.
@@ -109,7 +104,8 @@ export async function getAvailableSlots(
       organizationId,
       professionalId,
       status: { notIn: ["CANCELLED", "NO_SHOW"] },
-      startTime: { gte: dayStart, lte: dayEnd },
+      startTime: { lt: dayEnd },
+      endTime: { gt: dayStart },
     },
     select: { startTime: true, endTime: true },
   });
@@ -118,25 +114,19 @@ export async function getAvailableSlots(
     (b): TimeSlot => ({ startTime: b.startTime, endTime: b.endTime }),
   );
 
-  const slots: AvailableSlot[] = [];
-  const cursor = new Date(date);
-  cursor.setHours(DAY_START_HOUR, 0, 0, 0);
-  const cutoff = new Date(date);
-  cutoff.setHours(DAY_END_HOUR, 0, 0, 0);
+  const configuredSchedule = await getProfessionalSchedule(
+    organizationId,
+    professionalId,
+  );
+  const schedule = configuredSchedule.length
+    ? configuredSchedule
+    : DEFAULT_WEEKLY_SCHEDULE;
+  const settings = await prisma.organizationSettings.findUnique({
+    where: { organizationId },
+    select: { bufferMinutes: true },
+  });
 
-  while (cursor < cutoff) {
-    const slotStart = new Date(cursor);
-    const slotEnd = new Date(cursor.getTime() + service.durationMinutes * 60_000);
-
-    const slot: TimeSlot = { startTime: slotStart, endTime: slotEnd };
-    const isOccupied = occupied.some((o) => isOverlapping(slot, o));
-
-    if (!isOccupied) {
-      slots.push({ startTime: slotStart, endTime: slotEnd });
-    }
-
-    cursor.setMinutes(cursor.getMinutes() + SLOT_STEP_MINUTES);
-  }
-
-  return slots;
+  return calculateAvailableSlots(schedule, date, service.durationMinutes, occupied, {
+    bufferMinutes: settings?.bufferMinutes ?? 0,
+  });
 }

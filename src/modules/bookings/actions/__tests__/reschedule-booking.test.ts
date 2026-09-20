@@ -43,6 +43,9 @@ const txMock = vi.hoisted(() => ({
     update: vi.fn(),
     create: vi.fn(),
   },
+  professionalScheduleInterval: {
+    findMany: vi.fn(),
+  },
 }));
 
 const prismaMock = vi.hoisted(() => ({
@@ -126,6 +129,7 @@ describe("rescheduleBooking", () => {
     vi.clearAllMocks();
     prismaMock.booking.findFirst.mockResolvedValue(confirmedBooking());
     txMock.booking.findFirst.mockResolvedValue(null); // no overlap by default
+    txMock.professionalScheduleInterval.findMany.mockResolvedValue([]);
     txMock.booking.update.mockResolvedValue({
       ...confirmedBooking(),
       status: "RESCHEDULED",

@@ -98,11 +98,28 @@ model Professional {
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
-  bookings Booking[]
-  services  Service[]
+  bookings          Booking[]
+  services          Service[]
+  scheduleIntervals ProfessionalScheduleInterval[]
 
   @@index([organizationId])
   @@index([status])
+}
+
+model ProfessionalScheduleInterval {
+  id             String       @id @default(uuid())
+  organizationId String
+  professionalId String
+  professional   Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  dayOfWeek      Int
+  startMinute    Int
+  endMinute      Int
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+
+  @@unique([professionalId, dayOfWeek, startMinute, endMinute])
+  @@index([organizationId])
+  @@index([professionalId, dayOfWeek, startMinute])
 }
 
 model Patient {

@@ -46,6 +46,9 @@ const txMock = vi.hoisted(() => ({
     findFirst: vi.fn(),
     create: vi.fn(),
   },
+  professionalScheduleInterval: {
+    findMany: vi.fn(),
+  },
 }));
 
 const prismaMock = vi.hoisted(() => ({
@@ -136,6 +139,7 @@ describe("createBooking", () => {
     prismaMock.service.findUnique.mockResolvedValue(validService);
     prismaMock.professional.findFirst.mockResolvedValue(professionalForUser);
     txMock.booking.findFirst.mockResolvedValue(null); // no overlap by default
+    txMock.professionalScheduleInterval.findMany.mockResolvedValue([]);
     txMock.booking.create.mockResolvedValue(createdBooking);
   });
 

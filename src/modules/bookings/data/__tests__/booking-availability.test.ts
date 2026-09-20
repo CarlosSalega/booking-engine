@@ -23,6 +23,12 @@ const prismaMock = {
   service: {
     findUnique: vi.fn(),
   },
+  professionalScheduleInterval: {
+    findMany: vi.fn(),
+  },
+  organizationSettings: {
+    findUnique: vi.fn(),
+  },
 };
 
 vi.mock("@/lib/prisma", () => ({
@@ -134,6 +140,8 @@ describe("getAvailableSlots", () => {
   it("returns 24 slots from 08:00 to 20:00 in 30-min increments for a 30-min service with no bookings", async () => {
     prismaMock.service.findUnique.mockResolvedValueOnce({ durationMinutes: 30 });
     prismaMock.booking.findMany.mockResolvedValueOnce([]);
+    prismaMock.professionalScheduleInterval.findMany.mockResolvedValueOnce([]);
+    prismaMock.organizationSettings.findUnique.mockResolvedValueOnce(null);
 
     const date = new Date(2026, 5, 19); // 2026-06-19 local
     const result = await getAvailableSlots(ORG_ID, PROF_ID, SERVICE_ID, date);
@@ -149,6 +157,8 @@ describe("getAvailableSlots", () => {
   it("each slot's endTime equals startTime + service durationMinutes", async () => {
     prismaMock.service.findUnique.mockResolvedValueOnce({ durationMinutes: 45 });
     prismaMock.booking.findMany.mockResolvedValueOnce([]);
+    prismaMock.professionalScheduleInterval.findMany.mockResolvedValueOnce([]);
+    prismaMock.organizationSettings.findUnique.mockResolvedValueOnce(null);
 
     const date = new Date(2026, 5, 19);
     const result = await getAvailableSlots(ORG_ID, PROF_ID, SERVICE_ID, date);
@@ -171,6 +181,8 @@ describe("getAvailableSlots", () => {
         status: "CONFIRMED",
       },
     ]);
+    prismaMock.professionalScheduleInterval.findMany.mockResolvedValueOnce([]);
+    prismaMock.organizationSettings.findUnique.mockResolvedValueOnce(null);
 
     const date = new Date(2026, 5, 19);
     const result = await getAvailableSlots(ORG_ID, PROF_ID, SERVICE_ID, date);
@@ -192,6 +204,8 @@ describe("getAvailableSlots", () => {
     // is wired to return [] to simulate that filtering.
     prismaMock.service.findUnique.mockResolvedValueOnce({ durationMinutes: 30 });
     prismaMock.booking.findMany.mockResolvedValueOnce([]);
+    prismaMock.professionalScheduleInterval.findMany.mockResolvedValueOnce([]);
+    prismaMock.organizationSettings.findUnique.mockResolvedValueOnce(null);
 
     const date = new Date(2026, 5, 19);
     const result = await getAvailableSlots(ORG_ID, PROF_ID, SERVICE_ID, date);
@@ -202,6 +216,8 @@ describe("getAvailableSlots", () => {
   it("queries the service to read its durationMinutes", async () => {
     prismaMock.service.findUnique.mockResolvedValueOnce({ durationMinutes: 60 });
     prismaMock.booking.findMany.mockResolvedValueOnce([]);
+    prismaMock.professionalScheduleInterval.findMany.mockResolvedValueOnce([]);
+    prismaMock.organizationSettings.findUnique.mockResolvedValueOnce(null);
 
     const date = new Date(2026, 5, 19);
     await getAvailableSlots(ORG_ID, PROF_ID, SERVICE_ID, date);
@@ -216,6 +232,8 @@ describe("getAvailableSlots", () => {
   it("scopes the bookings query to organizationId, professionalId, and the given date", async () => {
     prismaMock.service.findUnique.mockResolvedValueOnce({ durationMinutes: 30 });
     prismaMock.booking.findMany.mockResolvedValueOnce([]);
+    prismaMock.professionalScheduleInterval.findMany.mockResolvedValueOnce([]);
+    prismaMock.organizationSettings.findUnique.mockResolvedValueOnce(null);
 
     const date = new Date(2026, 5, 19);
     await getAvailableSlots(ORG_ID, PROF_ID, SERVICE_ID, date);

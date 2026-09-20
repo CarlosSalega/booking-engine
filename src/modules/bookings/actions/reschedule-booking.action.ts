@@ -36,6 +36,7 @@ import { revalidatePath } from "next/cache";
 
 import { auth } from "@/core/auth";
 import { prisma } from "@/lib/prisma";
+import { isSlotWithinSchedule } from "@/modules/availability";
 import { Prisma } from "@/generated/prisma/client";
 import { USER_ROLE } from "@/modules/auth/domain";
 import {
@@ -127,6 +128,16 @@ export async function rescheduleBooking(
           id: { not: booking.id },
         },
       });
+      const schedule = await tx.professionalScheduleInterval.findMany({
+        where: { organizationId, professionalId: booking.professionalId },
+        select: { dayOfWeek: true, startMinute: true, endMinute: true },
+      });
+      if (
+        schedule.length > 0 &&
+        !isSlotWithinSchedule(schedule, newStartTime, newEndTime)
+      ) {
+        throw new OutsideScheduleError();
+      }
       if (overlap) {
         throw new RescheduleOverlapError();
       }
@@ -154,6 +165,12 @@ export async function rescheduleBooking(
   } catch (error) {
     if (error instanceof RescheduleOverlapError) {
       return { success: false, error: "El horario deseado está ocupado" };
+    }
+    if (error instanceof OutsideScheduleError) {
+      return {
+        success: false,
+        error: "El horario está fuera de la disponibilidad del profesional",
+      };
     }
     if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2025") {
       return {
@@ -187,5 +204,12 @@ class RescheduleOverlapError extends Error {
   constructor() {
     super("Reschedule slot overlap detected");
     this.name = "RescheduleOverlapError";
+  }
+}
+
+class OutsideScheduleError extends Error {
+  constructor() {
+    super("Booking is outside the professional schedule");
+    this.name = "OutsideScheduleError";
   }
 }
