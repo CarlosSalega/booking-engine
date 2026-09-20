@@ -89,8 +89,57 @@ Server Component. Shows: patient, professional, service, payments[], two badges,
 
 Six-step: (1) service, (2) professional filtered by service, (3) available slots, (4) patient search OR guest form (name/phone/email), (5) payment placeholder, (6) confirm + create. Zustand store cleared on mount. Step validation blocks advance. Progress indicator.
 
+**Step 4 customer-mode switch**: The customer-mode switch (existing patient vs. new guest) MUST be implemented as a valid `radiogroup` (either native radio inputs or a shadcn/Radix `ToggleGroup` with `type="single"`) with correct ARIA semantics:
+
+- The container MUST have `role="radiogroup"` (or use Radix `ToggleGroup` which provides this automatically).
+- Each option MUST have `role="radio"` (or be a Radix `ToggleGroupItem` which provides this).
+- The selected option MUST have `aria-checked="true"`; unselected options MUST have `aria-checked="false"`.
+- Arrow-key navigation MUST move focus between options (handled automatically by Radix `ToggleGroup` or native radio group behavior).
+- The radiogroup MUST have an accessible label (via `aria-label` or `aria-labelledby`) in Spanish (e.g. "Modo de paciente").
+- The previous `role="tablist"` / `role="tab"` markup MUST NOT be present on this control.
+
+**Progress indicator**: The wizard's step progress indicator MUST NOT communicate state by color alone. Each step MUST be identifiable by:
+
+- A visible text label (step number + step name, e.g. "1. Servicio").
+- `aria-current="step"` on the current step element.
+- Color MAY supplement the indication but MUST NOT be the sole channel.
+
+**Step loading**: Content loading within wizard steps MUST use `Skeleton` components (shimmer placeholders) rather than spinners. This applies to step 4 patient search results and any other step that loads data asynchronously.
+
+(Previously: Creation Wizard required six-step flow with progress indicator and step validation, but step 4 used a fake `tablist` with no keyboard contract, progress was color-only, and loading used spinners.)
+
 #### Scenario: Complete and guest paths
 - GIVEN all steps filled, patient selected → creates booking. GIVEN guest form → creates without patientId
 
 #### Scenario: Step validation and slot filtering
 - GIVEN no service → blocked at step 1. GIVEN professional booked 09:00–09:30, service=30min → step 3 shows 09:30+
+
+#### Scenario: Step 4 radiogroup semantics
+- GIVEN the wizard is on step 4
+- WHEN inspecting the customer-mode switch
+- THEN the container has `role="radiogroup"` (or is a Radix `ToggleGroup`)
+- AND each option has `role="radio"` with `aria-checked` reflecting selection
+- AND no `role="tablist"` or `role="tab"` is present on this control
+
+#### Scenario: Step 4 arrow-key navigation
+- GIVEN focus is on the first radio option in step 4
+- WHEN the user presses ArrowRight or ArrowDown
+- THEN focus moves to the next radio option
+- AND `aria-checked` updates to reflect the new selection
+
+#### Scenario: Step 4 radiogroup has accessible label
+- GIVEN the wizard is on step 4
+- WHEN inspecting the radiogroup
+- THEN it has `aria-label` or `aria-labelledby` in Spanish (e.g. "Modo de paciente")
+
+#### Scenario: Progress indicator non-color channel
+- GIVEN the wizard is on step 3
+- WHEN inspecting the progress indicator
+- THEN the current step has `aria-current="step"`
+- AND the current step displays a visible text label (step number + name)
+- AND the step is distinguishable from completed/pending steps without relying on color alone
+
+#### Scenario: Step 4 patient search loading uses skeleton
+- GIVEN the wizard is on step 4 and patient search is in progress
+- WHEN the loading state is active
+- THEN `Skeleton` components are rendered (not a spinner)
