@@ -10,6 +10,7 @@
  */
 
 import { Suspense } from "react";
+import { connection } from "next/server";
 
 import { getOrganizationId } from "@/modules/dashboard";
 import { getBookingsByDay, getRevenueByMonth } from "@/modules/dashboard";
@@ -24,15 +25,17 @@ import {
 } from "@/components/dashboard/charts";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default async function DashboardPage() {
-  const organizationId = await getOrganizationId();
+// Operator dashboard is per-organization live data with `new Date()`
+// windows — it can never prerender or navigate instantly. Declaring the
+// blocking intent silences the instant-navigation warning and allows the
+// request-time `connection()` below.
+export const instant = false;
 
-  // Pre-fetch the chart and table data so the Suspense boundaries can
-  // stream them in parallel with the metrics.
-  const [revenueData, bookingsByDayData] = await Promise.all([
-    getRevenueByMonth(organizationId),
-    getBookingsByDay(organizationId),
-  ]);
+export default async function DashboardPage() {
+  // Force request-time rendering so prerender never runs.
+  await connection();
+
+  const organizationId = await getOrganizationId();
 
   return (
     <>
@@ -50,10 +53,14 @@ export default async function DashboardPage() {
       <div className="px-4 lg:px-6">
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
           <div className="lg:col-span-4">
-            <RevenueChartClient data={revenueData} />
+            <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}>
+              <RevenueChartData organizationId={organizationId} />
+            </Suspense>
           </div>
           <div className="lg:col-span-3">
-            <BookingsChartClient data={bookingsByDayData} />
+            <Suspense fallback={<Skeleton className="h-[300px] w-full rounded-xl" />}>
+              <BookingsChartData organizationId={organizationId} />
+            </Suspense>
           </div>
         </div>
       </div>
@@ -87,6 +94,16 @@ export default async function DashboardPage() {
 async function TopServicesData({ organizationId }: { organizationId: string }) {
   await Promise.resolve(); // force the async boundary
   return <TopServices organizationId={organizationId} />;
+}
+
+async function RevenueChartData({ organizationId }: { organizationId: string }) {
+  const data = await getRevenueByMonth(organizationId);
+  return <RevenueChartClient data={data} />;
+}
+
+async function BookingsChartData({ organizationId }: { organizationId: string }) {
+  const data = await getBookingsByDay(organizationId);
+  return <BookingsChartClient data={data} />;
 }
 
 async function TodayBookingsData({ organizationId }: { organizationId: string }) {
