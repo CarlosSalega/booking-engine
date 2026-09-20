@@ -3,6 +3,14 @@
  * current day, with status badge and patient/professional info.
  *
  * Server Component. Renders an empty state when there are no bookings.
+ *
+ * Slice 2 (ux-audit-fixes): every `STATUS_TONE` value now references
+ * the semantic `--status-*` token class defined in `globals.css` (via
+ * the Tailwind v4 `@theme inline` `--color-status-*` mapping). CANCELLED
+ * and NO_SHOW keep the `destructive` variant mapping — the badge's
+ * variant already paints them red (NO_SHOW = real revenue impact) or
+ * gray (CANCELLED, D1 supersession). COMPLETED adopts the dark-neutral
+ * `--status-completed` token (D1; previously sky blue).
  */
 
 import { CalendarX2 } from "lucide-react";
@@ -12,6 +20,7 @@ import {
   getTodayBookings,
   formatTime,
 } from "@/modules/dashboard";
+import { BookingStatus } from "@/modules/bookings/domain/booking";
 
 import {
   Card,
@@ -35,13 +44,18 @@ interface TodayBookingsProps {
 }
 
 const STATUS_TONE: Record<string, string> = {
-  PENDING: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  CONFIRMED: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  AWAITING_PAYMENT: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  CANCELLED: "bg-destructive/10 text-destructive",
-  NO_SHOW: "bg-destructive/10 text-destructive",
-  COMPLETED: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
-  RESCHEDULED: "bg-violet-500/15 text-violet-700 dark:text-violet-300",
+  [BookingStatus.PENDING]:
+    "bg-status-pending/15 text-status-pending-foreground",
+  [BookingStatus.CONFIRMED]:
+    "bg-status-confirmed/15 text-status-confirmed-foreground",
+  [BookingStatus.AWAITING_PAYMENT]:
+    "bg-status-awaiting-payment/15 text-status-awaiting-payment-foreground",
+  [BookingStatus.CANCELLED]: "bg-status-cancelled/15 text-status-cancelled-foreground",
+  [BookingStatus.NO_SHOW]: "bg-status-no-show/15 text-status-no-show-foreground",
+  [BookingStatus.COMPLETED]:
+    "bg-status-completed/15 text-status-completed-foreground",
+  [BookingStatus.RESCHEDULED]:
+    "bg-status-rescheduled/15 text-status-rescheduled-foreground",
 };
 
 export async function TodayBookings({ organizationId }: TodayBookingsProps) {
