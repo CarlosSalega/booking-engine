@@ -14,6 +14,7 @@ export default defineConfig([
     "node_modules/**",
     "coverage/**",
     ".vercel/**",
+    ".agents/**",
     "next-env.d.ts",
   ]),
 

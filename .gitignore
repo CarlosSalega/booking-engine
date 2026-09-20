@@ -44,3 +44,5 @@ openspec/changes/tmp
 .atl/.skill-registry.cache.json
 .turbo
 .atl
+.agents
+skills-lock.json
