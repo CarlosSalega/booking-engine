@@ -30,8 +30,6 @@
 
 import * as React from "react";
 
-import { cn } from "@/lib/utils";
-
 export interface AuthFieldProps {
   /** Input id; used as the label's `htmlFor`. */
   id: string;
@@ -64,7 +62,7 @@ export function AuthField({
   const hasError = Boolean(error);
 
   return (
-    <div className={cn("space-y-1.5")}>
+    <div className="space-y-1.5">
       <label
         htmlFor={id}
         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
