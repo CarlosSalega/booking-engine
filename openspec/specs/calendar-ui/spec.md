@@ -28,6 +28,8 @@ The Calendar component SHALL render `DayPicker` from `react-day-picker` v10 and 
 
 The Calendar component SHALL inject CSS custom properties through the `DayPicker` `style` prop to control react-day-picker's internal layout and color tokens.
 
+All `--rdp-*` color variables MUST reference design token values directly via `var(--token-name)` without wrapping in `hsl()`. Since the project's design tokens are authored in `oklch()`, wrapping them in `hsl()` produces invalid CSS (e.g. `hsl(oklch(...))` is dropped by the browser).
+
 | Variable | Value | Purpose |
 |----------|-------|---------|
 | `--rdp-day-width` | `2rem` | Uniform day cell width |
@@ -35,23 +37,45 @@ The Calendar component SHALL inject CSS custom properties through the `DayPicker
 | `--rdp-day_button-width` | `2rem` | Button inside day cell |
 | `--rdp-day_button-height` | `2rem` | Button inside day cell |
 | `--rdp-months-gap` | `3rem` | Gap between months in multi-month |
-| `--rdp-accent-color` | `hsl(var(--primary))` | Selected day background (maps to global --primary) |
-| `--rdp-accent-background-color` | `hsl(var(--primary) / 0.15)` | Range middle background |
-| `--rdp-range_start-date-background-color` | `hsl(var(--primary))` | Range start day background |
-| `--rdp-range_end-date-background-color` | `hsl(var(--primary))` | Range end day background |
-| `--rdp-range_start-color` | `hsl(var(--primary-foreground))` | Range start text color |
-| `--rdp-range_end-color` | `hsl(var(--primary-foreground))` | Range end text color |
+| `--rdp-accent-color` | `var(--primary)` | Selected day background (maps to global --primary) |
+| `--rdp-accent-background-color` | `var(--primary) / 0.15` or `color-mix(in oklch, var(--primary) 15%, transparent)` | Range middle background |
+| `--rdp-range_start-date-background-color` | `var(--primary)` | Range start day background |
+| `--rdp-range_end-date-background-color` | `var(--primary)` | Range end day background |
+| `--rdp-range_start-color` | `var(--primary-foreground)` | Range start text color |
+| `--rdp-range_end-color` | `var(--primary-foreground)` | Range end text color |
 
-#### Scenario: Accent color maps to theme primary
-- GIVEN `--primary` defined as green in globals.css
+The corresponding test file (`src/components/ui/__tests__/calendar.test.tsx`) MUST assert the corrected `var(--primary)` value, not the previous broken `hsl(var(--primary))` value.
+
+(Previously: `--rdp-accent-color` and related color variables used `hsl(var(--primary))`, which is invalid CSS because `--primary` is defined in `oklch()`. The `hsl(oklch(...))` declaration was dropped by the browser, causing the calendar's selected/range styling to fall back to defaults. The test file also asserted the broken value.)
+
+#### Scenario: Accent color maps to theme primary via valid CSS
+- GIVEN `--primary` defined in `globals.css` as an `oklch()` value
 - WHEN Calendar renders
-- THEN selected day shows green background via `--rdp-accent-color: hsl(var(--primary))`
+- THEN `--rdp-accent-color` is set to `var(--primary)` (not `hsl(var(--primary))`)
+- AND the selected day shows the primary color background correctly in the browser
+
+#### Scenario: Range middle background uses valid token reference
+- GIVEN Calendar with `mode="range"` and a multi-day selection
+- WHEN the range middle days render
+- THEN `--rdp-accent-background-color` references `var(--primary)` with opacity (not wrapped in `hsl()`)
+- AND the range middle background is visible and matches the primary color at reduced opacity
+
+#### Scenario: Range start/end colors use valid references
+- GIVEN Calendar with `mode="range"` and a complete selection
+- WHEN the range start and end days render
+- THEN `--rdp-range_start-date-background-color` is `var(--primary)` (not `hsl(var(--primary))`)
+- AND `--rdp-range_start-color` is `var(--primary-foreground)` (not `hsl(var(--primary-foreground))`)
 
 #### Scenario: Months gap applied at 3rem
 - GIVEN Calendar with 2 months visible
 - WHEN DayPicker renders
 - THEN gap between months is 3rem via `--rdp-months-gap`
 
+#### Scenario: Test assertions match corrected values
+- GIVEN the `calendar.test.tsx` test file
+- WHEN the test for accent color runs
+- THEN it asserts `var(--primary)` (not `hsl(var(--primary))`)
+- AND the test passes with the corrected implementation
 ### Requirement: navLayout and Chevron Navigation
 
 The Calendar SHALL support `navLayout` prop (default `"around"`) and SHALL render lucide-react `ChevronLeft`/`ChevronRight` icons as custom chevron components.
