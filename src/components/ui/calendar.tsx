@@ -31,14 +31,19 @@ function Calendar({
           "--rdp-day_button-width": "2rem",
           "--rdp-day_button-height": "2rem",
           "--rdp-months-gap": "3rem",
-          // Theme accent — maps to globals.css --primary (green)
-          "--rdp-accent-color": "hsl(var(--primary))",
-          "--rdp-accent-background-color": "hsl(var(--primary) / 0.15)",
-          "--rdp-range_start-date-background-color": "hsl(var(--primary))",
-          "--rdp-range_end-date-background-color": "hsl(var(--primary))",
-          "--rdp-range_start-color": "hsl(var(--primary-foreground))",
-          "--rdp-range_end-color": "hsl(var(--primary-foreground))",
-          "--rdp-today-color": "hsl(var(--primary))",
+          // Theme accent — maps to globals.css --primary. The variables
+          // are authored as oklch(), so wrapping them in hsl() would
+          // produce invalid CSS (hsl(oklch(...))) that the browser
+          // drops. Bare `var(--*)` references + `color-mix` for the
+          // translucent range middle keep the value theme-reactive.
+          "--rdp-accent-color": "var(--primary)",
+          "--rdp-accent-background-color":
+            "color-mix(in oklch, var(--primary) 15%, transparent)",
+          "--rdp-range_start-date-background-color": "var(--primary)",
+          "--rdp-range_end-date-background-color": "var(--primary)",
+          "--rdp-range_start-color": "var(--primary-foreground)",
+          "--rdp-range_end-color": "var(--primary-foreground)",
+          "--rdp-today-color": "var(--primary)",
         } as React.CSSProperties
       }
       components={{
