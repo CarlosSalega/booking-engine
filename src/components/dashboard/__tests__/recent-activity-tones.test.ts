@@ -2,9 +2,8 @@
  * Tone pins for the `RecentActivity` activity-type map.
  *
  * The `TONE` map paints icon tiles on pale `/15` tints, so entries must
- * use color-mix ink
- * (`text-[color-mix(in_oklch,var(--*)_70%,var(--foreground))]`), never
- * the solid fill inks (`text-info-foreground`, `text-success-foreground`,
+ * use color-mix ink built from their own var plus the foreground var,
+ * never the solid fill inks (`text-info-foreground`, `text-success-foreground`,
  * `text-status-completed-foreground`) — those are white/near-white in
  * light theme and unreadable on the tints (white-on-tint regression,
  * PR #19 fixup part 2 — same root cause as the shared bookings
