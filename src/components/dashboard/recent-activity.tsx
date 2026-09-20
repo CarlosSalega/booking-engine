@@ -43,10 +43,13 @@ const ICONS: Record<ActivityType, React.ComponentType<{ className?: string }>> =
   patient: UserPlus,
 };
 
-const TONE: Record<ActivityType, string> = {
-  booking: "bg-info/15 text-info-foreground",
-  payment: "bg-success/15 text-success-foreground",
-  patient: "bg-status-completed/15 text-status-completed-foreground",
+export const TONE: Record<ActivityType, string> = {
+  booking:
+    "bg-info/15 text-[color-mix(in_oklch,var(--info)_70%,var(--foreground))]",
+  payment:
+    "bg-success/15 text-[color-mix(in_oklch,var(--success)_70%,var(--foreground))]",
+  patient:
+    "bg-status-completed/15 text-[color-mix(in_oklch,var(--status-completed)_70%,var(--foreground))]",
 };
 
 const LABEL: Record<ActivityType, string> = {
