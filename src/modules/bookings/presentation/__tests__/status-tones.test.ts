@@ -10,14 +10,19 @@
  * Pure: no React, no Next.js, no Prisma. Importable from both Server
  * and Client Components.
  *
- * Slice 2 (ux-audit-fixes) lockstep update:
- *   - `STATUS_TONE_CLASS` values now reference the semantic token
- *     classes (`bg-status-pending/15`, `text-status-pending-foreground`,
- *     …) defined in `globals.css` rather than raw Tailwind palette
- *     substrings (`amber-500`, `emerald-500`, …). CANCELLED and
- *     NO_SHOW remain empty strings — the badge variant (destructive)
- *     carries their color.
- *   - `STATUS_HEX` for CANCELLED is now neutral gray (D1 supersession;
+  * Slice 2 (ux-audit-fixes) lockstep update:
+  *   - `STATUS_TONE_CLASS` values now reference the semantic token
+  *     classes (`bg-status-pending/15`,
+  *     `text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))]`,
+  *     …) defined in `globals.css` rather than raw Tailwind palette
+  *     substrings (`amber-500`, `emerald-500`, …). CANCELLED and
+  *     NO_SHOW remain empty strings — the badge variant (destructive)
+  *     carries their color.
+  *   - Badge text uses color-mix ink (status token 70% + `--foreground`)
+  *     instead of the solid `-foreground` fill inks: the `-foreground`
+  *     tokens are white/near-white in light theme (white text on a
+  *     pale `/15` tint is unreadable — reported on CONFIRMED).
+  *   - `STATUS_HEX` for CANCELLED is now neutral gray (D1 supersession;
  *     the previous red rendered every cancellation as an emergency)
  *     and COMPLETED is now dark neutral (D1; the previous emerald
  *     collided with CONFIRMED). Hex values approximate the
@@ -60,7 +65,7 @@ describe("STATUS_TONE_CLASS", () => {
       "bg-status-pending/15",
     );
     expect(STATUS_TONE_CLASS[BookingStatus.PENDING]).toContain(
-      "text-status-pending-foreground",
+      "text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))]",
     );
   });
 
@@ -69,7 +74,7 @@ describe("STATUS_TONE_CLASS", () => {
       "bg-status-confirmed/15",
     );
     expect(STATUS_TONE_CLASS[BookingStatus.CONFIRMED]).toContain(
-      "text-status-confirmed-foreground",
+      "text-[color-mix(in_oklch,var(--status-confirmed)_70%,var(--foreground))]",
     );
   });
 
@@ -78,7 +83,7 @@ describe("STATUS_TONE_CLASS", () => {
       "bg-status-awaiting-payment/15",
     );
     expect(STATUS_TONE_CLASS[BookingStatus.AWAITING_PAYMENT]).toContain(
-      "text-status-awaiting-payment-foreground",
+      "text-[color-mix(in_oklch,var(--status-awaiting-payment)_70%,var(--foreground))]",
     );
   });
 
@@ -87,7 +92,7 @@ describe("STATUS_TONE_CLASS", () => {
       "bg-status-rescheduled/15",
     );
     expect(STATUS_TONE_CLASS[BookingStatus.RESCHEDULED]).toContain(
-      "text-status-rescheduled-foreground",
+      "text-[color-mix(in_oklch,var(--status-rescheduled)_70%,var(--foreground))]",
     );
   });
 
@@ -96,8 +101,21 @@ describe("STATUS_TONE_CLASS", () => {
       "bg-status-completed/15",
     );
     expect(STATUS_TONE_CLASS[BookingStatus.COMPLETED]).toContain(
-      "text-status-completed-foreground",
+      "text-[color-mix(in_oklch,var(--status-completed)_70%,var(--foreground))]",
     );
+  });
+
+  it("tinted entries never use solid text-status-*-foreground fill inks (white-on-tint regression)", () => {
+    const TINTED: BookingStatusType[] = [
+      BookingStatus.PENDING,
+      BookingStatus.CONFIRMED,
+      BookingStatus.RESCHEDULED,
+      BookingStatus.COMPLETED,
+      BookingStatus.AWAITING_PAYMENT,
+    ];
+    for (const status of TINTED) {
+      expect(STATUS_TONE_CLASS[status]).not.toContain("text-status-");
+    }
   });
 
   it("CANCELLED is empty (variant=destructive carries the color, D1 gray)", () => {

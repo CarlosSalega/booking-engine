@@ -47,17 +47,17 @@ import { BookingStatus, type BookingStatusType } from "@/modules/bookings/domain
 
 export const STATUS_TONE_CLASS: Record<BookingStatusType, string> = {
   [BookingStatus.PENDING]:
-    "bg-status-pending/15 text-status-pending-foreground border-status-pending/30",
+    "bg-status-pending/15 text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))] border-status-pending/30",
   [BookingStatus.CONFIRMED]:
-    "bg-status-confirmed/15 text-status-confirmed-foreground border-status-confirmed/30",
+    "bg-status-confirmed/15 text-[color-mix(in_oklch,var(--status-confirmed)_70%,var(--foreground))] border-status-confirmed/30",
   [BookingStatus.CANCELLED]: "",
   [BookingStatus.RESCHEDULED]:
-    "bg-status-rescheduled/15 text-status-rescheduled-foreground border-status-rescheduled/30",
+    "bg-status-rescheduled/15 text-[color-mix(in_oklch,var(--status-rescheduled)_70%,var(--foreground))] border-status-rescheduled/30",
   [BookingStatus.COMPLETED]:
-    "bg-status-completed/15 text-status-completed-foreground border-status-completed/30",
+    "bg-status-completed/15 text-[color-mix(in_oklch,var(--status-completed)_70%,var(--foreground))] border-status-completed/30",
   [BookingStatus.NO_SHOW]: "",
   [BookingStatus.AWAITING_PAYMENT]:
-    "bg-status-awaiting-payment/15 text-status-awaiting-payment-foreground border-status-awaiting-payment/30",
+    "bg-status-awaiting-payment/15 text-[color-mix(in_oklch,var(--status-awaiting-payment)_70%,var(--foreground))] border-status-awaiting-payment/30",
 };
 
 // ---------------------------------------------------------------------------
