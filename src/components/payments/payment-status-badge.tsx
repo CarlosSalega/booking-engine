@@ -54,17 +54,20 @@ export const PAYMENT_STATUS_BADGE_VARIANT: Record<
  * top of the variant. Every value references a semantic token class
  * defined in `globals.css` (`@theme inline` `--color-*` mapping); no
  * raw palette substrings remain in this file (ui-feedback spec).
+ * Tinted entries use color-mix ink (token 70% + `--foreground`) —
+ * the solid `-foreground` fill inks are white in light theme and
+ * unreadable on the pale `/15` tints.
  */
-const STATUS_TONE_CLASS: Record<ProviderPaymentStatusType, string> = {
+export const STATUS_TONE_CLASS: Record<ProviderPaymentStatusType, string> = {
   [ProviderPaymentStatus.PENDING]:
-    "bg-status-pending/15 text-status-pending-foreground border-status-pending/30",
+    "bg-status-pending/15 text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))] border-status-pending/30",
   [ProviderPaymentStatus.APPROVED]:
-    "bg-success/15 text-success-foreground border-success/30",
+    "bg-success/15 text-[color-mix(in_oklch,var(--success)_70%,var(--foreground))] border-success/30",
   [ProviderPaymentStatus.REJECTED]: "",
   [ProviderPaymentStatus.CANCELLED]:
-    "bg-status-cancelled/15 text-status-cancelled-foreground border-status-cancelled/30",
+    "bg-status-cancelled/15 text-[color-mix(in_oklch,var(--status-cancelled)_70%,var(--foreground))] border-status-cancelled/30",
   [ProviderPaymentStatus.IN_PROCESS]:
-    "bg-info/15 text-info-foreground border-info/30",
+    "bg-info/15 text-[color-mix(in_oklch,var(--info)_70%,var(--foreground))] border-info/30",
 };
 
 interface PaymentStatusBadgeProps {
