@@ -15,26 +15,49 @@
  *
  * Pure: no React, no Next.js, no Prisma. Importable from Server and
  * Client Components.
+ *
+ * Slice 2 (ux-audit-fixes) update:
+ *   - `STATUS_TONE_CLASS` values now reference semantic `--status-*`
+ *     token classes (consumed via Tailwind v4's `@theme inline`
+ *     `--color-status-*` mapping) instead of raw Tailwind palette
+ *     substrings. CANCELLED and NO_SHOW remain empty strings because
+ *     their color comes from the `destructive` Badge variant.
+ *   - `STATUS_HEX` for CANCELLED is neutral gray (D1: cancellations
+ *     should not read as emergencies) and COMPLETED is dark-neutral
+ *     (D1: the previous emerald collided with CONFIRMED). Hex values
+ *     approximate the tokens because Schedule-X requires concrete
+ *     colors — the badges themselves render via the token classes
+ *     defined in `globals.css`.
  */
 
 import { BookingStatus, type BookingStatusType } from "@/modules/bookings/domain/booking";
 
 // ---------------------------------------------------------------------------
 // Tailwind class tones — consumed by `BookingStatusBadge`.
-// Mirrors the existing inline `STATUS_TONE_CLASS` previously declared in
-// `src/components/bookings/booking-status-badge.tsx`. Empty strings are
-// allowed for the destructive-variant statuses (CANCELLED, NO_SHOW) which
-// inherit their color from the badge variant and don't need an extra tone.
+// Mirrors the per-status color mapping previously declared as raw palette
+// substrings; now every entry references the `--status-*` token class
+// defined in `globals.css`. Empty strings are intentional for the
+// destructive-variant statuses (CANCELLED, NO_SHOW) which inherit their
+// color from the badge variant and don't need an extra tone.
+//
+// Opacity modifiers (`/15`, `/30`) are valid on oklch()-authored tokens
+// in Tailwind v4 — they preserve the original `/15` tint idiom while
+// keeping the rendering theme-reactive.
 // ---------------------------------------------------------------------------
 
 export const STATUS_TONE_CLASS: Record<BookingStatusType, string> = {
-  [BookingStatus.PENDING]: "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30",
-  [BookingStatus.CONFIRMED]: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
+  [BookingStatus.PENDING]:
+    "bg-status-pending/15 text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))] border-status-pending/30",
+  [BookingStatus.CONFIRMED]:
+    "bg-status-confirmed/15 text-[color-mix(in_oklch,var(--status-confirmed)_70%,var(--foreground))] border-status-confirmed/30",
   [BookingStatus.CANCELLED]: "",
-  [BookingStatus.RESCHEDULED]: "bg-violet-500/15 text-violet-700 dark:text-violet-300",
-  [BookingStatus.COMPLETED]: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  [BookingStatus.RESCHEDULED]:
+    "bg-status-rescheduled/15 text-[color-mix(in_oklch,var(--status-rescheduled)_70%,var(--foreground))] border-status-rescheduled/30",
+  [BookingStatus.COMPLETED]:
+    "bg-status-completed/15 text-[color-mix(in_oklch,var(--status-completed)_70%,var(--foreground))] border-status-completed/30",
   [BookingStatus.NO_SHOW]: "",
-  [BookingStatus.AWAITING_PAYMENT]: "bg-orange-500/15 text-orange-700 dark:text-orange-300 border-orange-500/30",
+  [BookingStatus.AWAITING_PAYMENT]:
+    "bg-status-awaiting-payment/15 text-[color-mix(in_oklch,var(--status-awaiting-payment)_70%,var(--foreground))] border-status-awaiting-payment/30",
 };
 
 // ---------------------------------------------------------------------------
@@ -45,9 +68,12 @@ export const STATUS_TONE_CLASS: Record<BookingStatusType, string> = {
 // `BookingStatus` value because the mapping `event.calendarId = booking.status`
 // is set in `bookingToCalendarEvent`.
 //
-// Hex values mirror the Tailwind 500 (`main`), 100 (`container`), and
+// Hex values approximate the corresponding `--status-*` token (defined
+// as oklch() in `globals.css`) because Schedule-X requires concrete
+// colors. They mirror the Tailwind 500 (`main`), 100 (`container`), and
 // 800 (`onContainer`) scales so the calendar event matches the badge's
-// visual vocabulary on the list page.
+// visual vocabulary on the list page. CANCELLED and COMPLETED apply the
+// D1 supersession (gray / dark-neutral respectively).
 // ---------------------------------------------------------------------------
 
 export interface ScheduleXCalendarColor {
@@ -99,15 +125,18 @@ export const STATUS_HEX: Record<BookingStatusType, ScheduleXCalendarColor> = {
   },
   [BookingStatus.CANCELLED]: {
     colorName: BookingStatus.CANCELLED,
+    // D1 supersession — neutral gray (approximation of
+    // oklch(0.55 0.04 257.4)). Cancellations should not read as
+    // emergencies; staff use destructive badges only for NO_SHOW.
     lightColors: {
-      main: "#ef4444", // red-500
-      container: "#fee2e2", // red-100
-      onContainer: "#b91c1c", // red-700
+      main: "#6b7280", // gray-500
+      container: "#f3f4f6", // gray-100
+      onContainer: "#1f2937", // gray-800
     },
     darkColors: {
-      main: "#f87171", // red-400
-      container: "#7f1d1d", // red-900
-      onContainer: "#fee2e2", // red-100
+      main: "#94a3b8", // slate-400
+      container: "#1e293b", // slate-800
+      onContainer: "#f1f5f9", // slate-100
     },
   },
   [BookingStatus.RESCHEDULED]: {
@@ -125,28 +154,33 @@ export const STATUS_HEX: Record<BookingStatusType, ScheduleXCalendarColor> = {
   },
   [BookingStatus.COMPLETED]: {
     colorName: BookingStatus.COMPLETED,
+    // D1 supersession — dark-neutral slate (approximation of
+    // oklch(0.37 0.04 257.3)). The previous emerald collided with
+    // CONFIRMED; dark-neutral separates the two statuses.
     lightColors: {
-      main: "#10b981", // emerald-500 (same family as CONFIRMED; opacity/context differentiates)
-      container: "#d1fae5",
-      onContainer: "#047857",
+      main: "#475569", // slate-600
+      container: "#e2e8f0", // slate-200
+      onContainer: "#1e293b", // slate-800
     },
     darkColors: {
-      main: "#34d399",
-      container: "#064e3b",
-      onContainer: "#d1fae5",
+      main: "#64748b", // slate-500
+      container: "#0f172a", // slate-900
+      onContainer: "#e2e8f0", // slate-200
     },
   },
   [BookingStatus.NO_SHOW]: {
     colorName: BookingStatus.NO_SHOW,
+    // NO_SHOW keeps the destructive red — it has real revenue / scheduling
+    // impact and warrants the alert.
     lightColors: {
-      main: "#ef4444", // red-500 (same family as CANCELLED; opacity/context differentiates)
-      container: "#fee2e2",
-      onContainer: "#b91c1c",
+      main: "#ef4444", // red-500
+      container: "#fee2e2", // red-100
+      onContainer: "#b91c1c", // red-700
     },
     darkColors: {
-      main: "#f87171",
-      container: "#7f1d1d",
-      onContainer: "#fee2e2",
+      main: "#f87171", // red-400
+      container: "#7f1d1d", // red-900
+      onContainer: "#fee2e2", // red-100
     },
   },
   [BookingStatus.AWAITING_PAYMENT]: {

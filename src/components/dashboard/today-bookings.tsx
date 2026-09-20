@@ -3,6 +3,16 @@
  * current day, with status badge and patient/professional info.
  *
  * Server Component. Renders an empty state when there are no bookings.
+ *
+ * Slice 2 (ux-audit-fixes): every `STATUS_TONE` value now references
+ * the semantic `--status-*` token class defined in `globals.css` (via
+ * the Tailwind v4 `@theme inline` `--color-status-*` mapping). Every
+ * entry (including CANCELLED and NO_SHOW, which this table renders on
+ * a `secondary` badge) uses color-mix ink
+ * (`var(--status-*)_70%` + `var(--foreground)`) instead of the solid
+ * `-foreground` fill inks, which are white/near-white in light theme
+ * and unreadable on the pale `/15` tints. COMPLETED adopts the dark-neutral
+ * `--status-completed` token (D1; previously sky blue).
  */
 
 import { CalendarX2 } from "lucide-react";
@@ -12,6 +22,7 @@ import {
   getTodayBookings,
   formatTime,
 } from "@/modules/dashboard";
+import { BookingStatus } from "@/modules/bookings/domain/booking";
 
 import {
   Card,
@@ -34,14 +45,21 @@ interface TodayBookingsProps {
   organizationId: string;
 }
 
-const STATUS_TONE: Record<string, string> = {
-  PENDING: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  CONFIRMED: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  AWAITING_PAYMENT: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  CANCELLED: "bg-destructive/10 text-destructive",
-  NO_SHOW: "bg-destructive/10 text-destructive",
-  COMPLETED: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
-  RESCHEDULED: "bg-violet-500/15 text-violet-700 dark:text-violet-300",
+export const STATUS_TONE: Record<string, string> = {
+  [BookingStatus.PENDING]:
+    "bg-status-pending/15 text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))]",
+  [BookingStatus.CONFIRMED]:
+    "bg-status-confirmed/15 text-[color-mix(in_oklch,var(--status-confirmed)_70%,var(--foreground))]",
+  [BookingStatus.AWAITING_PAYMENT]:
+    "bg-status-awaiting-payment/15 text-[color-mix(in_oklch,var(--status-awaiting-payment)_70%,var(--foreground))]",
+  [BookingStatus.CANCELLED]:
+    "bg-status-cancelled/15 text-[color-mix(in_oklch,var(--status-cancelled)_70%,var(--foreground))]",
+  [BookingStatus.NO_SHOW]:
+    "bg-status-no-show/15 text-[color-mix(in_oklch,var(--status-no-show)_70%,var(--foreground))]",
+  [BookingStatus.COMPLETED]:
+    "bg-status-completed/15 text-[color-mix(in_oklch,var(--status-completed)_70%,var(--foreground))]",
+  [BookingStatus.RESCHEDULED]:
+    "bg-status-rescheduled/15 text-[color-mix(in_oklch,var(--status-rescheduled)_70%,var(--foreground))]",
 };
 
 export async function TodayBookings({ organizationId }: TodayBookingsProps) {

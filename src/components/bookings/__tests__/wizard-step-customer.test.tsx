@@ -6,15 +6,21 @@
  *   fetched via `getPatientsForWizard(search?)`.
  * - **Guest** — three inputs (name, phone, email) and no DB lookup.
  *
- * Toggling between modes is a `Tabs`-like radio group. The component
- * owns no state for the search term — it manages the search input
- * locally and re-fetches on each debounced change.
+ * Toggling between modes is a native radio group (no ToggleGroup dep,
+ * per the ux-audit-fixes design decision — ToggleGroup is not
+ * installed in this repo). The component owns no state for the search
+ * term — it manages the search input locally and re-fetches on each
+ * debounced change.
+ *
+ * Loading state uses `Skeleton` rows (per ui-feedback spec — content
+ * loading is Skeleton, not spinners). Spinners are reserved for
+ * button-level submit actions.
  *
  * The Server Action is mocked at the module boundary.
  */
 
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import type { PatientOption } from "@/modules/bookings/data/booking-data.types";
@@ -44,7 +50,7 @@ const PATIENTS: PatientOption[] = [
 ];
 
 describe("WizardStepCustomer", () => {
-  it("renders a mode toggle (existing / guest) by default on existing", () => {
+  it("renders a mode toggle (existing / guest) as a native radiogroup", () => {
     getPatientsMock.mockResolvedValue([]);
     render(
       <WizardStepCustomer
@@ -58,11 +64,15 @@ describe("WizardStepCustomer", () => {
         onGuestChange={vi.fn()}
       />,
     );
-    expect(screen.getByRole("tab", { name: /paciente existente/i })).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: /invitado/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /paciente existente/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("radio", { name: /invitado/i }),
+    ).toBeInTheDocument();
   });
 
-  it("calls onModeChange when the guest tab is clicked", async () => {
+  it("calls onModeChange when the guest radio is selected", async () => {
     const user = userEvent.setup();
     const onModeChange = vi.fn();
     getPatientsMock.mockResolvedValue([]);
@@ -78,7 +88,7 @@ describe("WizardStepCustomer", () => {
         onGuestChange={vi.fn()}
       />,
     );
-    await user.click(screen.getByRole("tab", { name: /invitado/i }));
+    await user.click(screen.getByRole("radio", { name: /invitado/i }));
     expect(onModeChange).toHaveBeenCalledWith("guest");
   });
 
@@ -231,5 +241,204 @@ describe("WizardStepCustomer", () => {
       />,
     );
     expect(screen.queryByLabelText(/buscar paciente/i)).not.toBeInTheDocument();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Radiogroup semantics — bookings spec §"Step 4 customer-mode switch"
+// ---------------------------------------------------------------------------
+
+describe("WizardStepCustomer — customer-mode radiogroup (bookings spec)", () => {
+  it("renders the switch as a radiogroup with a Spanish accessible name", () => {
+    getPatientsMock.mockResolvedValue([]);
+    render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("radiogroup", { name: /modo de paciente/i }),
+    ).toBeInTheDocument();
+  });
+
+  it("exposes exactly two radio options inside the radiogroup", () => {
+    getPatientsMock.mockResolvedValue([]);
+    render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    const group = screen.getByRole("radiogroup", {
+      name: /modo de paciente/i,
+    });
+    expect(
+      within(group).getAllByRole("radio", {
+        name: /paciente existente/i,
+      }),
+    ).toHaveLength(1);
+    expect(
+      within(group).getAllByRole("radio", {
+        name: /invitado/i,
+      }),
+    ).toHaveLength(1);
+  });
+
+  it("marks the selected option as checked and the other as not checked", () => {
+    getPatientsMock.mockResolvedValue([]);
+    render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("radio", { name: /paciente existente/i }),
+    ).toBeChecked();
+    expect(screen.getByRole("radio", { name: /invitado/i })).not.toBeChecked();
+  });
+
+  it("reverses the checked state when the parent flips mode to guest", () => {
+    getPatientsMock.mockResolvedValue([]);
+    render(
+      <WizardStepCustomer
+        mode="guest"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    expect(
+      screen.getByRole("radio", { name: /paciente existente/i }),
+    ).not.toBeChecked();
+    expect(screen.getByRole("radio", { name: /invitado/i })).toBeChecked();
+  });
+
+  it("does NOT render the previous tablist/tab roles on the switch", () => {
+    getPatientsMock.mockResolvedValue([]);
+    render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    expect(screen.queryByRole("tablist")).not.toBeInTheDocument();
+    expect(screen.queryByRole("tab")).not.toBeInTheDocument();
+  });
+
+  it("moves focus and updates selection with ArrowRight (native radio behavior)", async () => {
+    const user = userEvent.setup();
+    const onModeChange = vi.fn();
+    getPatientsMock.mockResolvedValue([]);
+    render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={onModeChange}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    const existing = screen.getByRole("radio", {
+      name: /paciente existente/i,
+    });
+    existing.focus();
+    expect(existing).toHaveFocus();
+    await user.keyboard("{ArrowRight}");
+    // Native radios with the same `name` form an implicit radiogroup:
+    // ArrowRight moves focus to the next radio AND selects it. The
+    // parent is notified via `onChange` on the underlying input.
+    expect(onModeChange).toHaveBeenCalledWith("guest");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Patient-search loading state — bookings + ui-feedback spec
+// (Skeleton rows, not spinners; `role="status"` + Spanish aria-label)
+// ---------------------------------------------------------------------------
+
+describe("WizardStepCustomer — patient-search loading skeleton", () => {
+  it("renders three Skeleton rows while the patient fetch is pending", () => {
+    getPatientsMock.mockReturnValue(new Promise(() => {})); // never resolves
+    const { container } = render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    const status = screen.getByRole("status", { name: /buscando pacientes/i });
+    expect(status).toBeInTheDocument();
+    // The loading region contains exactly 3 Skeleton rows dimension-matched
+    // to the patient-row buttons (`p-3` row, 68px tall, full width, rounded).
+    // Skeleton renders a <div data-slot="skeleton"> — the stable selector
+    // is the `data-slot` attribute (matches the `ui/skeleton.tsx` contract).
+    const skeletons = Array.from(
+      container.querySelectorAll('[data-slot="skeleton"]'),
+    );
+    expect(skeletons).toHaveLength(3);
+    // Class assertion stays implementation-coupled by design — the
+    // 68px dimension is a contract to the patient row height so the
+    // layout does not jump on resolve.
+    expect(skeletons[0]).toHaveClass("h-[68px]");
+    expect(skeletons[0]).toHaveClass("w-full");
+    expect(skeletons[0]).toHaveClass("rounded-lg");
+  });
+
+  it("does NOT render a Loader2 spinner in the loading state", () => {
+    getPatientsMock.mockReturnValue(new Promise(() => {}));
+    const { container } = render(
+      <WizardStepCustomer
+        mode="existing"
+        onModeChange={vi.fn()}
+        selectedPatientId={null}
+        onSelectPatient={vi.fn()}
+        guestName=""
+        guestPhone=""
+        guestEmail=""
+        onGuestChange={vi.fn()}
+      />,
+    );
+    // Loader2 from lucide-react renders an <svg … animate-spin />. The
+    // stable contract is the spinning-class substring; we grep the
+    // container for `animate-spin` and assert zero matches.
+    expect(container.querySelector(".animate-spin")).toBeNull();
   });
 });

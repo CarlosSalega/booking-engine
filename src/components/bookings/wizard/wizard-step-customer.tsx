@@ -12,9 +12,15 @@
  *   The user types directly; the parent page wires the values into
  *   the wizard store.
  *
- * Toggling between modes is a `Tabs`-like radio group. The component
- * owns no state for the mode — the parent passes `mode` in and is
- * notified of changes via `onModeChange`.
+ * Toggling between modes is a native radio group (per the ux-audit-fixes
+ * design decision: native radio inputs give arrow-key navigation +
+ * `aria-checked` + form semantics with zero JS, no ToggleGroup dep).
+ * The component owns no state for the mode — the parent passes `mode`
+ * in and is notified of changes via `onModeChange`.
+ *
+ * The patient search loading state renders `Skeleton` rows (per the
+ * ui-feedback spec: content-area loading is Skeleton, not spinners).
+ * Button-level submit spinners are explicitly permitted and stay.
  *
  * The patient search field is intentionally local to this component
  * (not in the store) because it's a transient UI input — the
@@ -22,12 +28,13 @@
  */
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Loader2, Mail, Phone, Search, User } from "lucide-react";
+import { AlertCircle, Mail, Phone, Search, User } from "lucide-react";
 
 import { getPatientsForWizard } from "@/modules/bookings/actions";
 import type { PatientOption } from "@/modules/bookings/data/booking-data.types";
 
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 export type WizardCustomerMode = "existing" | "guest";
@@ -50,6 +57,22 @@ type FetchState =
   | { kind: "ready"; patients: PatientOption[] };
 
 const DEBOUNCE_MS = 300;
+
+const SKELETON_ROW_CLASS = "h-[68px] w-full rounded-lg";
+
+/**
+ * Visual treatment for each radio option in the customer-mode switch.
+ * Active = filled card (selected), inactive = muted pill (hoverable).
+ * Shared by both options to keep the segmented-control look cohesive.
+ */
+function radioLabelClass(active: boolean): string {
+  return cn(
+    "cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
+    active
+      ? "bg-card text-foreground shadow-sm"
+      : "text-muted-foreground hover:text-foreground",
+  );
+}
 
 export function WizardStepCustomer({
   mode,
@@ -105,40 +128,40 @@ export function WizardStepCustomer({
 
   return (
     <div className="space-y-4" data-wizard-step-customer>
-      {/* Mode toggle — a Tabs-style radio group */}
+      {/* Mode toggle — native radio group (per ux-audit-fixes design:
+          no ToggleGroup dep; arrow-key + aria-checked + form semantics
+          come for free with native radios sharing a single `name`).
+          `role="radiogroup"` + `aria-label` are explicit because
+          <fieldset>'s implicit ARIA role is `group`, not `radiogroup`. */}
       <div
-        role="tablist"
-        aria-label="Tipo de cliente"
-        className="inline-flex rounded-lg border bg-muted/30 p-1"
+        role="radiogroup"
+        aria-label="Modo de paciente"
+        className="space-y-0"
       >
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === "existing"}
-          onClick={() => onModeChange("existing")}
-          className={cn(
-            "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-            mode === "existing"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          Paciente existente
-        </button>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={mode === "guest"}
-          onClick={() => onModeChange("guest")}
-          className={cn(
-            "rounded-md px-3 py-1.5 text-sm font-medium transition-colors",
-            mode === "guest"
-              ? "bg-card text-foreground shadow-sm"
-              : "text-muted-foreground hover:text-foreground",
-          )}
-        >
-          Invitado
-        </button>
+        <div className="inline-flex rounded-lg border bg-muted/30 p-1">
+          <label className={radioLabelClass(mode === "existing")}>
+            <input
+              type="radio"
+              name="wizard-customer-mode"
+              value="existing"
+              checked={mode === "existing"}
+              onChange={() => onModeChange("existing")}
+              className="sr-only peer"
+            />
+            Paciente existente
+          </label>
+          <label className={radioLabelClass(mode === "guest")}>
+            <input
+              type="radio"
+              name="wizard-customer-mode"
+              value="guest"
+              checked={mode === "guest"}
+              onChange={() => onModeChange("guest")}
+              className="sr-only peer"
+            />
+            Invitado
+          </label>
+        </div>
       </div>
 
       {mode === "existing" ? (
@@ -162,9 +185,19 @@ export function WizardStepCustomer({
           </div>
 
           {state.kind === "loading" ? (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              Buscando pacientes…
+            // Per ui-feedback spec: content loading = Skeleton, not
+            // spinners. Three rows dimension-matched to the patient-row
+            // buttons (`p-3` row, 68px tall, full width, rounded).
+            // `role="status"` + `aria-label` provides the non-color
+            // channel so screen-reader users know the section is loading.
+            <div
+              role="status"
+              aria-label="Buscando pacientes…"
+              className="space-y-2"
+            >
+              {Array.from({ length: 3 }).map((_, i) => (
+                <Skeleton key={i} className={SKELETON_ROW_CLASS} />
+              ))}
             </div>
           ) : state.kind === "error" ? (
             <div

@@ -90,13 +90,37 @@ Route `/dashboard/payments/[id]` SHALL be a Server Component.
 | Component | Type | Description |
 |-----------|------|-------------|
 | `PaymentTable` | Client | Paginated table with 7 columns, "Acciones" column links to detail |
-| `PaymentStatusBadge` | Client | Color-coded badge: PENDING=yellow, APPROVED=green, REJECTED=red, CANCELLED=gray, IN_PROCESS=blue |
+| `PaymentStatusBadge` | Client | Color-coded badge consuming semantic design tokens: PENDING=`--status-pending`, APPROVED=`--success`, REJECTED=`--destructive`, CANCELLED=`--status-cancelled` (neutral gray), IN_PROCESS=`--info` |
 | `PaymentStatusFilter` | Client | Status `<Select>` dropdown, all ProviderPaymentStatus values + "Todos" default |
 | `PaymentSearchBar` | Client | Debounced text input (300ms), placeholder "Buscar por paciente..." |
 | `PaymentDetailCard` | Server | Card layout with all EnrichedPayment fields, booking link, retry button |
 | `PaymentEmptyState` | Server | Centered illustration, "No hay pagos" message |
 | `PaymentTableSkeleton` | Server | Shimmer table rows matching 7-column layout |
 
+`PaymentStatusBadge` MUST consume semantic design tokens (`--status-*`, `--success`, `--destructive`, `--info`) rather than raw Tailwind palette classes. No raw palette classes (e.g. `bg-yellow-500`, `bg-green-500`, `bg-red-500`) SHALL be used for status coloring in the badge.
+
+(Previously: `PaymentStatusBadge` used a hardcoded `STATUS_TONE_CLASS` map with raw Tailwind palette values — PENDING=yellow, APPROVED=green, REJECTED=red, CANCELLED=gray, IN_PROCESS=blue. Now uses semantic tokens while preserving the documented status→color intent.)
+
+#### Scenario: PaymentStatusBadge uses semantic tokens
+- GIVEN a payment with status=PENDING
+- WHEN PaymentStatusBadge renders
+- THEN the badge's color classes reference `--status-pending` (not a raw palette class like `bg-yellow-500`)
+
+#### Scenario: Approved payment uses success token
+- GIVEN a payment with status=APPROVED
+- WHEN PaymentStatusBadge renders
+- THEN the badge references `--success` token (not `bg-green-500`)
+
+#### Scenario: Rejected payment uses destructive token
+- GIVEN a payment with status=REJECTED
+- WHEN PaymentStatusBadge renders
+- THEN the badge references `--destructive` token (not `bg-red-500`)
+
+#### Scenario: No raw palette classes in badge
+- GIVEN the `payment-status-badge.tsx` source
+- WHEN inspected for color class assignments
+- THEN no raw Tailwind palette classes are used for status coloring
+- AND all status colors reference semantic tokens
 ### Requirement: Formatters
 
 | Formatter | Signature | Behavior |

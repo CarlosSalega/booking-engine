@@ -1,8 +1,10 @@
 /**
  * Dashboard site header — breadcrumb + sidebar trigger.
  *
- * Server Component: no client state needed. Receives the current page
- * title as a prop from the layout/page.
+ * Server Component: no client state needed. When no `crumbs` prop is
+ * passed the header mounts the route-derived `<DashboardBreadcrumbs />`
+ * client leaf (slice 3a); explicit `crumbs` arrays still render as
+ * before for callers that want a static trail.
  */
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -15,6 +17,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+
+import { DashboardBreadcrumbs } from "./dashboard-breadcrumbs";
 
 interface Crumb {
   label: string;
@@ -34,14 +38,12 @@ export function SiteHeader({ crumbs = [] }: SiteHeaderProps) {
           orientation="vertical"
           className="mx-2 data-[orientation=vertical]:h-4"
         />
-        <Breadcrumb>
-          <BreadcrumbList>
-            {crumbs.length === 0 ? (
-              <BreadcrumbItem>
-                <BreadcrumbPage>Dashboard</BreadcrumbPage>
-              </BreadcrumbItem>
-            ) : (
-              crumbs.map((crumb, index) => {
+        {crumbs.length === 0 ? (
+          <DashboardBreadcrumbs />
+        ) : (
+          <Breadcrumb>
+            <BreadcrumbList>
+              {crumbs.map((crumb, index) => {
                 const isLast = index === crumbs.length - 1;
                 return (
                   <span key={`${crumb.label}-${index}`} className="contents">
@@ -57,10 +59,10 @@ export function SiteHeader({ crumbs = [] }: SiteHeaderProps) {
                     {!isLast ? <BreadcrumbSeparator /> : null}
                   </span>
                 );
-              })
-            )}
-          </BreadcrumbList>
-        </Breadcrumb>
+              })}
+            </BreadcrumbList>
+          </Breadcrumb>
+        )}
       </div>
     </header>
   );

@@ -29,6 +29,7 @@ import {
 
 import {
   PAYMENT_STATUS_BADGE_VARIANT,
+  STATUS_TONE_CLASS,
   PaymentStatusBadge,
 } from "@/components/payments/payment-status-badge";
 
@@ -121,5 +122,67 @@ describe("PaymentStatusBadge", () => {
     render(<PaymentStatusBadge status={ProviderPaymentStatus.CANCELLED} />);
     const badge = screen.getByText("Cancelado");
     expect(badge).toHaveAttribute("data-variant", "secondary");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// STATUS_TONE_CLASS — tinted entries use color-mix ink, never solid
+// text-*-foreground fill inks (white-on-tint regression, PR #19 fixup
+// part 2 — same root cause as the shared bookings status-tones map).
+// ---------------------------------------------------------------------------
+
+describe("STATUS_TONE_CLASS", () => {
+  it("PENDING uses --status-pending tint with color-mix ink", () => {
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.PENDING]).toContain(
+      "bg-status-pending/15",
+    );
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.PENDING]).toContain(
+      "text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))]",
+    );
+  });
+
+  it("APPROVED uses --success tint with color-mix ink", () => {
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.APPROVED]).toContain(
+      "bg-success/15",
+    );
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.APPROVED]).toContain(
+      "text-[color-mix(in_oklch,var(--success)_70%,var(--foreground))]",
+    );
+  });
+
+  it("CANCELLED uses --status-cancelled tint with color-mix ink", () => {
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.CANCELLED]).toContain(
+      "bg-status-cancelled/15",
+    );
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.CANCELLED]).toContain(
+      "text-[color-mix(in_oklch,var(--status-cancelled)_70%,var(--foreground))]",
+    );
+  });
+
+  it("IN_PROCESS uses --info tint with color-mix ink", () => {
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.IN_PROCESS]).toContain(
+      "bg-info/15",
+    );
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.IN_PROCESS]).toContain(
+      "text-[color-mix(in_oklch,var(--info)_70%,var(--foreground))]",
+    );
+  });
+
+  it("REJECTED stays empty (destructive variant carries the color)", () => {
+    expect(STATUS_TONE_CLASS[ProviderPaymentStatus.REJECTED]).toBe("");
+  });
+
+  it("tinted entries never use solid text-*-foreground fill inks (white-on-tint regression)", () => {
+    const TINTED: ProviderPaymentStatusType[] = [
+      ProviderPaymentStatus.PENDING,
+      ProviderPaymentStatus.APPROVED,
+      ProviderPaymentStatus.CANCELLED,
+      ProviderPaymentStatus.IN_PROCESS,
+    ];
+    for (const status of TINTED) {
+      expect(STATUS_TONE_CLASS[status]).not.toContain("text-status-");
+      expect(STATUS_TONE_CLASS[status]).not.toContain("text-success-");
+      expect(STATUS_TONE_CLASS[status]).not.toContain("text-info-");
+    }
   });
 });

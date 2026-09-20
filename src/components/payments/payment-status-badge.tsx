@@ -7,12 +7,12 @@
  * (and any other consumer that needs to style the badge by status)
  * can import the same source of truth.
  *
- * Color tones (per design AD6):
- * - PENDING    → yellow/amber  (default variant + amber tone)
- * - APPROVED   → green/emerald (default variant + emerald tone)
- * - REJECTED   → red           (destructive variant)
- * - CANCELLED  → gray          (secondary variant)
- * - IN_PROCESS → blue          (default variant + blue tone)
+ * Color tones (slice 2 / payments-presentation spec):
+ * - PENDING    → `--status-pending`        (default variant)
+ * - APPROVED   → `--success`               (default variant)
+ * - REJECTED   → `--destructive` variant   (no tone — variant paints it)
+ * - CANCELLED  → `--status-cancelled`      (secondary variant)
+ * - IN_PROCESS → `--info`                 (default variant)
  *
  * The component is marked `"use client"` because the surrounding
  * `PaymentTable` is a Client Component (it owns row click handlers),
@@ -34,10 +34,9 @@ import { cn } from "@/lib/utils";
 /**
  * Status → shadcn/ui Badge variant. The variant controls the
  * general shape (default = primary tone, secondary = neutral,
- * destructive = red). The color tones (amber, emerald, blue) are
- * layered on top via `STATUS_TONE_CLASS` so the Argentinian UI
- * uses the same color vocabulary as the patients/professionals
- * modules.
+ * destructive = red). The color tones are layered on top via
+ * `STATUS_TONE_CLASS` so the Argentinian UI uses the same token
+ * vocabulary as the rest of the dashboard.
  */
 export const PAYMENT_STATUS_BADGE_VARIANT: Record<
   ProviderPaymentStatusType,
@@ -52,20 +51,23 @@ export const PAYMENT_STATUS_BADGE_VARIANT: Record<
 
 /**
  * Status → Tailwind class for the per-status color tone. Layered on
- * top of the variant. Mirrors the patient / professional badge
- * palette (emerald for "good") and adds amber for "pending" and
- * blue for "in process" so the visual vocabulary matches the
- * payment lifecycle.
+ * top of the variant. Every value references a semantic token class
+ * defined in `globals.css` (`@theme inline` `--color-*` mapping); no
+ * raw palette substrings remain in this file (ui-feedback spec).
+ * Tinted entries use color-mix ink (token 70% + `--foreground`) —
+ * the solid `-foreground` fill inks are white in light theme and
+ * unreadable on the pale `/15` tints.
  */
-const STATUS_TONE_CLASS: Record<ProviderPaymentStatusType, string> = {
+export const STATUS_TONE_CLASS: Record<ProviderPaymentStatusType, string> = {
   [ProviderPaymentStatus.PENDING]:
-    "bg-amber-500/15 text-amber-700 dark:text-amber-300 border-amber-500/30",
+    "bg-status-pending/15 text-[color-mix(in_oklch,var(--status-pending)_70%,var(--foreground))] border-status-pending/30",
   [ProviderPaymentStatus.APPROVED]:
-    "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border-emerald-500/30",
+    "bg-success/15 text-[color-mix(in_oklch,var(--success)_70%,var(--foreground))] border-success/30",
   [ProviderPaymentStatus.REJECTED]: "",
-  [ProviderPaymentStatus.CANCELLED]: "",
+  [ProviderPaymentStatus.CANCELLED]:
+    "bg-status-cancelled/15 text-[color-mix(in_oklch,var(--status-cancelled)_70%,var(--foreground))] border-status-cancelled/30",
   [ProviderPaymentStatus.IN_PROCESS]:
-    "bg-blue-500/15 text-blue-700 dark:text-blue-300 border-blue-500/30",
+    "bg-info/15 text-[color-mix(in_oklch,var(--info)_70%,var(--foreground))] border-info/30",
 };
 
 interface PaymentStatusBadgeProps {

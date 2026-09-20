@@ -10,9 +10,15 @@
  *   - Renders lucide-react `ChevronLeft` / `ChevronRight` icons in nav.
  *
  * Spec scenarios covered (from
- * `openspec/changes/calendar-post-archive-docs/specs/calendar-ui/spec.md`):
+ * `openspec/changes/calendar-post-archive-docs/specs/calendar-ui/spec.md`
+ * + `openspec/changes/ux-audit-fixes/specs/calendar-ui/spec.md`):
  * - RDP v10 DayPicker Integration: className merge, props spread.
  * - CSS Variable Theming: --rdp-* variables via inline style.
+ *   **Slice 2 fix**: the color tokens now use bare `var(--primary)` /
+ *   `var(--primary-foreground)` and `color-mix(in oklch, …)` for the
+ *   translucent range middle. The previous `hsl(var(--primary))` form
+ *   was invalid CSS because `--primary` is defined as an `oklch()`
+ *   value in `globals.css`.
  * - navLayout and Chevron Navigation: arrows + lucide icons.
  * - DayFlag Styling: outside (opacity), today (font-semibold), disabled.
  */
@@ -73,12 +79,33 @@ describe("Calendar — CSS variable theming via style prop", () => {
     const { container } = render(<Calendar />);
     const root = getCalendarRoot(container);
     const style = root.getAttribute("style") ?? "";
-    expect(style).toContain("--rdp-accent-color: hsl(var(--primary))");
+    // Slice 2: --primary is an oklch() value in globals.css, so it MUST
+    // be referenced via bare `var(--*)` — wrapping in `hsl()` would
+    // produce invalid CSS (hsl(oklch(...))).
+    expect(style).toContain("--rdp-accent-color: var(--primary)");
     expect(style).toContain("--rdp-months-gap: 3rem");
     expect(style).toContain("--rdp-day-width: 2rem");
     expect(style).toContain(
-      "--rdp-range_start-color: hsl(var(--primary-foreground))",
+      "--rdp-range_start-color: var(--primary-foreground)",
     );
+  });
+
+  it("uses color-mix() for the translucent range middle background", () => {
+    const { container } = render(<Calendar />);
+    const root = getCalendarRoot(container);
+    const style = root.getAttribute("style") ?? "";
+    // The range middle must use color-mix() against --primary (oklch
+    // is the only color space in the project's tokens).
+    expect(style).toContain(
+      '--rdp-accent-background-color: color-mix(in oklch, var(--primary) 15%, transparent)',
+    );
+  });
+
+  it("never references color tokens through hsl(var(--...))", () => {
+    const { container } = render(<Calendar />);
+    const root = getCalendarRoot(container);
+    const style = root.getAttribute("style") ?? "";
+    expect(style).not.toMatch(/hsl\(\s*var\(--/);
   });
 });
 
