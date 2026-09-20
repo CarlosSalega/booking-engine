@@ -69,12 +69,53 @@ Click booking MUST open shadcn Popover: patient, service, time, status badge, ac
 
 ### Requirement: Status Colors and Locale
 
-Booking colors MUST match `STATUS_TONE_CLASS`: PENDING→amber, CONFIRMED→emerald, CANCELLED→red, RESCHEDULED→violet, COMPLETED→emerald, NO_SHOW→red, AWAITING_PAYMENT→orange. es-AR locale SHALL apply: Monday-first week, day names Lun/Mar/Mié/Jue/Vie/Sáb/Dom, 24h time. All UI labels in Argentinian Spanish; "Hoy" present.
+Booking colors MUST be derived from semantic `--status-*` design tokens (defined in `globals.css`) rather than a raw-palette `STATUS_TONE_CLASS` map. The mapping is:
+
+| Status | Semantic Token | Rendered Color |
+|--------|---------------|----------------|
+| PENDING | `--status-pending` | amber-family (unchanged) |
+| CONFIRMED | `--status-confirmed` | emerald-family (unchanged) |
+| AWAITING_PAYMENT | `--status-awaiting-payment` | orange-family (unchanged) |
+| IN_PROCESS | `--status-in-process` | blue-family (unchanged) |
+| NO_SHOW | `--status-no-show` | red-family (unchanged) |
+| REJECTED | `--status-rejected` | red-family (unchanged) |
+| CANCELLED | `--status-cancelled` | neutral gray (per product decision D1) |
+| COMPLETED | `--status-completed` | dark neutral (per product decision D1) |
+
+**Product decision D1 (resolved)**: CANCELLED and COMPLETED adopt the semantic token semantics. `--status-cancelled` is neutral gray (cancellations should not read as emergencies); `--status-completed` is dark neutral. The previous red rendering for CANCELLED and sky-blue rendering for COMPLETED are superseded.
+
+All status color references in `calendar-view` (event blocks, popover badges, and any inline status indicators) MUST consume these semantic tokens. No raw Tailwind palette classes (e.g. `bg-red-500`, `bg-sky-500`) SHALL be used for status coloring.
+
+es-AR locale SHALL apply: Monday-first week, day names Lun/Mar/Mié/Jue/Vie/Sáb/Dom, 24h time. All UI labels in Argentinian Spanish; "Hoy" present.
+
+(Previously: Booking colors matched a hardcoded `STATUS_TONE_CLASS` map with raw Tailwind palette values — PENDING→amber, CONFIRMED→emerald, CANCELLED→red, RESCHEDULED→violet, COMPLETED→emerald, NO_SHOW→red, AWAITING_PAYMENT→orange. CANCELLED now renders as neutral gray; COMPLETED now renders as dark neutral per D1.)
 
 #### Scenario: Colors and locale consistent
 - GIVEN calendar rendered in any view
-- THEN event colors match `BookingStatusBadge`; headers Lun–Dom 24h; "Hoy" in Spanish
+- THEN event colors use semantic `--status-*` tokens; headers Lun–Dom 24h; "Hoy" in Spanish
 
+#### Scenario: Parity-safe statuses render identically
+- GIVEN a PENDING booking on the calendar
+- WHEN the event block renders
+- THEN the color matches the `--status-pending` token (amber-family, visually consistent with prior rendering)
+
+#### Scenario: CANCELLED uses neutral gray per D1
+- GIVEN a CANCELLED booking on the calendar
+- WHEN the event block renders
+- THEN the color is derived from `--status-cancelled` (neutral gray)
+- AND the rendering is NOT red (previous behavior superseded)
+
+#### Scenario: COMPLETED uses dark neutral per D1
+- GIVEN a COMPLETED booking on the calendar
+- WHEN the event block renders
+- THEN the color is derived from `--status-completed` (dark neutral)
+- AND the rendering is NOT sky-blue (previous behavior superseded)
+
+#### Scenario: No raw palette classes in status rendering
+- GIVEN the calendar-view source files
+- WHEN inspected for status color assignments
+- THEN no raw Tailwind palette classes (e.g. `bg-red-500`, `bg-sky-500`, `bg-emerald-500`) are used for status coloring
+- AND all status colors reference semantic tokens
 ### Requirement: Navigation and Data Refetching
 
 Previous/Next and "Hoy" buttons. URL `?date=YYYY-MM-DD&view=week|day|month` SHALL reflect current state. Range change MUST refetch bookings via server action or `router.refresh`. Rapid navigation MAY debounce refetches.
