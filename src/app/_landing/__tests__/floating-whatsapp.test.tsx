@@ -53,7 +53,7 @@ describe("FloatingWhatsApp — link + a11y wiring", () => {
   });
 
   it("renders the lucide MessageCircle icon", () => {
-    const { container } = render(<FloatingWhatsApp {...DEFAULT_PROPS} />);
+    render(<FloatingWhatsApp {...DEFAULT_PROPS} />);
     const link = screen.getByRole("link", { name: /contactar por whatsapp/i });
     const svg = link.querySelector("svg");
     expect(svg).not.toBeNull();
